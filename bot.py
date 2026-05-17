@@ -52,7 +52,7 @@ def get_next_lesson(current_module_id, current_lesson_id):
             for j, lesson in enumerate(module["lessons"]):
                 if lesson["lesson_id"] == current_lesson_id:
                     current_lesson_index = j
-            break
+                    break
 
     if current_module_index == -1 or current_lesson_index == -1:
         return None, None
@@ -61,11 +61,13 @@ def get_next_lesson(current_module_id, current_lesson_id):
     if current_lesson_index + 1 < len(MODULES[current_module_index]["lessons"]):
         next_lesson = MODULES[current_module_index]["lessons"][current_lesson_index + 1]
         return current_module_id, next_lesson["lesson_id"]
+
     # Try to get the first lesson in the next module
     elif current_module_index + 1 < len(MODULES):
         next_module = MODULES[current_module_index + 1]
         if next_module["lessons"]:
             return next_module["module_id"], next_module["lessons"][0]["lesson_id"]
+
     return None, None
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -89,6 +91,7 @@ async def progress(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
     current_module_id, current_lesson_id, quiz_completed = result
     module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+
     if module and lesson:
         # Count completed modules
         module_index = 0
@@ -96,8 +99,8 @@ async def progress(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             if m["module_id"] == current_module_id:
                 module_index = i
                 break
-        total_modules = len(MODULES)
 
+        total_modules = len(MODULES)
         await update.message.reply_text(
             f"📊 Your Progress:\n\n"
             f"📖 Module {module_index + 1}/{total_modules}: {module['title']}\n"
@@ -133,6 +136,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     # Check if we're moving to the next module and quiz hasn't been done
     if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
         module = get_module_by_id(current_module_id)
+
         # Show the current lesson first if not seen yet
         seen_key = f"seen_{current_module_id}_{current_lesson_id}"
         if not context.user_data.get(seen_key):
@@ -145,11 +149,12 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     f"{lesson['content']}",
                     parse_mode="Markdown"
                 )
-                await update.message.reply_text(
-                    f"✅ You've completed all lessons in \"{module['title']}\"!\n\n"
-                    f"Time for a quick quiz to test your knowledge. Type /quiz to begin."
-                )
-                return
+
+            await update.message.reply_text(
+                f"✅ You've completed all lessons in \"{module['title']}\"!\n\n"
+                f"Time for a quick quiz to test your knowledge. Type /quiz to begin."
+            )
+            return
         else:
             await update.message.reply_text(
                 f"You need to complete the quiz for \"{module['title']}\" before moving on.\n\n"
@@ -175,6 +180,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 f"{lesson['content']}",
                 parse_mode="Markdown"
             )
+
             # If this is the last lesson of the module, prompt for quiz
             if is_last_lesson_of_module(next_module_id, next_lesson_id):
                 context.user_data[f"seen_{next_module_id}_{next_lesson_id}"] = True
@@ -188,6 +194,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         # Check if current lesson has been shown
         module, lesson = get_module_lesson(current_module_id, current_lesson_id)
         seen_key = f"seen_{current_module_id}_{current_lesson_id}"
+
         if not context.user_data.get(seen_key):
             context.user_data[seen_key] = True
             if module and lesson:
@@ -219,11 +226,15 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         return
 
     module = get_module_by_id(current_module_id)
+
     if module and "quiz" in module:
         quiz_data = module["quiz"]
         options = quiz_data["options"]
-        keyboard = [[InlineKeyboardButton(option, callback_data=f"quiz_{current_module_id}_{option[0]}")] for option in options]
+        
+        # FIXED: Use pipe (|) separator instead of underscore to avoid conflict with module_id
+        keyboard = [[InlineKeyboardButton(option, callback_data=f"quiz|{current_module_id}|{option[0]}")] for option in options]
         reply_markup = InlineKeyboardMarkup(keyboard)
+
         await update.message.reply_text(
             f"📝 *Quiz for: {module['title']}*\n\n{quiz_data['question']}",
             reply_markup=reply_markup,
@@ -235,14 +246,23 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
     await query.answer()
+
     user_id = query.from_user.id
-    data = query.data.split("_")
+    
+    # FIXED: Use pipe separator instead of underscore
+    data = query.data.split("|")
+    
+    if len(data) < 3:
+        await query.edit_message_text("Error processing quiz. Please try again.")
+        return
+    
     action = data[0]
 
     if action == "quiz":
         module_id = data[1]
         selected_answer = data[2]
         module = get_module_by_id(module_id)
+
         if module and "quiz" in module:
             correct_answer = module["quiz"]["answer"]
             if selected_answer == correct_answer:
@@ -258,6 +278,8 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 )
         else:
             await query.edit_message_text("Error processing quiz. Please try again.")
+    else:
+        await query.edit_message_text("Error processing quiz. Please try again.")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
@@ -272,11 +294,13 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     menu_text = "📚 *Course Outline*\n\n"
+
     for i, module in enumerate(MODULES):
         menu_text += f"*Module {i+1}: {module['title']}*\n"
         for lesson in module["lessons"]:
-            menu_text += f"  • {lesson['title']}\n"
+            menu_text += f" • {lesson['title']}\n"
         menu_text += "\n"
+
     menu_text += "Type /next to continue from where you left off."
     await update.message.reply_text(menu_text, parse_mode="Markdown")
 
@@ -310,6 +334,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
 def main() -> None:
     init_db()
+
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
         logger.error("TELEGRAM_BOT_TOKEN environment variable not set.")
