@@ -3,7 +3,7 @@ import json
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from db_manager_updated import (
+from db_manager import (
     init_db, enroll_learner, get_learner_progress, update_learner_progress, 
     update_quiz_status, update_language_preference, get_language_preference
 )
