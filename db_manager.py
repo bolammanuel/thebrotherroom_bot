@@ -1,5 +1,3 @@
-DB Manager
-
 import sqlite3
 import os
 
