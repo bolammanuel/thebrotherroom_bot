@@ -1,0 +1,115 @@
+{
+    "course_title": "Young Men Against Gender Based Violence",
+    "course_description": "This course is designed for young Nigerian men to explore positive masculinity and prevent gender-based violence.",
+    "modules": [
+        {
+            "module_id": "module_1",
+            "title": "Understanding Gender-Based Violence",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_1_1",
+                    "title": "What is GBV?",
+                    "content": "Gender-based violence (GBV) refers to harmful acts directed at an individual based on their gender. It is rooted in gender inequality, the abuse of power, and harmful norms. GBV can be physical, sexual, emotional, or economic."
+                },
+                {
+                    "lesson_id": "lesson_1_2",
+                    "title": "Types and Forms of GBV",
+                    "content": "GBV manifests in various forms, including domestic violence, sexual harassment, rape, child marriage, female genital mutilation, and emotional abuse. It affects individuals across all social strata."
+                }
+            ],
+            "quiz": {
+                "question": "Which of the following is NOT a form of Gender-Based Violence?",
+                "options": [
+                    "A) Domestic Violence",
+                    "B) Sexual Harassment",
+                    "C) Child Marriage",
+                    "D) Financial Literacy"
+                ],
+                "answer": "D"
+            }
+        },
+        {
+            "module_id": "module_2",
+            "title": "Exploring Positive Masculinity",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_2_1",
+                    "title": "Defining Masculinity",
+                    "content": "Masculinity is a set of attributes, behaviors, and roles associated with boys and men. Positive masculinity encourages healthy expressions of manhood that reject dominance, aggression, and violence."
+                },
+                {
+                    "lesson_id": "lesson_2_2",
+                    "title": "Traits of Positive Masculinity",
+                    "content": "Positive masculinity includes traits like empathy, respect, responsibility, emotional intelligence, and non-violence. It promotes equality and partnership in relationships."
+                },
+                {
+                    "lesson_id": "lesson_2_3",
+                    "title": "Challenging Harmful Stereotypes",
+                    "content": "Harmful stereotypes often pressure men to be tough, suppress emotions, and exert control. Positive masculinity challenges these norms, advocating for authenticity and respect for all genders."
+                }
+            ],
+            "quiz": {
+                "question": "What is a key characteristic of positive masculinity?",
+                "options": [
+                    "A) Dominance over women",
+                    "B) Suppression of emotions",
+                    "C) Empathy and respect",
+                    "D) Aggression and control"
+                ],
+                "answer": "C"
+            }
+        },
+        {
+            "module_id": "module_3",
+            "title": "The Role of Young Men in Prevention",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_3_1",
+                    "title": "Being an Ally",
+                    "content": "Young men can be powerful allies in preventing GBV by speaking out against violence, supporting survivors, and promoting respectful relationships among their peers."
+                },
+                {
+                    "lesson_id": "lesson_3_2",
+                    "title": "Promoting Equality",
+                    "content": "Promoting gender equality means advocating for equal rights, opportunities, and treatment for all genders. This is fundamental to preventing GBV."
+                }
+            ],
+            "quiz": {
+                "question": "How can young men be allies in GBV prevention?",
+                "options": [
+                    "A) By ignoring harmful jokes",
+                    "B) By speaking out against violence",
+                    "C) By maintaining traditional gender roles",
+                    "D) By avoiding discussions about gender"
+                ],
+                "answer": "B"
+            }
+        },
+        {
+            "module_id": "module_4",
+            "title": "Building Healthy Relationships",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_4_1",
+                    "title": "Communication and Consent",
+                    "content": "Healthy relationships are built on open communication, mutual respect, and enthusiastic consent. Understanding and practicing consent is crucial in all interactions."
+                },
+                {
+                "lesson_id": "lesson_4_2",
+                    "title": "Conflict Resolution without Violence",
+                    "content": "Disagreements are normal, but resolving conflicts without resorting to violence or aggression is a hallmark of healthy relationships. This involves active listening and compromise."
+                }
+            ],
+            "quiz": {
+                "question": "What is essential for building healthy relationships?",
+                "options": [
+                    "A) Dominance and control",
+                    "B) Lack of communication",
+                    "C) Mutual respect and consent",
+                    "D) Suppressing disagreements"
+                ],
+                "answer": "C"
+            }
+        }
+    ]
+}
