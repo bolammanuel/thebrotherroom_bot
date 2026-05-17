@@ -2,7 +2,7 @@ import os
 import json
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
-from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes
+from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from db_manager import init_db, enroll_learner, get_learner_progress, update_learner_progress, update_quiz_status
 from openai_utils import get_openai_response
 
