@@ -22,6 +22,12 @@ COURSE_DESCRIPTION = COURSE_CONTENT["course_description"]
 MODULES = COURSE_CONTENT["modules"]
 
 # Helper function to get module and lesson by ID
+def get_module_by_id(module_id):
+    for module in MODULES:
+        if module["module_id"] == module_id:
+            return module
+    return None
+
 def get_module_lesson(module_id, lesson_id):
     for module in MODULES:
         if module["module_id"] == module_id:
@@ -29,6 +35,12 @@ def get_module_lesson(module_id, lesson_id):
                 if lesson["lesson_id"] == lesson_id:
                     return module, lesson
     return None, None
+
+def is_last_lesson_of_module(module_id, lesson_id):
+    module = get_module_by_id(module_id)
+    if module and module["lessons"]:
+        return lesson_id == module["lessons"][-1]["lesson_id"]
+    return False
 
 def get_next_lesson(current_module_id, current_lesson_id):
     current_module_index = -1
@@ -59,86 +71,166 @@ def get_next_lesson(current_module_id, current_lesson_id):
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
     enroll_learner(user_id)
+
+    # Show welcome message
     await update.message.reply_text(
-        f"\"Ekaabo!\" (Welcome!) to the \"{COURSE_TITLE}\" course, designed just for young Nigerian men like you.\n\n{COURSE_DESCRIPTION}\n\nType /next to begin your journey or /help for a list of commands."
+        f"\"Ekaabo!\" (Welcome!) to the \"{COURSE_TITLE}\" course, designed just for young Nigerian men like you.\n\n"
+        f"{COURSE_DESCRIPTION}\n\n"
+        f"Type /next to begin your first lesson or /help for a list of commands."
     )
 
 async def progress(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
-    current_module_id, current_lesson_id, quiz_completed = get_learner_progress(user_id)
+    result = get_learner_progress(user_id)
 
-    if not current_module_id:
+    if not result or not result[0]:
         await update.message.reply_text("It seems you haven't started the course yet. Type /start to begin!")
         return
 
+    current_module_id, current_lesson_id, quiz_completed = result
     module, lesson = get_module_lesson(current_module_id, current_lesson_id)
     if module and lesson:
-        status = "Completed" if quiz_completed else "Pending"
+        # Count completed modules
+        module_index = 0
+        for i, m in enumerate(MODULES):
+            if m["module_id"] == current_module_id:
+                module_index = i
+                break
+        total_modules = len(MODULES)
+
         await update.message.reply_text(
-            f"You are currently on Module: {module["title"]}, Lesson: {lesson["title"]}.\nQuiz for this module: {status}"
+            f"📊 Your Progress:\n\n"
+            f"📖 Module {module_index + 1}/{total_modules}: {module['title']}\n"
+            f"📝 Current Lesson: {lesson['title']}\n\n"
+            f"Type /next to continue learning."
         )
     else:
         await update.message.reply_text("Could not retrieve your progress. Please try /start again.")
 
 async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
-    current_module_id, current_lesson_id, quiz_completed = get_learner_progress(user_id)
+    result = get_learner_progress(user_id)
 
-    if not current_module_id:
+    if not result or not result[0]:
         await update.message.reply_text("It seems you haven't started the course yet. Type /start to begin!")
         return
 
-    # If quiz is pending, prompt user to take quiz first
-    if not quiz_completed:
-        module, _ = get_module_lesson(current_module_id, current_lesson_id)
+    current_module_id, current_lesson_id, quiz_completed = result
+
+    # Check if we're at the last lesson of a module and quiz is not completed
+    if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
+        module = get_module_by_id(current_module_id)
         if module and "quiz" in module:
+            # Check if user has already seen this lesson (not first time)
+            seen_key = f"seen_{current_module_id}_{current_lesson_id}"
+            if context.user_data.get(seen_key):
+                await update.message.reply_text(
+                    f"You need to complete the quiz for \"{module['title']}\" before moving on.\n\n"
+                    f"Type /quiz to take the quiz."
+                )
+                return
+
+    # Check if we're moving to the next module and quiz hasn't been done
+    if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
+        module = get_module_by_id(current_module_id)
+        # Show the current lesson first if not seen yet
+        seen_key = f"seen_{current_module_id}_{current_lesson_id}"
+        if not context.user_data.get(seen_key):
+            module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+            if module and lesson:
+                context.user_data[seen_key] = True
+                await update.message.reply_text(
+                    f"📖 *Module: {module['title']}*\n"
+                    f"📝 *Lesson: {lesson['title']}*\n\n"
+                    f"{lesson['content']}",
+                    parse_mode="Markdown"
+                )
+                await update.message.reply_text(
+                    f"✅ You've completed all lessons in \"{module['title']}\"!\n\n"
+                    f"Time for a quick quiz to test your knowledge. Type /quiz to begin."
+                )
+                return
+        else:
             await update.message.reply_text(
-                f"You need to complete the quiz for Module: {module["title"]} before moving to the next lesson. Type /quiz to start the quiz."
+                f"You need to complete the quiz for \"{module['title']}\" before moving on.\n\n"
+                f"Type /quiz to take the quiz."
             )
             return
 
+    # If quiz is completed for current module's last lesson, or we're mid-module, advance
     next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
 
     if next_module_id and next_lesson_id:
-        update_learner_progress(user_id, next_module_id, next_lesson_id)
+        # If moving to a new module, reset quiz status
+        if next_module_id != current_module_id:
+            update_learner_progress(user_id, next_module_id, next_lesson_id, quiz_completed=0)
+        else:
+            update_learner_progress(user_id, next_module_id, next_lesson_id)
+
         module, lesson = get_module_lesson(next_module_id, next_lesson_id)
         if module and lesson:
             await update.message.reply_text(
-                f"*Module: {module["title"]}*\n*Lesson: {lesson["title"]}*\n\n{lesson["content"]}",
+                f"📖 *Module: {module['title']}*\n"
+                f"📝 *Lesson: {lesson['title']}*\n\n"
+                f"{lesson['content']}",
                 parse_mode="Markdown"
             )
-            # If it's the last lesson of a module, prompt for quiz
-            if lesson["lesson_id"] == module["lessons"][-1]["lesson_id"]:
+            # If this is the last lesson of the module, prompt for quiz
+            if is_last_lesson_of_module(next_module_id, next_lesson_id):
+                context.user_data[f"seen_{next_module_id}_{next_lesson_id}"] = True
                 await update.message.reply_text(
-                    f"You've completed all lessons in Module: {module["title"]}. Time for a quick check! Type /quiz to test your knowledge."
+                    f"✅ You've completed all lessons in \"{module['title']}\"!\n\n"
+                    f"Time for a quick quiz to test your knowledge. Type /quiz to begin."
                 )
-                update_quiz_status(user_id, 0) # Reset quiz status for new module
         else:
             await update.message.reply_text("Error retrieving next lesson. Please contact support.")
     else:
-        await update.message.reply_text("You have completed all available lessons! Congratulations!\n\nType /progress to see your achievement.")
+        # Check if current lesson has been shown
+        module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+        seen_key = f"seen_{current_module_id}_{current_lesson_id}"
+        if not context.user_data.get(seen_key):
+            context.user_data[seen_key] = True
+            if module and lesson:
+                await update.message.reply_text(
+                    f"📖 *Module: {module['title']}*\n"
+                    f"📝 *Lesson: {lesson['title']}*\n\n"
+                    f"{lesson['content']}",
+                    parse_mode="Markdown"
+                )
+        else:
+            await update.message.reply_text(
+                "🎉 Congratulations! You have completed all available lessons and quizzes!\n\n"
+                "You are now a champion for positive masculinity and GBV prevention.\n\n"
+                "Type /progress to review your achievement or /start to retake the course."
+            )
 
 async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
-    current_module_id, _, quiz_completed = get_learner_progress(user_id)
+    result = get_learner_progress(user_id)
 
-    if not current_module_id:
+    if not result or not result[0]:
         await update.message.reply_text("It seems you haven't started the course yet. Type /start to begin!")
         return
+
+    current_module_id, current_lesson_id, quiz_completed = result
 
     if quiz_completed:
         await update.message.reply_text("You have already completed the quiz for this module. Type /next to continue.")
         return
 
-    module, _ = get_module_lesson(current_module_id, "") # Get current module details
+    module = get_module_by_id(current_module_id)
     if module and "quiz" in module:
         quiz_data = module["quiz"]
         options = quiz_data["options"]
         keyboard = [[InlineKeyboardButton(option, callback_data=f"quiz_{current_module_id}_{option[0]}")] for option in options]
         reply_markup = InlineKeyboardMarkup(keyboard)
-        await update.message.reply_text(f"*Quiz for Module: {module["title"]}*\n\n{quiz_data["question"]}", reply_markup=reply_markup, parse_mode="Markdown")
+        await update.message.reply_text(
+            f"📝 *Quiz for: {module['title']}*\n\n{quiz_data['question']}",
+            reply_markup=reply_markup,
+            parse_mode="Markdown"
+        )
     else:
-        await update.message.reply_text("No quiz available for the current module or you have completed it. Type /next to continue.")
+        await update.message.reply_text("No quiz available for the current module. Type /next to continue.")
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -150,52 +242,62 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if action == "quiz":
         module_id = data[1]
         selected_answer = data[2]
-        module, _ = get_module_lesson(module_id, "")
+        module = get_module_by_id(module_id)
         if module and "quiz" in module:
             correct_answer = module["quiz"]["answer"]
             if selected_answer == correct_answer:
-                update_quiz_status(user_id, 1) # Mark quiz as completed
-                await query.edit_message_text("\"Ehen!\" (Correct!) That's the right answer! You've passed the quiz for this module. Type /next to continue your learning journey.")
+                update_quiz_status(user_id, 1)  # Mark quiz as completed
+                await query.edit_message_text(
+                    "\"Ehen!\" Correct! 🎉 That's the right answer!\n\n"
+                    "You've passed the quiz for this module. Type /next to continue your learning journey."
+                )
             else:
-                await query.edit_message_text(f"\"Chai!\" (Incorrect!) That's not quite right. The correct answer was {correct_answer}. Please review the lessons and try again.\n\nType /quiz to retry or /next to move on if you're ready.")
+                await query.edit_message_text(
+                    f"\"Chai!\" Not quite right. The correct answer was {correct_answer}.\n\n"
+                    f"Don't worry — learning is a journey! Type /quiz to retry."
+                )
         else:
             await query.edit_message_text("Error processing quiz. Please try again.")
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.message.reply_text(
-        "Here are the commands you can use:\n"
+        "Here are the commands you can use:\n\n"
         "/start - Begin or restart the course\n"
-        "/progress - Check your current module and lesson\n"
-        "/next - Move to the next lesson or module\n"
+        "/next - Move to the next lesson\n"
         "/quiz - Take the quiz for the current module\n"
-        "/menu - See the course menu (coming soon!)\n"
+        "/progress - Check your current module and lesson\n"
         "/help - Show this help message\n\n"
-        "You can also ask me questions about the course content, and I'll do my best to answer!"
+        "You can also type 'next' or ask me questions about the course content!"
     )
 
 async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    # This can be expanded to show a full course menu with inline buttons for modules/lessons
-    await update.message.reply_text("The course menu feature is still under development. For now, please use /next to navigate through lessons.")
+    menu_text = "📚 *Course Outline*\n\n"
+    for i, module in enumerate(MODULES):
+        menu_text += f"*Module {i+1}: {module['title']}*\n"
+        for lesson in module["lessons"]:
+            menu_text += f"  • {lesson['title']}\n"
+        menu_text += "\n"
+    menu_text += "Type /next to continue from where you left off."
+    await update.message.reply_text(menu_text, parse_mode="Markdown")
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_message = update.message.text
     user_id = update.effective_user.id
 
     # Check for 'next' or similar keywords to advance lesson
-    if user_message.lower() in ["next", "continue", "go next", "move on"]:
+    if user_message.lower().strip() in ["next", "continue", "go next", "move on"]:
         await next_lesson_handler(update, context)
         return
 
     # Get current course context for OpenAI
-    current_module_id, current_lesson_id, _ = get_learner_progress(user_id)
-    full_course_text = json.dumps(COURSE_CONTENT) # Send entire course content for context
+    result = get_learner_progress(user_id)
+    full_course_text = json.dumps(COURSE_CONTENT)
 
-    if current_module_id and current_lesson_id:
+    if result and result[0]:
+        current_module_id, current_lesson_id, _ = result
         module, lesson = get_module_lesson(current_module_id, current_lesson_id)
         if module and lesson:
-            # Prioritize current lesson content for context
             current_context = f"Current Module: {module['title']}. Current Lesson: {lesson['title']}. Content: {lesson['content']}"
-            # Combine with full course content, ensuring it doesn't exceed token limits
             context_for_openai = f"Course Overview: {full_course_text}\n\nUser is currently in: {current_context}"
         else:
             context_for_openai = full_course_text
