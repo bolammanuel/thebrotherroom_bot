@@ -3,7 +3,10 @@ import json
 import logging
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
-from db_manager import init_db, enroll_learner, get_learner_progress, update_learner_progress, update_quiz_status
+from db_manager_updated import (
+    init_db, enroll_learner, get_learner_progress, update_learner_progress, 
+    update_quiz_status, update_language_preference, get_language_preference
+)
 from openai_utils import get_openai_response
 
 # Enable logging
@@ -17,18 +20,68 @@ COURSE_CONTENT = {}
 with open("course_content.json", "r") as f:
     COURSE_CONTENT = json.load(f)
 
+# Load translations
+TRANSLATIONS = {}
+with open("translations.json", "r") as f:
+    TRANSLATIONS = json.load(f)
+
 COURSE_TITLE = COURSE_CONTENT["course_title"]
 COURSE_DESCRIPTION = COURSE_CONTENT["course_description"]
 MODULES = COURSE_CONTENT["modules"]
 
-# Helper function to get module and lesson by ID
+# ============== TRANSLATION HELPER FUNCTIONS ==============
+
+def get_text(key, lang='en', **kwargs):
+    """Get translated text with variable substitution."""
+    try:
+        text = TRANSLATIONS.get(key, {}).get(lang, TRANSLATIONS.get(key, {}).get('en', ''))
+        # Replace variables in curly braces
+        for var, value in kwargs.items():
+            text = text.replace('{' + var + '}', str(value))
+        return text
+    except Exception as e:
+        logger.error(f"Translation error for key {key}: {e}")
+        return "Error"
+
+def get_command_button(button_name, lang='en'):
+    """Get translated command button text."""
+    return get_text(f"command_buttons.{button_name}", lang)
+
+# ============== INLINE BUTTON HELPER ==============
+
+def get_main_menu_buttons(lang='en'):
+    """Get context-aware main menu buttons."""
+    buttons = [
+        [InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next")],
+        [InlineKeyboardButton(get_command_button("quiz", lang), callback_data="cmd_quiz")],
+        [InlineKeyboardButton(get_command_button("progress", lang), callback_data="cmd_progress"),
+         InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
+        [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
+         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")]
+    ]
+    return InlineKeyboardMarkup(buttons)
+
+def get_language_selection_buttons():
+    """Get language selection buttons."""
+    buttons = [
+        [InlineKeyboardButton("English", callback_data="lang_en")],
+        [InlineKeyboardButton("Hausa", callback_data="lang_ha")],
+        [InlineKeyboardButton("Yoruba", callback_data="lang_yo")],
+        [InlineKeyboardButton("Igbo", callback_data="lang_ig")]
+    ]
+    return InlineKeyboardMarkup(buttons)
+
+# ============== COURSE NAVIGATION HELPERS ==============
+
 def get_module_by_id(module_id):
+    """Get module by ID."""
     for module in MODULES:
         if module["module_id"] == module_id:
             return module
     return None
 
 def get_module_lesson(module_id, lesson_id):
+    """Get module and lesson by IDs."""
     for module in MODULES:
         if module["module_id"] == module_id:
             for lesson in module["lessons"]:
@@ -37,12 +90,14 @@ def get_module_lesson(module_id, lesson_id):
     return None, None
 
 def is_last_lesson_of_module(module_id, lesson_id):
+    """Check if lesson is the last in module."""
     module = get_module_by_id(module_id)
     if module and module["lessons"]:
         return lesson_id == module["lessons"][-1]["lesson_id"]
     return False
 
 def get_next_lesson(current_module_id, current_lesson_id):
+    """Get next lesson or module."""
     current_module_index = -1
     current_lesson_index = -1
 
@@ -57,12 +112,12 @@ def get_next_lesson(current_module_id, current_lesson_id):
     if current_module_index == -1 or current_lesson_index == -1:
         return None, None
 
-    # Try to get the next lesson in the current module
+    # Try to get next lesson in current module
     if current_lesson_index + 1 < len(MODULES[current_module_index]["lessons"]):
         next_lesson = MODULES[current_module_index]["lessons"][current_lesson_index + 1]
         return current_module_id, next_lesson["lesson_id"]
 
-    # Try to get the first lesson in the next module
+    # Try to get first lesson in next module
     elif current_module_index + 1 < len(MODULES):
         next_module = MODULES[current_module_index + 1]
         if next_module["lessons"]:
@@ -70,30 +125,70 @@ def get_next_lesson(current_module_id, current_lesson_id):
 
     return None, None
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    user_id = update.effective_user.id
-    enroll_learner(user_id)
+# ============== COMMAND HANDLERS ==============
 
-    # Show welcome message
+async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Start command - show language selection."""
+    user_id = update.effective_user.id
+    
+    # Show language selection
     await update.message.reply_text(
-        f"\"Ekaabo!\" (Welcome!) to the \"{COURSE_TITLE}\" course, designed just for young Nigerian men like you.\n\n"
-        f"{COURSE_DESCRIPTION}\n\n"
-        f"Type /next to begin your first lesson or /help for a list of commands."
+        TRANSLATIONS["language_selection"]["en"],
+        reply_markup=get_language_selection_buttons()
+    )
+    
+    # Store that we're waiting for language selection
+    context.user_data['awaiting_language_selection'] = True
+
+async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Help command."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    await update.message.reply_text(
+        get_text("help_menu", lang),
+        reply_markup=get_main_menu_buttons(lang)
     )
 
-async def progress(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show course outline."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    menu_text = get_text("menu_header", lang) + "\n\n"
+    
+    for i, module in enumerate(MODULES):
+        menu_text += f"*Module {i+1}: {module['title']}*\n"
+        for lesson in module["lessons"]:
+            menu_text += f" • {lesson['title']}\n"
+        menu_text += "\n"
+    
+    menu_text += get_text("menu_continue", lang)
+    
+    await update.message.reply_text(
+        menu_text,
+        parse_mode="Markdown",
+        reply_markup=get_main_menu_buttons(lang)
+    )
+
+async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show learner progress."""
     user_id = update.effective_user.id
     result = get_learner_progress(user_id)
-
+    
     if not result or not result[0]:
-        await update.message.reply_text("It seems you haven't started the course yet. Type /start to begin!")
+        lang = 'en'
+        await update.message.reply_text(
+            get_text("not_started", lang),
+            reply_markup=get_main_menu_buttons(lang)
+        )
         return
 
-    current_module_id, current_lesson_id, quiz_completed = result
+    # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
+    current_module_id, current_lesson_id, quiz_completed, lang = result
     module, lesson = get_module_lesson(current_module_id, current_lesson_id)
 
     if module and lesson:
-        # Count completed modules
         module_index = 0
         for i, m in enumerate(MODULES):
             if m["module_id"] == current_module_id:
@@ -101,128 +196,111 @@ async def progress(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 break
 
         total_modules = len(MODULES)
+        
+        progress_text = get_text(
+            "progress_message", lang,
+            module_num=module_index + 1,
+            total_modules=total_modules,
+            module_title=module['title'],
+            lesson_title=lesson['title']
+        )
+        
         await update.message.reply_text(
-            f"📊 Your Progress:\n\n"
-            f"📖 Module {module_index + 1}/{total_modules}: {module['title']}\n"
-            f"📝 Current Lesson: {lesson['title']}\n\n"
-            f"Type /next to continue learning."
+            progress_text,
+            reply_markup=get_main_menu_buttons(lang)
         )
     else:
-        await update.message.reply_text("Could not retrieve your progress. Please try /start again.")
+        await update.message.reply_text(
+            get_text("error_generic", lang),
+            reply_markup=get_main_menu_buttons(lang)
+        )
 
 async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /next command and next button."""
     user_id = update.effective_user.id
     result = get_learner_progress(user_id)
 
     if not result or not result[0]:
-        await update.message.reply_text("It seems you haven't started the course yet. Type /start to begin!")
+        lang = 'en'
+        await update.message.reply_text(
+            get_text("not_started", lang),
+            reply_markup=get_main_menu_buttons(lang)
+        )
         return
 
-    current_module_id, current_lesson_id, quiz_completed = result
+    # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
+    current_module_id, current_lesson_id, quiz_completed, lang = result
 
-    # Check if we're at the last lesson of a module and quiz is not completed
+    # If at last lesson and quiz not done, BLOCK progression
     if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
         module = get_module_by_id(current_module_id)
-        if module and "quiz" in module:
-            # Check if user has already seen this lesson (not first time)
-            seen_key = f"seen_{current_module_id}_{current_lesson_id}"
-            if context.user_data.get(seen_key):
-                await update.message.reply_text(
-                    f"You need to complete the quiz for \"{module['title']}\" before moving on.\n\n"
-                    f"Type /quiz to take the quiz."
-                )
-                return
+        await update.message.reply_text(
+            get_text("quiz_not_completed", lang, module_title=module['title']),
+            reply_markup=get_main_menu_buttons(lang)
+        )
+        return
 
-    # Check if we're moving to the next module and quiz hasn't been done
-    if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
-        module = get_module_by_id(current_module_id)
-
-        # Show the current lesson first if not seen yet
-        seen_key = f"seen_{current_module_id}_{current_lesson_id}"
-        if not context.user_data.get(seen_key):
-            module, lesson = get_module_lesson(current_module_id, current_lesson_id)
-            if module and lesson:
-                context.user_data[seen_key] = True
-                await update.message.reply_text(
-                    f"📖 *Module: {module['title']}*\n"
-                    f"📝 *Lesson: {lesson['title']}*\n\n"
-                    f"{lesson['content']}",
-                    parse_mode="Markdown"
-                )
-
-            await update.message.reply_text(
-                f"✅ You've completed all lessons in \"{module['title']}\"!\n\n"
-                f"Time for a quick quiz to test your knowledge. Type /quiz to begin."
-            )
-            return
-        else:
-            await update.message.reply_text(
-                f"You need to complete the quiz for \"{module['title']}\" before moving on.\n\n"
-                f"Type /quiz to take the quiz."
-            )
-            return
-
-    # If quiz is completed for current module's last lesson, or we're mid-module, advance
+    # Get next lesson
     next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
 
     if next_module_id and next_lesson_id:
-        # If moving to a new module, reset quiz status
+        # If moving to new module, reset quiz status
         if next_module_id != current_module_id:
             update_learner_progress(user_id, next_module_id, next_lesson_id, quiz_completed=0)
         else:
             update_learner_progress(user_id, next_module_id, next_lesson_id)
 
         module, lesson = get_module_lesson(next_module_id, next_lesson_id)
+        
         if module and lesson:
+            # Show lesson
+            lesson_header = get_text("lesson_header", lang, module_title=module['title'], lesson_title=lesson['title'])
+            
             await update.message.reply_text(
-                f"📖 *Module: {module['title']}*\n"
-                f"📝 *Lesson: {lesson['title']}*\n\n"
-                f"{lesson['content']}",
-                parse_mode="Markdown"
+                f"{lesson_header}\n\n{lesson['content']}",
+                parse_mode="Markdown",
+                reply_markup=get_main_menu_buttons(lang)
             )
 
-            # If this is the last lesson of the module, prompt for quiz
+            # If this is last lesson, prompt for quiz
             if is_last_lesson_of_module(next_module_id, next_lesson_id):
-                context.user_data[f"seen_{next_module_id}_{next_lesson_id}"] = True
                 await update.message.reply_text(
-                    f"✅ You've completed all lessons in \"{module['title']}\"!\n\n"
-                    f"Time for a quick quiz to test your knowledge. Type /quiz to begin."
-                )
-        else:
-            await update.message.reply_text("Error retrieving next lesson. Please contact support.")
-    else:
-        # Check if current lesson has been shown
-        module, lesson = get_module_lesson(current_module_id, current_lesson_id)
-        seen_key = f"seen_{current_module_id}_{current_lesson_id}"
-
-        if not context.user_data.get(seen_key):
-            context.user_data[seen_key] = True
-            if module and lesson:
-                await update.message.reply_text(
-                    f"📖 *Module: {module['title']}*\n"
-                    f"📝 *Lesson: {lesson['title']}*\n\n"
-                    f"{lesson['content']}",
-                    parse_mode="Markdown"
+                    get_text("lessons_complete", lang, module_title=module['title']),
+                    reply_markup=get_main_menu_buttons(lang)
                 )
         else:
             await update.message.reply_text(
-                "🎉 Congratulations! You have completed all available lessons and quizzes!\n\n"
-                "You are now a champion for positive masculinity and GBV prevention.\n\n"
-                "Type /progress to review your achievement or /start to retake the course."
+                get_text("error_generic", lang),
+                reply_markup=get_main_menu_buttons(lang)
             )
+    else:
+        # Course complete
+        await update.message.reply_text(
+            get_text("course_complete", lang),
+            reply_markup=get_main_menu_buttons(lang)
+        )
 
-async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show quiz for current module."""
     user_id = update.effective_user.id
     result = get_learner_progress(user_id)
 
     if not result or not result[0]:
-        await update.message.reply_text("It seems you haven't started the course yet. Type /start to begin!")
+        lang = 'en'
+        await update.message.reply_text(
+            get_text("not_started", lang),
+            reply_markup=get_main_menu_buttons(lang)
+        )
         return
 
-    current_module_id, current_lesson_id, quiz_completed = result
+    # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
+    current_module_id, current_lesson_id, quiz_completed, lang = result
 
     if quiz_completed:
-        await update.message.reply_text("You have already completed the quiz for this module. Type /next to continue.")
+        await update.message.reply_text(
+            get_text("quiz_already_completed", lang),
+            reply_markup=get_main_menu_buttons(lang)
+        )
         return
 
     module = get_module_by_id(current_module_id)
@@ -230,95 +308,135 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if module and "quiz" in module:
         quiz_data = module["quiz"]
         options = quiz_data["options"]
+
+        # Create quiz instructions and buttons
+        quiz_header = get_text("quiz_instructions", lang, module_title=module['title'], quiz_question=quiz_data['question'])
         
-        # FIXED: Use pipe (|) separator instead of underscore to avoid conflict with module_id
-        keyboard = [[InlineKeyboardButton(option, callback_data=f"quiz|{current_module_id}|{option[0]}")] for option in options]
-        reply_markup = InlineKeyboardMarkup(keyboard)
+        # Create answer buttons
+        buttons = [[InlineKeyboardButton(option, callback_data=f"quiz|{current_module_id}|{option[0]}")] for option in options]
+        reply_markup = InlineKeyboardMarkup(buttons)
 
         await update.message.reply_text(
-            f"📝 *Quiz for: {module['title']}*\n\n{quiz_data['question']}",
+            quiz_header,
             reply_markup=reply_markup,
             parse_mode="Markdown"
         )
     else:
-        await update.message.reply_text("No quiz available for the current module. Type /next to continue.")
+        lang = get_language_preference(user_id)
+        await update.message.reply_text(
+            get_text("error_generic", lang),
+            reply_markup=get_main_menu_buttons(lang)
+        )
 
-async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Change language preference."""
+    await update.message.reply_text(
+        TRANSLATIONS["language_selection"]["en"],
+        reply_markup=get_language_selection_buttons()
+    )
+
+# ============== BUTTON CALLBACK HANDLERS ==============
+
+async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle button clicks."""
     query = update.callback_query
     await query.answer()
-
+    
     user_id = query.from_user.id
+    data = query.data
     
-    # FIXED: Use pipe separator instead of underscore
-    data = query.data.split("|")
-    
-    if len(data) < 3:
-        await query.edit_message_text("Error processing quiz. Please try again.")
+    # Language selection
+    if data.startswith("lang_"):
+        lang_code = data.split("_")[1]
+        enroll_learner(user_id, lang_code)
+        
+        # Show welcome message
+        welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
+        
+        await query.edit_message_text(
+            welcome_text,
+            reply_markup=get_main_menu_buttons(lang_code)
+        )
         return
     
-    action = data[0]
-
-    if action == "quiz":
-        module_id = data[1]
-        selected_answer = data[2]
+    # Command buttons
+    lang = get_language_preference(user_id)
+    
+    if data == "cmd_next":
+        await query.delete_message()
+        # Call next_lesson_handler via update object
+        await next_lesson_handler(update, context)
+    
+    elif data == "cmd_quiz":
+        await query.delete_message()
+        await quiz_command(update, context)
+    
+    elif data == "cmd_progress":
+        await query.delete_message()
+        await progress_command(update, context)
+    
+    elif data == "cmd_menu":
+        await query.delete_message()
+        await menu_command(update, context)
+    
+    elif data == "cmd_language":
+        await query.edit_message_text(
+            TRANSLATIONS["language_selection"]["en"],
+            reply_markup=get_language_selection_buttons()
+        )
+    
+    elif data == "cmd_help":
+        await query.delete_message()
+        await help_command(update, context)
+    
+    # Quiz answer
+    elif data.startswith("quiz|"):
+        parts = data.split("|")
+        if len(parts) < 3:
+            await query.edit_message_text(get_text("error_generic", lang))
+            return
+        
+        module_id = parts[1]
+        selected_answer = parts[2]
         module = get_module_by_id(module_id)
 
         if module and "quiz" in module:
             correct_answer = module["quiz"]["answer"]
             if selected_answer == correct_answer:
-                update_quiz_status(user_id, 1)  # Mark quiz as completed
+                update_quiz_status(user_id, 1)
                 await query.edit_message_text(
-                    "\"Ehen!\" Correct! 🎉 That's the right answer!\n\n"
-                    "You've passed the quiz for this module. Type /next to continue your learning journey."
+                    get_text("quiz_correct", lang),
+                    reply_markup=get_main_menu_buttons(lang)
                 )
             else:
                 await query.edit_message_text(
-                    f"\"Chai!\" Not quite right. The correct answer was {correct_answer}.\n\n"
-                    f"Don't worry — learning is a journey! Type /quiz to retry."
+                    get_text("quiz_incorrect", lang, correct_answer=correct_answer),
+                    reply_markup=get_main_menu_buttons(lang)
                 )
         else:
-            await query.edit_message_text("Error processing quiz. Please try again.")
-    else:
-        await query.edit_message_text("Error processing quiz. Please try again.")
-
-async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    await update.message.reply_text(
-        "Here are the commands you can use:\n\n"
-        "/start - Begin or restart the course\n"
-        "/next - Move to the next lesson\n"
-        "/quiz - Take the quiz for the current module\n"
-        "/progress - Check your current module and lesson\n"
-        "/help - Show this help message\n\n"
-        "You can also type 'next' or ask me questions about the course content!"
-    )
-
-async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    menu_text = "📚 *Course Outline*\n\n"
-
-    for i, module in enumerate(MODULES):
-        menu_text += f"*Module {i+1}: {module['title']}*\n"
-        for lesson in module["lessons"]:
-            menu_text += f" • {lesson['title']}\n"
-        menu_text += "\n"
-
-    menu_text += "Type /next to continue from where you left off."
-    await update.message.reply_text(menu_text, parse_mode="Markdown")
+            await query.edit_message_text(
+                get_text("error_generic", lang),
+                reply_markup=get_main_menu_buttons(lang)
+            )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle text messages."""
     user_message = update.message.text
     user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
 
-    # Check for 'next' or similar keywords to advance lesson
+    # Check for navigation keywords
     if user_message.lower().strip() in ["next", "continue", "go next", "move on"]:
         await next_lesson_handler(update, context)
         return
 
-    # Get current course context for OpenAI
+    # Get context for OpenAI
     result = get_learner_progress(user_id)
     full_course_text = json.dumps(COURSE_CONTENT)
 
     if result and result[0]:
-        current_module_id, current_lesson_id, _ = result
+        # FIXED: Unpack 4 values
+        current_module_id, current_lesson_id, _, _ = result
         module, lesson = get_module_lesson(current_module_id, current_lesson_id)
         if module and lesson:
             current_context = f"Current Module: {module['title']}. Current Lesson: {lesson['title']}. Content: {lesson['content']}"
@@ -330,9 +448,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # Generate response using OpenAI
     response = get_openai_response(user_message, context_for_openai)
-    await update.message.reply_text(response)
+    
+    await update.message.reply_text(
+        response,
+        reply_markup=get_main_menu_buttons(lang)
+    )
 
 def main() -> None:
+    """Start the bot."""
     init_db()
 
     token = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -344,19 +467,18 @@ def main() -> None:
 
     # Command handlers
     application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("progress", progress))
-    application.add_handler(CommandHandler("next", next_lesson_handler))
-    application.add_handler(CommandHandler("quiz", quiz))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("menu", menu_command))
+    application.add_handler(CommandHandler("progress", progress_command))
+    application.add_handler(CommandHandler("next", next_lesson_handler))
+    application.add_handler(CommandHandler("quiz", quiz_command))
+    application.add_handler(CommandHandler("language", language_command))
 
-    # Message handler for general text and 'next' keyword
+    # Message and button handlers
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(CallbackQueryHandler(button_handler))
 
-    # Callback query handler for quiz buttons
-    application.add_handler(CallbackQueryHandler(button))
-
-    # Run the bot until the user presses Ctrl-C
+    # Run the bot
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
