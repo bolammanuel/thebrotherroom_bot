@@ -175,6 +175,14 @@
     "ig": "Asụsụ gbanworo gaa na Igbo! 🎉"
   },
 
+  "friendly_nudge": {
+    "en": "Hey brother! I'm here to guide you through the course. Use the buttons below or try these:\n\n📖 /next — Continue your lesson\n📝 /quiz — Take the module quiz\n📊 /progress — See where you are\n📚 /menu — View course outline\n\nYou can also ask me questions about the course content!",
+    "pcm": "How far brother! I dey here to guide you through the course. Use the buttons below or try these:\n\n📖 /next — Continue your lesson\n📝 /quiz — Do the quiz\n📊 /progress — Check where you dey\n📚 /menu — See course outline\n\nYou fit also ask me questions about the course!",
+    "ha": "Sannu brother! Ina nan don taimaka maka a cikin jerin. Yi amfani da batu a ƙasa ko gwada waɗannan:\n\n📖 /next — Ci gaba da jerin\n📝 /quiz — Yi quiz\n📊 /progress — Dubi inda kake\n📚 /menu — Dubi firafen jerin\n\nKana iya tambayar ni game da abin da ake koyarwa!",
+    "yo": "Hey brother! Mo wa nibi lati tọ ọ si eko naa. Lo awọn bọtini ni isalẹ tabi gbiyanju awọn wọnyi:\n\n📖 /next — Tẹsiwaju eko rẹ\n📝 /quiz — Ṣe idinku\n📊 /progress — Wo ibi ti o wa\n📚 /menu — Wo ọkọ eko\n\nO le beere awọn ibeere nipa eko naa!",
+    "ig": "Hey brother! A nọ ebe a iji duzie gị na akwukwo. Jiri bọtini ndị dị n'okpuru ma ọ bụ nwaa ndị a:\n\n📖 /next — Gaa n'ihu na akwukwo\n📝 /quiz — Mee ajụjụ\n📊 /progress — Lee ebe ị nọ\n📚 /menu — Lee ụkpụrụ akwukwo\n\nỊ nwekwara ike ịjụ m ajụjụ banyere akwukwo!"
+  },
+
   "error_generic": {
     "en": "Sorry, something went wrong. Please try again.",
     "pcm": "Sorry, something no work well. Abeg try again.",

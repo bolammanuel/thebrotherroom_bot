@@ -431,29 +431,50 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await next_lesson_handler(update, context)
         return
 
-    # Get context for OpenAI
-    result = get_learner_progress(user_id)
-    full_course_text = json.dumps(COURSE_CONTENT)
+    # Course-related keywords to check if the message is about the course
+    course_keywords = [
+        "gbv", "gender", "violence", "masculinity", "masculine", "man", "men",
+        "woman", "women", "abuse", "consent", "relationship", "equality",
+        "norm", "toxic", "positive", "harm", "prevent", "prevention",
+        "module", "lesson", "course", "learn", "teach", "explain",
+        "what is", "what are", "how", "why", "tell me", "define",
+        "example", "meaning", "understand", "sex", "power", "control",
+        "respect", "emotion", "stereotype", "bystander", "ally",
+        "community", "advocacy", "intervention", "healthy", "unhealthy"
+    ]
 
-    if result and result[0]:
-        # FIXED: Unpack 4 values
-        current_module_id, current_lesson_id, _, _ = result
-        module, lesson = get_module_lesson(current_module_id, current_lesson_id)
-        if module and lesson:
-            current_context = f"Current Module: {module['title']}. Current Lesson: {lesson['title']}. Content: {lesson['content']}"
-            context_for_openai = f"Course Overview: {full_course_text}\n\nUser is currently in: {current_context}"
+    # Check if message seems course-related
+    message_lower = user_message.lower()
+    is_course_related = any(keyword in message_lower for keyword in course_keywords)
+
+    if is_course_related:
+        # Use AI to answer course-related questions
+        result = get_learner_progress(user_id)
+        full_course_text = json.dumps(COURSE_CONTENT)
+
+        if result and result[0]:
+            current_module_id, current_lesson_id, _, _ = result
+            module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+            if module and lesson:
+                current_context = f"Current Module: {module['title']}. Current Lesson: {lesson['title']}. Content: {lesson['content']}"
+                context_for_openai = f"Course Overview: {full_course_text}\n\nUser is currently in: {current_context}"
+            else:
+                context_for_openai = full_course_text
         else:
             context_for_openai = full_course_text
-    else:
-        context_for_openai = full_course_text
 
-    # Generate response using OpenAI
-    response = get_openai_response(user_message, context_for_openai)
-    
-    await update.message.reply_text(
-        response,
-        reply_markup=get_main_menu_buttons(lang)
-    )
+        response = get_openai_response(user_message, context_for_openai)
+        await update.message.reply_text(
+            response,
+            reply_markup=get_main_menu_buttons(lang)
+        )
+    else:
+        # Friendly nudge for non-course messages
+        nudge = get_text("friendly_nudge", lang)
+        await update.message.reply_text(
+            nudge,
+            reply_markup=get_main_menu_buttons(lang)
+        )
 
 def main() -> None:
     """Start the bot."""
