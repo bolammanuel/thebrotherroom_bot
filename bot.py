@@ -65,6 +65,7 @@ def get_language_selection_buttons():
     """Get language selection buttons."""
     buttons = [
         [InlineKeyboardButton("English", callback_data="lang_en")],
+        [InlineKeyboardButton("Pidgin", callback_data="lang_pcm")],
         [InlineKeyboardButton("Hausa", callback_data="lang_ha")],
         [InlineKeyboardButton("Yoruba", callback_data="lang_yo")],
         [InlineKeyboardButton("Igbo", callback_data="lang_ig")]

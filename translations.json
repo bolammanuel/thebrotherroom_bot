@@ -1,9 +1,10 @@
 {
-  "languages": ["English", "Hausa", "Yoruba", "Igbo"],
-  "language_codes": ["en", "ha", "yo", "ig"],
+  "languages": ["English", "Pidgin", "Hausa", "Yoruba", "Igbo"],
+  "language_codes": ["en", "pcm", "ha", "yo", "ig"],
   
   "language_selection": {
     "en": "🌍 Please select your preferred language:\n\n📌 Select one:",
+    "pcm": "🌍 Abeg pick the language wey you wan use:\n\n📌 Pick one:",
     "ha": "🌍 Zaɓi harshe da kake so:\n\n📌 Zaɓi daya:",
     "yo": "🌍 Jọwọ yan ede ti o fẹ lo:\n\n📌 Yan ọkan:",
     "ig": "🌍 Biko horo asụsụ ọ na-ahọrọ:\n\n📌 Horo otu:"
@@ -11,6 +12,7 @@
 
   "start_welcome": {
     "en": "\"Ekaabo!\" (Welcome!) to the \"{course_title}\" course, designed just for young Nigerian men like you.\n\n{course_description}\n\nType /next to begin your first lesson or /help for a list of commands.",
+    "pcm": "\"How far!\" (Welcome!) to the \"{course_title}\" course, wey we design for young Nigerian men like you.\n\n{course_description}\n\nType /next to start your first lesson or /help to see wetin you fit do.",
     "ha": "\"Sannu!\" (Maraba!) ga jerin aiki \"{course_title}\", wanda aka tsara ga samari Nijeriya kamar ku.\n\n{course_description}\n\nKunna /next don fara jerin ko /help don jerin umarnin.",
     "yo": "\"O ku abo!\" (Kaabo!) si eko \"{course_title}\", ti a dida fun awọn ọkunrin araba ti Naijiria gẹgẹ bi yin.\n\n{course_description}\n\nKunna /next lati bẹrẹ eko akọkọ rẹ tabi /help fun akojọ awọn aṣayan.",
     "ig": "\"Kedu!\" (Ndewo!) na echiche \"{course_title}\", emebere maka ụmụ nwoke Nigeria dika unu.\n\n{course_description}\n\nBiko kunna /next iji malite akwukwo mbụ gị ma /help maka onyonyo."
@@ -18,6 +20,7 @@
 
   "help_menu": {
     "en": "Here are the commands you can use:\n\n/start - Begin or restart the course\n/next - Move to the next lesson\n/quiz - Take the quiz for the current module\n/progress - Check your current module and lesson\n/language - Change your language\n/menu - View course outline\n/help - Show this help message",
+    "pcm": "Na these commands you fit use:\n\n/start - Begin or restart the course\n/next - Go to the next lesson\n/quiz - Do quiz for this module\n/progress - Check where you dey now\n/language - Change your language\n/menu - See course outline\n/help - Show this help message",
     "ha": "Ga nan umarnin da kake iya amfani:\n\n/start - Fara ko maimaita jerin\n/next - Wuce ga jerin na gida\n/quiz - Yi quiz na modul na yanzu\n/progress - Dubi modul da jerin na yanzu\n/language - Canja harshek\n/menu - Dubi firafen jerin\n/help - Nuna sanarwar mai taimakon",
     "yo": "Eyi ni awọn aṣayan ti o le lo:\n\n/start - Bẹrẹ tabi tun bẹrẹ eko naa\n/next - Lo si eko atẹle\n/quiz - Ṣe idinku fun modul lọwọlọwọ\n/progress - Yaworan modul ati eko lọwọlọwọ\n/language - Yi ede naa\n/menu - Wo ọkọ eko naa\n/help - Fihan ifiranṣẹ iranlọwọ",
     "ig": "Ndị bụ onyonyo ị nwere ike iji:\n\n/start - Malite ma ọ bụ malite ọzọ akwukwo\n/next - Gaa na akwukwo ọzọ\n/quiz - Eme ajụjụ maka modul ugbu a\n/progress - Lelee modul na akwukwo ugbu a\n/language - Gbanwe asụsụ gị\n/menu - Lelee ụkpụrụ akwukwo\n/help - Igosi ozi inyere"
@@ -25,6 +28,7 @@
 
   "progress_message": {
     "en": "📊 Your Progress:\n\n📖 Module {module_num}/{total_modules}: {module_title}\n📝 Current Lesson: {lesson_title}\n\nType /next to continue learning.",
+    "pcm": "📊 Where You Dey:\n\n📖 Module {module_num}/{total_modules}: {module_title}\n📝 Current Lesson: {lesson_title}\n\nType /next to continue.",
     "ha": "📊 Gwarwarki:\n\n📖 Modul {module_num}/{total_modules}: {module_title}\n📝 Jerin na yanzu: {lesson_title}\n\nKunna /next don ci gaba da ilimi.",
     "yo": "📊 Iṣẹ Ẹ:\n\n📖 Modul {module_num}/{total_modules}: {module_title}\n📝 Eko Lọwọlọwọ: {lesson_title}\n\nKunna /next lati tẹsiwaju ẹkọ.",
     "ig": "📊 Ime Gị:\n\n📖 Modul {module_num}/{total_modules}: {module_title}\n📝 Akwukwo Ugbu a: {lesson_title}\n\nBiko kunna /next iji gaa n'ihu."
@@ -32,6 +36,7 @@
 
   "lesson_header": {
     "en": "📖 *Module: {module_title}*\n📝 *Lesson: {lesson_title}*",
+    "pcm": "📖 *Module: {module_title}*\n📝 *Lesson: {lesson_title}*",
     "ha": "📖 *Modul: {module_title}*\n📝 *Jerin: {lesson_title}*",
     "yo": "📖 *Modul: {module_title}*\n📝 *Eko: {lesson_title}*",
     "ig": "📖 *Modul: {module_title}*\n📝 *Akwukwo: {lesson_title}*"
@@ -39,6 +44,7 @@
 
   "lessons_complete": {
     "en": "✅ You've completed all lessons in \"{module_title}\"!\n\nTime for a quick quiz to test your knowledge. Type /quiz to begin.",
+    "pcm": "✅ You don finish all the lessons for \"{module_title}\"!\n\nTime to do small quiz. Type /quiz to start.",
     "ha": "✅ Ka gama jerin duka a cikin \"{module_title}\"!\n\nLokacin gaida quiz don gwada iliminka. Kunna /quiz don fara.",
     "yo": "✅ Ẹ ti parí gbogbo eko ninu \"{module_title}\"!\n\nAkoko fun idinku kekere lati lo imọ yin. Kunna /quiz lati bẹrẹ.",
     "ig": "✅ Ị gachasịla akwukwo nile na \"{module_title}\"!\n\nOgbe maka ajụjụ mma maka ịmụta gị. Kunna /quiz iji malite."
@@ -46,6 +52,7 @@
 
   "quiz_not_completed": {
     "en": "You need to complete the quiz for \"{module_title}\" before moving on.\n\nType /quiz to take the quiz.",
+    "pcm": "You need to finish the quiz for \"{module_title}\" before you fit move.\n\nType /quiz to do the quiz.",
     "ha": "Kana bukatar gama quiz na \"{module_title}\" kafin mu ci gaba.\n\nKunna /quiz don yin quiz.",
     "yo": "Ẹ nilo lati parí idinku fun \"{module_title}\" ṣaaju ki ẹ lọ siwaju.\n\nKunna /quiz lati ṣe idinku.",
     "ig": "Ị nwere ike ịrụchasi ajụjụ maka \"{module_title}\" tupu ị gaa n'ihu.\n\nBiko kunna /quiz iji ṣee ajụjụ."
@@ -53,6 +60,7 @@
 
   "quiz_instructions": {
     "en": "📝 *Quiz for: {module_title}*\n\n{quiz_question}\n\n👇 Select your answer below by clicking the button:",
+    "pcm": "📝 *Quiz for: {module_title}*\n\n{quiz_question}\n\n👇 Click the answer wey you think dey correct:",
     "ha": "📝 *Quiz don: {module_title}*\n\n{quiz_question}\n\n👇 Zaɓi amsar kai dai ta hanyar danna batu:",
     "yo": "📝 *Idinku fun: {module_title}*\n\n{quiz_question}\n\n👇 Yan awọn idahon nisi ni okanlọ:",
     "ig": "📝 *Ajụjụ maka: {module_title}*\n\n{quiz_question}\n\n👇 Horo azịza gị nke ọma site na ịpakpu ọgụ:"
@@ -60,6 +68,7 @@
 
   "quiz_correct": {
     "en": "\"Ehen!\" Correct! 🎉 That's the right answer!\n\nYou've passed the quiz for this module. Type /next to continue your learning journey.",
+    "pcm": "\"Ehen!\" Correct! 🎉 Na the right answer be that!\n\nYou don pass the quiz for this module. Type /next to continue.",
     "ha": "\"Haba!\" Daidai! 🎉 Wannan shine amsar daidai!\n\nKa saukar da quiz na wannan modul. Kunna /next don ci gaba da jerin ilimi.",
     "yo": "\"Daadiiu!\" O tọ! 🎉 Iyẹn ni idahon ti o tọ!\n\nẼ ti redi fun idinku fun modul yii. Kunna /next lati tẹsiwaju ẹkọ yin.",
     "ig": "\"Mma!\" Ziri! 🎉 Ọ bụ azịza ziri!\n\nỊ gachasịla ajụjụ maka modul a. Kunna /next iji gaa n'ihu."
@@ -67,6 +76,7 @@
 
   "quiz_incorrect": {
     "en": "\"Chai!\" Not quite right. The correct answer was {correct_answer}.\n\nDon't worry — learning is a journey! Type /quiz to retry.",
+    "pcm": "\"Chai!\" E no correct. The right answer na {correct_answer}.\n\nNo worry — learning na journey! Type /quiz to try again.",
     "ha": "\"Chai!\" Ba daidai ba. Amsar daidai ta ji {correct_answer}.\n\nKada ku damuwa — ilimi shi jira! Kunna /quiz don sake yin.",
     "yo": "\"Aye!\" Kò tọ daidai. Idahon ti o tọ ni {correct_answer}.\n\nKu maarun — ẹkọ ni orin! Kunna /quiz lati bã tun ṣe.",
     "ig": "\"Ehé!\" Ọ naghị ziri. Azịza ziri bụ {correct_answer}.\n\nKadụ na-eche iwe — ịmụta bụ njem! Kunna /quiz iji ṣee ọzọ."
@@ -74,6 +84,7 @@
 
   "quiz_already_completed": {
     "en": "You have already completed the quiz for this module. Type /next to continue.",
+    "pcm": "You don already do the quiz for this module. Type /next to continue.",
     "ha": "Ka gama quiz na wannan modul. Kunna /next don ci gaba.",
     "yo": "Ẹ ti parí idinku fun modul yii. Kunna /next lati tẹsiwaju.",
     "ig": "Ị gachasịla ajụjụ maka modul a. Kunna /next iji gaa n'ihu."
@@ -81,6 +92,7 @@
 
   "course_complete": {
     "en": "🎉 Congratulations! You have completed all available lessons and quizzes!\n\nYou are now a champion for positive masculinity and GBV prevention.\n\nType /progress to review your achievement or /start to retake the course.",
+    "pcm": "🎉 Congrats! You don finish all the lessons and quizzes!\n\nYou be champion now for positive masculinity and GBV prevention.\n\nType /progress to check your achievement or /start to do the course again.",
     "ha": "🎉 Kumatti! Ka gama jerin da quiz duka!\n\nKunna champion na musulunci mai kyau da kawar GBV.\n\nKunna /progress don sake duba nasarar ka ko /start don sake yin jerin.",
     "yo": "🎉 Oriire! Ẹ ti parí gbogbo eko ati idinku!\n\nẸ jẹ champion fun okunrin rere ati kawar GBV.\n\nKunna /progress lati yan awọ aseyọri rẹ tabi /start lati tun ṣe eko naa.",
     "ig": "🎉 Otú! Ị gachasịla akwukwo na ajụjụ nile!\n\nỊ bụ ọchịchị maka dị mma na ikpirikpi GBV.\n\nBiko kunna /progress iji lebanya ụnwụ gị ma /start iji ṣee akwukwo ọzọ."
@@ -88,6 +100,7 @@
 
   "not_started": {
     "en": "It seems you haven't started the course yet. Type /start to begin!",
+    "pcm": "E be like say you never start the course. Type /start to begin!",
     "ha": "Alama cewa ba ka fara jerin ba. Kunna /start don fara!",
     "yo": "O dipo pe ẹ ko ti bẹrẹ eko naa. Kunna /start lati bẹrẹ!",
     "ig": "Ọ dị ka ị megbeeru akwukwo ahụ. Kunna /start iji malite!"
@@ -95,6 +108,7 @@
 
   "menu_header": {
     "en": "📚 *Course Outline*",
+    "pcm": "📚 *Course Outline*",
     "ha": "📚 *Firafen Jerin*",
     "yo": "📚 *Ọkọ Eko*",
     "ig": "📚 *Ụkpụrụ Akwukwo*"
@@ -102,6 +116,7 @@
 
   "menu_continue": {
     "en": "Type /next to continue from where you left off.",
+    "pcm": "Type /next to continue from where you stop.",
     "ha": "Kunna /next don ci gaba daga inda ka bar.",
     "yo": "Kunna /next lati tẹsiwaju lati ibo ti ẹ ba le.",
     "ig": "Kunna /next iji gaa n'ihu site na ebe ị kwụsịrị."
@@ -110,36 +125,42 @@
   "command_buttons": {
     "next": {
       "en": "📖 Next",
+      "pcm": "📖 Next",
       "ha": "📖 Gida",
       "yo": "📖 Atẹle",
       "ig": "📖 Ọzọ"
     },
     "quiz": {
       "en": "📝 Quiz",
+      "pcm": "📝 Quiz",
       "ha": "📝 Quiz",
       "yo": "📝 Idinku",
       "ig": "📝 Ajụjụ"
     },
     "progress": {
       "en": "📊 Progress",
+      "pcm": "📊 Progress",
       "ha": "📊 Gwarwarki",
       "yo": "📊 Iṣẹ",
       "ig": "📊 Ime"
     },
     "menu": {
       "en": "📚 Menu",
+      "pcm": "📚 Menu",
       "ha": "📚 Menu",
       "yo": "📚 Akọsọ",
       "ig": "📚 Akwụkwọ"
     },
     "help": {
       "en": "❓ Help",
+      "pcm": "❓ Help",
       "ha": "❓ Taimakon",
       "yo": "❓ Iranlọwọ",
       "ig": "❓ Nyere"
     },
     "language": {
       "en": "🌍 Language",
+      "pcm": "🌍 Language",
       "ha": "🌍 Harshe",
       "yo": "🌍 Ede",
       "ig": "🌍 Asụsụ"
@@ -148,6 +169,7 @@
 
   "language_changed": {
     "en": "Language changed to English! 🎉",
+    "pcm": "Language don change to Pidgin! 🎉",
     "ha": "Harshe ta baje zuwa Hausa! 🎉",
     "yo": "Ede ti yi lọ si Yoruba! 🎉",
     "ig": "Asụsụ gbanworo gaa na Igbo! 🎉"
@@ -155,6 +177,7 @@
 
   "error_generic": {
     "en": "Sorry, something went wrong. Please try again.",
+    "pcm": "Sorry, something no work well. Abeg try again.",
     "ha": "Jiya, wani abu ya dace. Tunna ka sake gwada.",
     "yo": "E pẹ, ohun kan o dara. Jọwọ tun bã ṣe.",
     "ig": "E jọọ, ihe ụfọdụ adịghị mma. Biko zaa ṣee."
