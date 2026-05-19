@@ -247,9 +247,15 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
     current_module_id, current_lesson_id, quiz_completed, lang = result
 
-    # If at last lesson and quiz not done, allow moving to next module anyway
-    # (User can try quiz later or skip it)
-    # So we DON'T block here anymore
+    # Block progression to next MODULE if quiz not attempted
+    # (They must at least try the quiz — pass or fail doesn't matter)
+    if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
+        module = get_module_by_id(current_module_id)
+        await update.message.reply_text(
+            get_text("quiz_not_completed", lang, module_title=module['title']),
+            reply_markup=get_main_menu_buttons(lang)
+        )
+        return
 
     # Get next lesson
     next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
@@ -431,7 +437,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                     reply_markup=get_quiz_continue_button(lang)
                 )
             else:
-                # WRONG ANSWER - Show retry/move forward options
+                # WRONG ANSWER - Mark quiz as attempted so they can proceed
+                update_quiz_status(user_id, 1)
                 await query.edit_message_text(
                     get_text("quiz_incorrect", lang, correct_answer=correct_answer),
                     reply_markup=get_quiz_retry_buttons(lang)
