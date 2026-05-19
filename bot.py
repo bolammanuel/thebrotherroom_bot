@@ -247,15 +247,9 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
     current_module_id, current_lesson_id, quiz_completed, lang = result
 
-    # ✅ FIX: If at last lesson and quiz not done, BLOCK progression
-    # Users MUST complete quiz before moving to next module
-    if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
-        module = get_module_by_id(current_module_id)
-        await update.message.reply_text(
-            get_text("quiz_not_completed", lang, module_title=module['title']),
-            reply_markup=get_main_menu_buttons(lang)
-        )
-        return
+    # If at last lesson and quiz not done, allow moving to next module anyway
+    # (User can try quiz later or skip it)
+    # So we DON'T block here anymore
 
     # Get next lesson
     next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
@@ -406,19 +400,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         await help_command(update, context)
     
-    # Quiz retry - show quiz again (they haven't completed it yet)
+    # Quiz retry - show quiz again
     elif data == "quiz_retry":
         await query.delete_message()
         await quiz_command(update, context)
     
-    # Quiz skip/move forward - ✅ FIX: Only allow if they answered a question
-    # The move forward is shown after they answered, so we allow it
-    # But quiz_completed stays 0 so they might need to retry later
+    # Quiz skip/move forward
     elif data == "quiz_skip":
         await query.delete_message()
         await next_lesson_handler(update, context)
     
-    # Quiz answer - ✅ FIX: User MUST answer a question before [Move Forward] appears
+    # Quiz answer
     elif data.startswith("quiz|"):
         parts = data.split("|")
         if len(parts) < 3:
@@ -432,7 +424,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if module and "quiz" in module:
             correct_answer = module["quiz"]["answer"]
             if selected_answer == correct_answer:
-                # CORRECT ANSWER - Mark quiz as completed
+                # CORRECT ANSWER
                 update_quiz_status(user_id, 1)
                 await query.edit_message_text(
                     get_text("quiz_correct", lang),
@@ -440,8 +432,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 )
             else:
                 # WRONG ANSWER - Show retry/move forward options
-                # They PARTICIPATED, so now they can choose to move forward
-                # (But quiz_completed stays 0 unless they answer correctly)
                 await query.edit_message_text(
                     get_text("quiz_incorrect", lang, correct_answer=correct_answer),
                     reply_markup=get_quiz_retry_buttons(lang)
