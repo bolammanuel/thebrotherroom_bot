@@ -141,6 +141,24 @@ def get_next_lesson(current_module_id, current_lesson_id):
 
     return None, None
 
+# ============== REPLY HELPER ==============
+
+async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
+    """Send a reply that works for both commands and callback queries."""
+    if update.callback_query:
+        # Called from a button click — send new message via chat
+        await update.callback_query.message.reply_text(
+            text,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode
+        )
+    elif update.message:
+        await update.message.reply_text(
+            text,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode
+        )
+
 # ============== COMMAND HANDLERS ==============
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -148,7 +166,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     user_id = update.effective_user.id
     
     # Show language selection
-    await update.message.reply_text(
+    await send_reply(
+        update,
         TRANSLATIONS["language_selection"]["en"],
         reply_markup=get_language_selection_buttons()
     )
@@ -161,7 +180,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
-    await update.message.reply_text(
+    await send_reply(
+        update,
         get_text("help_menu", lang),
         reply_markup=get_main_menu_buttons(lang)
     )
@@ -181,7 +201,8 @@ async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     
     menu_text += get_text("menu_continue", lang)
     
-    await update.message.reply_text(
+    await send_reply(
+        update,
         menu_text,
         parse_mode="Markdown",
         reply_markup=get_main_menu_buttons(lang)
@@ -194,7 +215,8 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     
     if not result or not result[0]:
         lang = 'en'
-        await update.message.reply_text(
+        await send_reply(
+            update,
             get_text("not_started", lang),
             reply_markup=get_main_menu_buttons(lang)
         )
@@ -221,12 +243,14 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             lesson_title=lesson['title']
         )
         
-        await update.message.reply_text(
+        await send_reply(
+            update,
             progress_text,
             reply_markup=get_main_menu_buttons(lang)
         )
     else:
-        await update.message.reply_text(
+        await send_reply(
+            update,
             get_text("error_generic", lang),
             reply_markup=get_main_menu_buttons(lang)
         )
@@ -238,7 +262,8 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     if not result or not result[0]:
         lang = 'en'
-        await update.message.reply_text(
+        await send_reply(
+            update,
             get_text("not_started", lang),
             reply_markup=get_main_menu_buttons(lang)
         )
@@ -251,7 +276,8 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
     # (They must at least try the quiz — pass or fail doesn't matter)
     if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
         module = get_module_by_id(current_module_id)
-        await update.message.reply_text(
+        await send_reply(
+            update,
             get_text("quiz_not_completed", lang, module_title=module['title']),
             reply_markup=get_main_menu_buttons(lang)
         )
@@ -273,7 +299,8 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             # Show lesson
             lesson_header = get_text("lesson_header", lang, module_title=module['title'], lesson_title=lesson['title'])
             
-            await update.message.reply_text(
+            await send_reply(
+                update,
                 f"{lesson_header}\n\n{lesson['content']}",
                 parse_mode="Markdown",
                 reply_markup=get_main_menu_buttons(lang)
@@ -281,18 +308,21 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
             # If this is last lesson, prompt for quiz
             if is_last_lesson_of_module(next_module_id, next_lesson_id):
-                await update.message.reply_text(
+                await send_reply(
+                    update,
                     get_text("lessons_complete", lang, module_title=module['title']),
                     reply_markup=get_main_menu_buttons(lang)
                 )
         else:
-            await update.message.reply_text(
+            await send_reply(
+                update,
                 get_text("error_generic", lang),
                 reply_markup=get_main_menu_buttons(lang)
             )
     else:
         # Course complete
-        await update.message.reply_text(
+        await send_reply(
+            update,
             get_text("course_complete", lang),
             reply_markup=get_main_menu_buttons(lang)
         )
@@ -304,7 +334,8 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     if not result or not result[0]:
         lang = 'en'
-        await update.message.reply_text(
+        await send_reply(
+            update,
             get_text("not_started", lang),
             reply_markup=get_main_menu_buttons(lang)
         )
@@ -314,7 +345,8 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     current_module_id, current_lesson_id, quiz_completed, lang = result
 
     if quiz_completed:
-        await update.message.reply_text(
+        await send_reply(
+            update,
             get_text("quiz_already_completed", lang),
             reply_markup=get_main_menu_buttons(lang)
         )
@@ -333,21 +365,24 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         buttons = [[InlineKeyboardButton(option, callback_data=f"quiz|{current_module_id}|{option[0]}")] for option in options]
         reply_markup = InlineKeyboardMarkup(buttons)
 
-        await update.message.reply_text(
+        await send_reply(
+            update,
             quiz_header,
             reply_markup=reply_markup,
             parse_mode="Markdown"
         )
     else:
         lang = get_language_preference(user_id)
-        await update.message.reply_text(
+        await send_reply(
+            update,
             get_text("error_generic", lang),
             reply_markup=get_main_menu_buttons(lang)
         )
 
 async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Change language preference."""
-    await update.message.reply_text(
+    await send_reply(
+        update,
         TRANSLATIONS["language_selection"]["en"],
         reply_markup=get_language_selection_buttons()
     )
