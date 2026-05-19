@@ -82,6 +82,14 @@
     "ig": "🔄 Nwaa Ọzọ"
   },
 
+  "quiz_not_completed": {
+  "en": "Hold on! 🎯\n\nYou need to complete the quiz for \"{module_title}\" before moving to the next module.\n\nDon't worry — you don't have to get it right, just take the quiz!\n\nType /quiz to begin.",
+  "pcm": "Wait small! 🎯\n\nYou need to do the quiz for \"{module_title}\" before you fit move.\n\nNo pressure — you no need get am right, just try am!\n\nType /quiz to start.",
+  "ha": "Jiya! 🎯\n\nKana bukatar yin quiz na \"{module_title}\" kafin mu ci gaba.\n\nKada ku damuwa — ba kuna bukatan saukar, kawai yi gwada!\n\nKunna /quiz don fara.",
+  "yo": "Jẹ́ kẹ́! 🎯\n\nẸ nilo lati ṣe idinku fun \"{module_title}\" ṣaaju ki ẹ lo siwaju.\n\nKu maarun — ẹ ko nilo lati redi, kawẹ yi gbiyanju!\n\nKunna /quiz lati bẹrẹ.",
+  "ig": "Chere! 🎯\n\nỊ nwere ike ịrụchasi ajụjụ maka \"{module_title}\" tupu ị gaa n'ihu.\n\nKadụ na-eche iwe — ị naghị achọ izi, naanị nwaa!\n\nBiko kunna /quiz iji malite."
+},
+
   "quiz_skip_button": {
     "en": "⏭️ Move Forward",
     "pcm": "⏭️ Go Ahead",
