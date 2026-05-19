@@ -351,7 +351,17 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             reply_markup=get_main_menu_buttons(lang)
         )
         return
+  # ✅ NEW: Check if at last lesson
+    if not is_last_lesson_of_module(current_module_id, current_lesson_id):
+        module = get_module_by_id(current_module_id)
+        await send_reply(
+            update,
+            get_text("quiz_not_ready", lang, module_title=module['title']),
+            reply_markup=get_main_menu_buttons(lang)
+        )
+        return
 
+    module = get_module_by_id(current_module_id)
     module = get_module_by_id(current_module_id)
 
     if module and "quiz" in module:
