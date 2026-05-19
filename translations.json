@@ -50,14 +50,6 @@
     "ig": "✅ Ị gachasịla akwukwo nile na \"{module_title}\"!\n\nOgbe maka ajụjụ mma maka ịmụta gị. Kunna /quiz iji malite."
   },
 
-  "quiz_not_completed": {
-    "en": "You need to complete the quiz for \"{module_title}\" before moving on.\n\nType /quiz to take the quiz.",
-    "pcm": "You need to finish the quiz for \"{module_title}\" before you fit move.\n\nType /quiz to do the quiz.",
-    "ha": "Kana bukatar gama quiz na \"{module_title}\" kafin mu ci gaba.\n\nKunna /quiz don yin quiz.",
-    "yo": "Ẹ nilo lati parí idinku fun \"{module_title}\" ṣaaju ki ẹ lọ siwaju.\n\nKunna /quiz lati ṣe idinku.",
-    "ig": "Ị nwere ike ịrụchasi ajụjụ maka \"{module_title}\" tupu ị gaa n'ihu.\n\nBiko kunna /quiz iji ṣee ajụjụ."
-  },
-
   "quiz_instructions": {
     "en": "📝 *Quiz for: {module_title}*\n\n{quiz_question}\n\n👇 Select your answer below by clicking the button:",
     "pcm": "📝 *Quiz for: {module_title}*\n\n{quiz_question}\n\n👇 Click the answer wey you think dey correct:",
@@ -75,11 +67,35 @@
   },
 
   "quiz_incorrect": {
-    "en": "\"Chai!\" Not quite right. The correct answer was {correct_answer}.\n\nDon't worry — learning is a journey! Type /quiz to retry.",
-    "pcm": "\"Chai!\" E no correct. The right answer na {correct_answer}.\n\nNo worry — learning na journey! Type /quiz to try again.",
-    "ha": "\"Chai!\" Ba daidai ba. Amsar daidai ta ji {correct_answer}.\n\nKada ku damuwa — ilimi shi jira! Kunna /quiz don sake yin.",
-    "yo": "\"Aye!\" Kò tọ daidai. Idahon ti o tọ ni {correct_answer}.\n\nKu maarun — ẹkọ ni orin! Kunna /quiz lati bã tun ṣe.",
-    "ig": "\"Ehé!\" Ọ naghị ziri. Azịza ziri bụ {correct_answer}.\n\nKadụ na-eche iwe — ịmụta bụ njem! Kunna /quiz iji ṣee ọzọ."
+    "en": "\"Chai!\" Not quite right. The correct answer was {correct_answer}.\n\nDon't worry — learning is a journey! Want to try again or move forward?",
+    "pcm": "\"Chai!\" E no correct. The right answer na {correct_answer}.\n\nNo worry — learning na journey! You wan try again or move forward?",
+    "ha": "\"Chai!\" Ba daidai ba. Amsar daidai ta ji {correct_answer}.\n\nKada ku damuwa — ilimi shi jira! Kana so ka sake yin ko mu tafi gida?",
+    "yo": "\"Aye!\" Kò tọ daidai. Idahon ti o tọ ni {correct_answer}.\n\nKu maarun — ẹkọ ni orin! Se o ba fẹ gbiyanju lẹhin tabi lọ siwaju?",
+    "ig": "\"Ehé!\" Ọ naghị ziri. Azịza ziri bụ {correct_answer}.\n\nKadụ na-eche iwe — ịmụta bụ njem! Ọ na-achọ iji ka gbanwee ma ọ bụ ka mwu aga?"
+  },
+
+  "quiz_retry_button": {
+    "en": "🔄 Try Again",
+    "pcm": "🔄 Try Again",
+    "ha": "🔄 Sake Gwada",
+    "yo": "🔄 Gbiyanju Lẹhin",
+    "ig": "🔄 Nwaa Ọzọ"
+  },
+
+  "quiz_skip_button": {
+    "en": "⏭️ Move Forward",
+    "pcm": "⏭️ Go Ahead",
+    "ha": "⏭️ Tafi Gida",
+    "yo": "⏭️ Lọ Si Iwaju",
+    "ig": "⏭️ Gaa n'ihu"
+  },
+
+  "quiz_continue_button": {
+    "en": "➡️ Next Module",
+    "pcm": "➡️ Next Module",
+    "ha": "➡️ Module Na Gida",
+    "yo": "➡️ Module Atẹle",
+    "ig": "➡️ Module Na-esote"
   },
 
   "quiz_already_completed": {
