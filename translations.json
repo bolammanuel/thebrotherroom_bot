@@ -114,6 +114,14 @@
     "ig": "Ị gachasịla ajụjụ maka modul a. Kunna /next iji gaa n'ihu."
   },
 
+  "quiz_not_ready": {
+  "en": "Not yet! 🚫\n\nYou need to complete all lessons in \"{module_title}\" before taking the quiz.\n\nKeep learning! Use /next to continue.",
+  "pcm": "E no time yet! 🚫\n\nYou need to finish all lessons for \"{module_title}\" before quiz time.\n\nContinue learning! Type /next.",
+  "ha": "Ba yanzu ba! 🚫\n\nKana bukatar gama duk darasi a cikin \"{module_title}\" kafin quiz.\n\nKi ci gaba da ilimi! Kunna /next.",
+  "yo": "Kò àkókò ẹ! 🚫\n\nẸ nilo lati parí gbogbo eko ni \"{module_title}\" ṣaaju ki ẹ ṣe idinku.\n\nTẹsiwaju ẹkọ! Kunna /next.",
+  "ig": "Ọ naghị oge! 🚫\n\nỊ nwere ike igwu akwukwo nile na \"{module_title}\" tupu ajụjụ.\n\nGaa n'ihu na ịmụta! Kunna /next."
+},
+
   "course_complete": {
     "en": "🎉 Congratulations! You have completed all available lessons and quizzes!\n\nYou are now a champion for positive masculinity and GBV prevention.\n\nType /progress to review your achievement or /start to retake the course.",
     "pcm": "🎉 Congrats! You don finish all the lessons and quizzes!\n\nYou be champion now for positive masculinity and GBV prevention.\n\nType /progress to check your achievement or /start to do the course again.",
