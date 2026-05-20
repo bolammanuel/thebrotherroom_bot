@@ -215,6 +215,14 @@
     "ig": "Hey brother! A nọ ebe a iji duzie gị na akwukwo. Jiri bọtini ndị dị n'okpuru ma ọ bụ nwaa ndị a:\n\n📖 /next — Gaa n'ihu na akwukwo\n📝 /quiz — Mee ajụjụ\n📊 /progress — Lee ebe ị nọ\n📚 /menu — Lee ụkpụrụ akwukwo\n\nỊ nwekwara ike ịjụ m ajụjụ banyere akwukwo!"
   },
 
+  "welcome_back": {
+    "en": "Welcome back, brother! 💪\n\nYou're currently on:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nTap /next to continue where you left off, or /menu to see the full course outline.",
+    "pcm": "Welcome back, brother! 💪\n\nYou dey currently on:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nTap /next to continue where you stop, or /menu to see the full course.",
+    "ha": "Barka da dawowar, brother! 💪\n\nKana a yanzu:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nKunna /next don ci gaba, ko /menu don ganin jerin.",
+    "yo": "Ẹ ku abọ, brother! 💪\n\nẸ wa lori:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nKunna /next lati tẹsiwaju, tabi /menu lati ri gbogbo eto.",
+    "ig": "Nnọọ, brother! 💪\n\nỊ nọ ugbu a na:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nKunna /next iji gaa n'ihu, ma ọ bụ /menu iji hụ ụkpụrụ."
+  },
+
   "error_generic": {
     "en": "Sorry, something went wrong. Please try again.",
     "pcm": "Sorry, something no work well. Abeg try again.",

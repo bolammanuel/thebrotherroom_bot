@@ -162,10 +162,27 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
 # ============== COMMAND HANDLERS ==============
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Start command - show language selection."""
+    """Start command - show language selection or welcome back returning learners."""
     user_id = update.effective_user.id
     
-    # Show language selection
+    # Check if learner already has progress
+    result = get_learner_progress(user_id)
+    
+    if result and result[0]:
+        # Returning learner — welcome them back
+        current_module_id, current_lesson_id, quiz_completed, lang = result
+        module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+        
+        if module and lesson:
+            welcome_back = get_text("welcome_back", lang, module_title=module['title'], lesson_title=lesson['title'])
+            await send_reply(
+                update,
+                welcome_back,
+                reply_markup=get_main_menu_buttons(lang)
+            )
+            return
+    
+    # New learner — show language selection
     await send_reply(
         update,
         TRANSLATIONS["language_selection"]["en"],
@@ -361,7 +378,6 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         )
         return
 
-    module = get_module_by_id(current_module_id)
     module = get_module_by_id(current_module_id)
 
     if module and "quiz" in module:
