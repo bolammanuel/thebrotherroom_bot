@@ -497,20 +497,57 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await next_lesson_handler(update, context)
     
     # Quiz answer
-    elif data.startswith("quiz|"):
-        parts = data.split("|")
-        if len(parts) < 3:
-            await query.edit_message_text(get_text("error_generic", lang))
-            return
+elif data.startswith("quiz|"):
+    parts = data.split("|")
+
+    if len(parts) < 3:
+        await query.edit_message_text(get_text("error_generic", lang))
+        return
+
+    module_id = parts[1]
+    selected_answer = parts[2]
+    module = get_module_by_id(module_id)
+
+    if module and "quiz" in module:
+        correct_answer = module["quiz"]["answer"]
+
+        if selected_answer == correct_answer:
+            # CORRECT ANSWER
+            update_quiz_status(user_id, 1)
+
+            await query.edit_message_text(
+                get_text("quiz_correct", lang),
+                reply_markup=get_quiz_continue_button(lang)
+            )
+
+        else:
+            # WRONG ANSWER
+            update_quiz_status(user_id, 1)
+
+            await query.edit_message_text(
+                get_text("quiz_incorrect", lang, correct_answer=correct_answer),
+                reply_markup=get_quiz_retry_buttons(lang)
+            )
+    else:
+        await query.edit_message_text(
+            get_text("error_generic", lang),
+            reply_markup=get_main_menu_buttons(lang)
+        )
+
 # Reset confirmation
 elif data == "confirm_reset":
-    user_id = query.from_user.id
     lang = get_language_preference(user_id)
-    
+
     # Reset to beginning
-    update_learner_progress(user_id, "module_1", "lesson_1_1", quiz_completed=0)
-    
+    update_learner_progress(
+        user_id,
+        "module_1",
+        "lesson_1_1",
+        quiz_completed=0
+    )
+
     reset_message = get_text("reset_success", lang)
+
     await query.edit_message_text(
         reset_message,
         reply_markup=get_main_menu_buttons(lang)
@@ -518,7 +555,9 @@ elif data == "confirm_reset":
 
 elif data == "cancel_reset":
     lang = get_language_preference(user_id)
+
     cancel_message = get_text("reset_cancelled", lang)
+
     await query.edit_message_text(
         cancel_message,
         reply_markup=get_main_menu_buttons(lang)
