@@ -413,6 +413,25 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply_markup=get_language_selection_buttons()
     )
 
+async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Reset user's progress and start course over."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    # Create confirmation buttons
+    buttons = [
+        [InlineKeyboardButton("✅ Yes, Reset & Start Over", callback_data="confirm_reset")],
+        [InlineKeyboardButton("❌ Cancel", callback_data="cancel_reset")]
+    ]
+    reply_markup = InlineKeyboardMarkup(buttons)
+    
+    reset_confirm = get_text("reset_confirmation", lang)
+    await send_reply(
+        update,
+        reset_confirm,
+        reply_markup=reply_markup
+    )
+
 # ============== BUTTON CALLBACK HANDLERS ==============
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -483,6 +502,28 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if len(parts) < 3:
             await query.edit_message_text(get_text("error_generic", lang))
             return
+# Reset confirmation
+elif data == "confirm_reset":
+    user_id = query.from_user.id
+    lang = get_language_preference(user_id)
+    
+    # Reset to beginning
+    update_learner_progress(user_id, "module_1", "lesson_1_1", quiz_completed=0)
+    
+    reset_message = get_text("reset_success", lang)
+    await query.edit_message_text(
+        reset_message,
+        reply_markup=get_main_menu_buttons(lang)
+    )
+
+elif data == "cancel_reset":
+    lang = get_language_preference(user_id)
+    cancel_message = get_text("reset_cancelled", lang)
+    await query.edit_message_text(
+        cancel_message,
+        reply_markup=get_main_menu_buttons(lang)
+    )
+    
         
         module_id = parts[1]
         selected_answer = parts[2]
