@@ -368,8 +368,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             reply_markup=get_main_menu_buttons(lang)
         )
         return
-
-    # Check if at last lesson
+  # ✅ NEW: Check if at last lesson
     if not is_last_lesson_of_module(current_module_id, current_lesson_id):
         module = get_module_by_id(current_module_id)
         await send_reply(
@@ -414,25 +413,6 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply_markup=get_language_selection_buttons()
     )
 
-async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Reset user's progress and start course over."""
-    user_id = update.effective_user.id
-    lang = get_language_preference(user_id)
-    
-    # Create confirmation buttons
-    buttons = [
-        [InlineKeyboardButton("✅ Yes, Reset & Start Over", callback_data="confirm_reset")],
-        [InlineKeyboardButton("❌ Cancel", callback_data="cancel_reset")]
-    ]
-    reply_markup = InlineKeyboardMarkup(buttons)
-    
-    reset_confirm = get_text("reset_confirmation", lang)
-    await send_reply(
-        update,
-        reset_confirm,
-        reply_markup=reply_markup
-    )
-
 # ============== BUTTON CALLBACK HANDLERS ==============
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -442,10 +422,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     user_id = query.from_user.id
     data = query.data
-    lang = get_language_preference(user_id)
-
-    # ================= LANGUAGE SELECTION =================
     
+    # Language selection
     if data.startswith("lang_"):
         lang_code = data.split("_")[1]
         enroll_learner(user_id, lang_code)
@@ -459,10 +437,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
         return
     
-    # ================= COMMAND BUTTONS =================
+    # Command buttons
+    lang = get_language_preference(user_id)
     
     if data == "cmd_next":
         await query.delete_message()
+        # Call next_lesson_handler via update object
         await next_lesson_handler(update, context)
     
     elif data == "cmd_quiz":
@@ -487,23 +467,24 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         await help_command(update, context)
     
-    # ================= QUIZ RETRY / SKIP =================
-    
+    # Quiz retry - show quiz again
     elif data == "quiz_retry":
         await query.delete_message()
         await quiz_command(update, context)
     
+    # Quiz skip/move forward
     elif data == "quiz_skip":
         await query.delete_message()
         await next_lesson_handler(update, context)
     
-    # ================= QUIZ ANSWERS =================
-    
+    # Quiz answer
     elif data.startswith("quiz|"):
         parts = data.split("|")
         if len(parts) < 3:
             await query.edit_message_text(get_text("error_generic", lang))
             return
+
+    
         
         module_id = parts[1]
         selected_answer = parts[2]
@@ -530,32 +511,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 get_text("error_generic", lang),
                 reply_markup=get_main_menu_buttons(lang)
             )
-    
-    # ================= RESET COURSE =================
-    
-    elif data == "confirm_reset":
-        update_learner_progress(user_id, "module_1", "lesson_1_1", quiz_completed=0)
-        
-        reset_message = get_text("reset_success", lang)
-        await query.edit_message_text(
-            reset_message,
-            reply_markup=get_main_menu_buttons(lang)
-        )
-
-    elif data == "cancel_reset":
-        cancel_message = get_text("reset_cancelled", lang)
-        await query.edit_message_text(
-            cancel_message,
-            reply_markup=get_main_menu_buttons(lang)
-        )
-    
-    # ================= UNKNOWN BUTTON =================
-    
-    else:
-        await query.edit_message_text(
-            get_text("error_generic", lang),
-            reply_markup=get_main_menu_buttons(lang)
-        )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
@@ -632,7 +587,6 @@ def main() -> None:
     application.add_handler(CommandHandler("next", next_lesson_handler))
     application.add_handler(CommandHandler("quiz", quiz_command))
     application.add_handler(CommandHandler("language", language_command))
-    application.add_handler(CommandHandler("reset", reset_command))
 
     # Message and button handlers
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
