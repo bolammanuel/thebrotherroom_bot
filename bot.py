@@ -362,20 +362,28 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     current_module_id, current_lesson_id, quiz_completed, lang = result
 
     if quiz_completed:
-        await send_reply(
-            update,
-            get_text("quiz_already_completed", lang),
-            reply_markup=get_main_menu_buttons(lang)
-        )
-        return
-  # ✅ NEW: Check if at last lesson
+    await send_reply(
+        update,
+        get_text("quiz_already_completed", lang),
+        reply_markup=get_main_menu_buttons(lang)
+    )
+    return
+
+# Check if at last lesson
     if not is_last_lesson_of_module(current_module_id, current_lesson_id):
+    
         module = get_module_by_id(current_module_id)
+    
         await send_reply(
             update,
-            get_text("quiz_not_ready", lang, module_title=module['title']),
+            get_text(
+                "quiz_not_ready",
+                lang,
+                module_title=module['title']
+            ),
             reply_markup=get_main_menu_buttons(lang)
         )
+
         return
 
     module = get_module_by_id(current_module_id)
@@ -436,132 +444,156 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle button clicks."""
+    
     query = update.callback_query
     await query.answer()
-    
+
     user_id = query.from_user.id
     data = query.data
-    
-    # Language selection
+    lang = get_language_preference(user_id)
+
+    # ================= LANGUAGE SELECTION =================
+
     if data.startswith("lang_"):
         lang_code = data.split("_")[1]
+
         enroll_learner(user_id, lang_code)
-        
-        # Show welcome message
-        welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
-        
+
+        welcome_text = get_text(
+            "start_welcome",
+            lang_code,
+            course_title=COURSE_TITLE,
+            course_description=COURSE_DESCRIPTION
+        )
+
         await query.edit_message_text(
             welcome_text,
             reply_markup=get_main_menu_buttons(lang_code)
         )
-        return
-    
-    # Command buttons
-    lang = get_language_preference(user_id)
-    
-    if data == "cmd_next":
+
+    # ================= COMMAND BUTTONS =================
+
+    elif data == "cmd_next":
         await query.delete_message()
-        # Call next_lesson_handler via update object
         await next_lesson_handler(update, context)
-    
+
     elif data == "cmd_quiz":
         await query.delete_message()
         await quiz_command(update, context)
-    
+
     elif data == "cmd_progress":
         await query.delete_message()
         await progress_command(update, context)
-    
+
     elif data == "cmd_menu":
         await query.delete_message()
         await menu_command(update, context)
-    
+
     elif data == "cmd_language":
         await query.edit_message_text(
             TRANSLATIONS["language_selection"]["en"],
             reply_markup=get_language_selection_buttons()
         )
-    
+
     elif data == "cmd_help":
         await query.delete_message()
         await help_command(update, context)
-    
-    # Quiz retry - show quiz again
+
+    # ================= QUIZ RETRY / SKIP =================
+
     elif data == "quiz_retry":
         await query.delete_message()
         await quiz_command(update, context)
-    
-    # Quiz skip/move forward
+
     elif data == "quiz_skip":
         await query.delete_message()
         await next_lesson_handler(update, context)
-    
-    # Quiz answer
-elif data.startswith("quiz|"):
-    parts = data.split("|")
 
-    if len(parts) < 3:
-        await query.edit_message_text(get_text("error_generic", lang))
-        return
+    # ================= QUIZ ANSWERS =================
 
-    module_id = parts[1]
-    selected_answer = parts[2]
-    module = get_module_by_id(module_id)
+    elif data.startswith("quiz|"):
 
-    if module and "quiz" in module:
-        correct_answer = module["quiz"]["answer"]
+        parts = data.split("|")
 
-        if selected_answer == correct_answer:
-            # CORRECT ANSWER
-            update_quiz_status(user_id, 1)
-
+        if len(parts) < 3:
             await query.edit_message_text(
-                get_text("quiz_correct", lang),
-                reply_markup=get_quiz_continue_button(lang)
+                get_text("error_generic", lang)
             )
+            return
+
+        module_id = parts[1]
+        selected_answer = parts[2]
+
+        module = get_module_by_id(module_id)
+
+        if module and "quiz" in module:
+
+            correct_answer = module["quiz"]["answer"]
+
+            if selected_answer == correct_answer:
+
+                # Correct answer
+                update_quiz_status(user_id, 1)
+
+                await query.edit_message_text(
+                    get_text("quiz_correct", lang),
+                    reply_markup=get_quiz_continue_button(lang)
+                )
+
+            else:
+
+                # Wrong answer but still mark quiz attempted
+                update_quiz_status(user_id, 1)
+
+                await query.edit_message_text(
+                    get_text(
+                        "quiz_incorrect",
+                        lang,
+                        correct_answer=correct_answer
+                    ),
+                    reply_markup=get_quiz_retry_buttons(lang)
+                )
 
         else:
-            # WRONG ANSWER
-            update_quiz_status(user_id, 1)
-
             await query.edit_message_text(
-                get_text("quiz_incorrect", lang, correct_answer=correct_answer),
-                reply_markup=get_quiz_retry_buttons(lang)
+                get_text("error_generic", lang),
+                reply_markup=get_main_menu_buttons(lang)
             )
+
+    # ================= RESET COURSE =================
+
+    elif data == "confirm_reset":
+
+        update_learner_progress(
+            user_id,
+            "module_1",
+            "lesson_1_1",
+            quiz_completed=0
+        )
+
+        reset_message = get_text("reset_success", lang)
+
+        await query.edit_message_text(
+            reset_message,
+            reply_markup=get_main_menu_buttons(lang)
+        )
+
+    elif data == "cancel_reset":
+
+        cancel_message = get_text("reset_cancelled", lang)
+
+        await query.edit_message_text(
+            cancel_message,
+            reply_markup=get_main_menu_buttons(lang)
+        )
+
+    # ================= UNKNOWN BUTTON =================
+
     else:
         await query.edit_message_text(
             get_text("error_generic", lang),
             reply_markup=get_main_menu_buttons(lang)
         )
-
-# Reset confirmation
-elif data == "confirm_reset":
-    lang = get_language_preference(user_id)
-
-    # Reset to beginning
-    update_learner_progress(
-        user_id,
-        "module_1",
-        "lesson_1_1",
-        quiz_completed=0
-    )
-
-    reset_message = get_text("reset_success", lang)
-
-    await query.edit_message_text(
-        reset_message,
-        reply_markup=get_main_menu_buttons(lang)
-    )
-
-elif data == "cancel_reset":
-    lang = get_language_preference(user_id)
-
-    cancel_message = get_text("reset_cancelled", lang)
-
-    await query.edit_message_text(
-        cancel_message,
-        reply_markup=get_main_menu_buttons(lang)
-    )
     
         
         module_id = parts[1]
