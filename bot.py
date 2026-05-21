@@ -626,6 +626,7 @@ def main() -> None:
     application.add_handler(CommandHandler("next", next_lesson_handler))
     application.add_handler(CommandHandler("quiz", quiz_command))
     application.add_handler(CommandHandler("language", language_command))
+    application.add_handler(CommandHandler("reset", reset_command))
 
     # Message and button handlers
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
