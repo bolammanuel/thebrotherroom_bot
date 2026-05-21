@@ -123,12 +123,12 @@
 },
 
   "course_complete": {
-    "en": "🎉 Congratulations! You have completed all available lessons and quizzes!\n\nYou are now a champion for positive masculinity and GBV prevention.\n\nType /progress to review your achievement or /start to retake the course.",
-    "pcm": "🎉 Congrats! You don finish all the lessons and quizzes!\n\nYou be champion now for positive masculinity and GBV prevention.\n\nType /progress to check your achievement or /start to do the course again.",
-    "ha": "🎉 Kumatti! Ka gama jerin da quiz duka!\n\nKunna champion na musulunci mai kyau da kawar GBV.\n\nKunna /progress don sake duba nasarar ka ko /start don sake yin jerin.",
-    "yo": "🎉 Oriire! Ẹ ti parí gbogbo eko ati idinku!\n\nẸ jẹ champion fun okunrin rere ati kawar GBV.\n\nKunna /progress lati yan awọ aseyọri rẹ tabi /start lati tun ṣe eko naa.",
-    "ig": "🎉 Otú! Ị gachasịla akwukwo na ajụjụ nile!\n\nỊ bụ ọchịchị maka dị mma na ikpirikpi GBV.\n\nBiko kunna /progress iji lebanya ụnwụ gị ma /start iji ṣee akwukwo ọzọ."
-  },
+  "en": "🎉 Congratulations! You have completed all available lessons and quizzes!\n\nYou are now a champion for positive masculinity and GBV prevention.\n\nType /progress to review your achievement, /reset to retake the course, or /start to continue.",
+  "pcm": "🎉 Congrats! You don finish all the lessons and quizzes!\n\nYou be champion now for positive masculinity and GBV prevention.\n\nType /progress to check your achievement, /reset to do course again, or /start to continue.",
+  "ha": "🎉 Kumatti! Ka gama jerin da quiz duka!\n\nKunna champion na musulunci mai kyau da kawar GBV.\n\nKunna /progress don sake duba nasarar ka, /reset don sake yin jerin, ko /start don ci gaba.",
+  "yo": "🎉 Oriire! Ẹ ti parí gbogbo eko ati idinku!\n\nẸ jẹ champion fun okunrin rere ati kawar GBV.\n\nKunna /progress lati yan awọ aseyọri rẹ, /reset lati tun ṣe eko, tabi /start lati tẹsiwaju.",
+  "ig": "🎉 Otú! Ị gachasịla akwukwo na ajụjụ nile!\n\nỊ bụ ọchịchị maka dị mma na ikpirikpi GBV.\n\nKunna /progress iji lebanya ụnwụ gị, /reset iji ṣee akwukwo ọzọ, ma /start iji gaa n'ihu."
+}
 
   "not_started": {
     "en": "It seems you haven't started the course yet. Type /start to begin!",
@@ -137,6 +137,30 @@
     "yo": "O dipo pe ẹ ko ti bẹrẹ eko naa. Kunna /start lati bẹrẹ!",
     "ig": "Ọ dị ka ị megbeeru akwukwo ahụ. Kunna /start iji malite!"
   },
+
+  "reset_confirmation": {
+  "en": "🔄 Are you sure you want to reset your progress?\n\nThis will clear all your progress and start the course from the beginning. You'll have to retake all lessons and quizzes.\n\nContinue?",
+  "pcm": "🔄 You sure say you wan reset your progress?\n\nThis go clear everything and start the course from beginning. You go need to do all lessons again.\n\nYou sure?",
+  "ha": "🔄 Kana tiyata kana so ka sake fara?\n\nWannan go fara jerin daga farko. Za ka sake yin duk darasi.\n\nKana so?",
+  "yo": "🔄 Se o ba tiyatẹ pe o fẹ tun bẹrẹ?\n\nYii yoo pa gbogbo orisun rẹ. Ẹ nilo lati tun ṣe gbogbo eko.\n\nSe o ba tiyatẹ?",
+  "ig": "🔄 Ịnwere olileanya na ị na-achọ ịmalite ọzọ?\n\nNke a ga-ehichapụ ihe niile ma ịmalite ọzọ. Ị ga-eme ajụjụ nile ọzọ.\n\nỊ chọrọ?"
+},
+
+"reset_success": {
+  "en": "✅ Progress Reset!\n\nYour course progress has been cleared. You're now starting fresh!\n\nType /start to begin the course again.",
+  "pcm": "✅ Progress Reset!\n\nYour progress don clear. You don start fresh!\n\nType /start to begin again.",
+  "ha": "✅ An Sake Fara!\n\nProgresska ya gama. Ka tun fara!\n\nKunna /start don tun fara.",
+  "yo": "✅ Tun Bẹrẹ!\n\nOrisun rẹ ti gba. O tun bẹrẹ!\n\nKunna /start lati tun bẹrẹ.",
+  "ig": "✅ Ọzọ Malitere!\n\nIhe gị igichapụla. Ọ malitere ọzọ!\n\nKunna /start ka ịmalite."
+},
+
+"reset_cancelled": {
+  "en": "Cancelled! Your progress is safe. 😊\n\nContinue learning!",
+  "pcm": "Cancelled! Your progress still there. 😊\n\nContinue learning!",
+  "ha": "An Soke! Progresska a nan. 😊\n\nKi ci gaba da ilimi!",
+  "yo": "An Gbe! Orisun rẹ wa. 😊\n\nTẹsiwaju ẹkọ!",
+  "ig": "Ehichapụla! Ihe gị dịrị. 😊\n\nGaa n'ihu na ịmụta!"
+}
 
   "menu_header": {
     "en": "📚 *Course Outline*",
