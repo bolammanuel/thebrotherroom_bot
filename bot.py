@@ -483,8 +483,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if len(parts) < 3:
             await query.edit_message_text(get_text("error_generic", lang))
             return
-
-    
         
         module_id = parts[1]
         selected_answer = parts[2]
