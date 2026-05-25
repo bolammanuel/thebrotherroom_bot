@@ -366,7 +366,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
     current_module_id, current_lesson_id, quiz_completed, lang = result
 
-    if quiz_completed:
+    if quiz_completed == 1:
         await send_reply(
             update,
             get_text("quiz_already_completed", lang),
@@ -504,7 +504,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 )
             else:
                 # WRONG ANSWER - Mark quiz as attempted so they can proceed
-                update_quiz_status(user_id, 1)
+                update_quiz_status(user_id, 2)
                 await query.edit_message_text(
                     get_text("quiz_incorrect", lang, correct_answer=correct_answer),
                     reply_markup=get_quiz_retry_buttons(lang)
