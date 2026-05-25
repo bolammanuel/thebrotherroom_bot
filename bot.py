@@ -200,6 +200,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                     reply_markup=get_main_menu_buttons(lang)
                 )
                 return
+    
+    # New learner — show language selection
+    await send_reply(
+        update,
+        TRANSLATIONS["language_selection"]["en"],
+        reply_markup=get_language_selection_buttons()
+    )
+    
+    # Store that we're waiting for language selection
+    context.user_data['awaiting_language_selection'] = True
 
 async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Reset learner progress completely."""
@@ -219,16 +229,6 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
     # Redirect to the start command directly to show onboarding
     await start(update, context)
-    
-    # New learner — show language selection
-    await send_reply(
-        update,
-        TRANSLATIONS["language_selection"]["en"],
-        reply_markup=get_language_selection_buttons()
-    )
-    
-    # Store that we're waiting for language selection
-    context.user_data['awaiting_language_selection'] = True
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Help command."""
