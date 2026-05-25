@@ -1,7 +1,10 @@
 import os
 import json
 import logging
+import asyncio
+import csv
 from dotenv import load_dotenv
+
 
 # Load environment variables
 load_dotenv()
@@ -11,9 +14,13 @@ from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQu
 from db_manager import (
     init_db, enroll_learner, get_learner_progress, update_learner_progress, 
     update_quiz_status, update_language_preference, get_language_preference,
-    get_connection
+    get_connection, increment_ai_questions, increment_first_attempt_quizzes,
+    set_voice_responses, get_voice_responses, update_post_test_score,
+    save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
+    get_inactive_learners
 )
-from openai_utils import get_openai_response 
+from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
+
 
 # Enable logging
 logging.basicConfig(
@@ -197,20 +204,46 @@ def get_next_lesson(current_module_id, current_lesson_id):
 # ============== REPLY HELPER ==============
 
 async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
-    """Send a reply that works for both commands and callback queries."""
+    """Send a reply that works for both commands and callback queries, and handles accessibility voice notes if enabled."""
+    target_msg = None
     if update.callback_query:
-        # Called from a button click — send new message via chat
-        await update.callback_query.message.reply_text(
+        target_msg = await update.callback_query.message.reply_text(
             text,
             reply_markup=reply_markup,
             parse_mode=parse_mode
         )
     elif update.message:
-        await update.message.reply_text(
+        target_msg = await update.message.reply_text(
             text,
             reply_markup=reply_markup,
             parse_mode=parse_mode
         )
+        
+    # Check for voice accessibility preference
+    user_id = update.effective_user.id if update.effective_user else None
+    if user_id and get_voice_responses(user_id):
+        # Clean text of raw markdown formatting for a natural audio reading experience
+        clean_text = text.replace('*', '').replace('_', '').replace('`', '').replace('👉', '').replace('👇', '').replace('✅', '').replace('🎉', '').replace('📊', '').replace('📝', '').replace('📖', '').replace('📚', '').replace('🤛', '').replace('🤜', '')
+        
+        # Safe length truncation to optimize TTS request speed
+        if len(clean_text) > 800:
+            clean_text = clean_text[:800] + "..."
+            
+        output_filename = f"assets/voice_reply_{user_id}.ogg"
+        success = synthesize_speech(clean_text, output_filename)
+        if success:
+            try:
+                chat_msg = update.callback_query.message if update.callback_query else update.message
+                with open(output_filename, "rb") as voice_file:
+                    await chat_msg.reply_voice(voice=voice_file)
+            except Exception as e:
+                logger.error(f"Error sending synthesized voice reply: {e}")
+            finally:
+                if os.path.exists(output_filename):
+                    try:
+                        os.remove(output_filename)
+                    except Exception:
+                        pass
 
 # ============== COMMAND HANDLERS ==============
 
@@ -449,12 +482,8 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 reply_markup=get_main_menu_buttons(lang)
             )
     else:
-        # Course complete
-        await send_reply(
-            update,
-            get_text("course_complete", lang),
-            reply_markup=get_main_menu_buttons(lang)
-        )
+        # Course complete — Route to the scored exit post-test exam!
+        await send_post_test_welcome(update, context)
 
 async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show quiz for current module."""
@@ -525,6 +554,435 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply_markup=get_language_selection_buttons()
     )
 
+# ============== CERTIFICATE AND EXIT POST-TEST ENGINES ==============
+
+async def send_post_test_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Send the welcome message for the exit post-test."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    welcome_text = get_text("post_test.welcome", lang)
+    start_label = get_text("post_test.start_button", lang)
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(start_label, callback_data="posttest_start")]
+    ])
+    
+    await send_reply(update, welcome_text, reply_markup=keyboard)
+
+async def send_post_test_question(update: Update, context: ContextTypes.DEFAULT_TYPE, question_idx: int) -> None:
+    """Send a specific post-test question."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    questions = TRANSLATIONS["post_test"]["questions"]
+    if question_idx < 0 or question_idx >= len(questions):
+        # Done with all questions — grade the post-test!
+        await grade_post_test(update, context)
+        return
+        
+    question_data = questions[question_idx]
+    q_text = f"📝 *Question {question_idx + 1}/5*\n\n" + question_data["question"].get(lang, question_data["question"]["en"])
+    options = question_data["options"].get(lang, question_data["options"]["en"])
+    
+    # Store current question index in user_data
+    context.user_data["posttest_current"] = question_idx
+    
+    # Build buttons
+    buttons = []
+    for option in options:
+        choice_char = option[0] # e.g. 'A'
+        buttons.append([InlineKeyboardButton(option, callback_data=f"posttest_ans|{question_idx}|{choice_char}")])
+        
+    keyboard = InlineKeyboardMarkup(buttons)
+    
+    await send_reply(update, q_text, reply_markup=keyboard, parse_mode="Markdown")
+
+async def grade_post_test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Calculate post-test score and determine pass/fail state."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    # Retrieve answers from user_data
+    answers = context.user_data.get("posttest_answers", {})
+    questions = TRANSLATIONS["post_test"]["questions"]
+    
+    score = 0
+    for idx, q_data in enumerate(questions):
+        correct_ans = q_data["answer"]
+        user_ans = answers.get(idx)
+        if user_ans == correct_ans:
+            score += 10 # 10 points per question
+            
+    # Save score to database
+    update_post_test_score(user_id, score)
+    
+    # Clear active test session variables
+    context.user_data.pop("posttest_current", None)
+    context.user_data.pop("posttest_answers", None)
+    
+    if score >= 35:
+        # PASSED (score >= 35)
+        passed_text = get_text("post_test.passed", lang, score=score)
+        await send_reply(update, passed_text)
+        # Put user into a state waiting for their pledge
+        context.user_data["awaiting_pledge"] = True
+    else:
+        # FAILED
+        failed_text = get_text("post_test.failed", lang, score=score)
+        retry_label = get_text("post_test.retry_button", lang)
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(retry_label, callback_data="posttest_start")]
+        ])
+        await send_reply(update, failed_text, reply_markup=keyboard)
+
+def generate_certificate_image(name, date_str, user_id):
+    """Generate a highly aesthetic, premium certificate of completion using Pillow."""
+    import hashlib
+    from PIL import Image, ImageDraw, ImageFont
+    
+    width, height = 1920, 1080
+    
+    template_path = "assets/certificate_template.png"
+    if os.path.exists(template_path):
+        img = Image.open(template_path).convert("RGB")
+    else:
+        img = Image.new("RGB", (width, height), (252, 250, 242))
+        draw = ImageDraw.Draw(img)
+        draw.rectangle([40, 40, width - 40, height - 40], outline=(15, 32, 67), width=8)
+        draw.rectangle([55, 55, width - 55, height - 55], outline=(212, 175, 55), width=3)
+        margin = 55
+        for x, y in [(margin, margin), (width - margin, margin), (margin, height - margin), (width - margin, height - margin)]:
+            draw.regular_polygon((x, y, 15), 4, rotation=45, fill=(212, 175, 55))
+            
+    draw = ImageDraw.Draw(img)
+    
+    try:
+        font_header = ImageFont.truetype("assets/fonts/Outfit-Regular.ttf", 36)
+        font_title = ImageFont.truetype("assets/fonts/NotoSerif-Bold.ttf", 64)
+        font_subtitle = ImageFont.truetype("assets/fonts/Outfit-Regular.ttf", 28)
+        font_name = ImageFont.truetype("assets/fonts/NotoSerif-Bold.ttf", 72)
+        font_desc = ImageFont.truetype("assets/fonts/Outfit-Regular.ttf", 26)
+        font_course = ImageFont.truetype("assets/fonts/NotoSerif-Bold.ttf", 34)
+        font_footer = ImageFont.truetype("assets/fonts/Outfit-Regular.ttf", 20)
+    except Exception:
+        try:
+            font_header = ImageFont.truetype("Arial.ttf", 36)
+            font_title = ImageFont.truetype("Times New Roman.ttf", 64)
+            font_subtitle = ImageFont.truetype("Arial.ttf", 28)
+            font_name = ImageFont.truetype("Times New Roman.ttf", 72)
+            font_desc = ImageFont.truetype("Arial.ttf", 26)
+            font_course = ImageFont.truetype("Times New Roman.ttf", 34)
+            font_footer = ImageFont.truetype("Arial.ttf", 20)
+        except Exception:
+            font_header = font_title = font_subtitle = font_name = font_desc = font_course = font_footer = ImageFont.load_default()
+            
+    draw.text((width // 2, 150), "THE BROTHERS' ROOM", fill=(15, 32, 67), font=font_header, anchor="mm")
+    draw.line([(width // 2 - 150, 185), (width // 2 + 150, 185)], fill=(212, 175, 55), width=2)
+    draw.text((width // 2, 260), "CERTIFICATE OF COMPLETION", fill=(15, 32, 67), font=font_title, anchor="mm")
+    draw.text((width // 2, 360), "This is proudly awarded to", fill=(100, 100, 100), font=font_subtitle, anchor="mm")
+    draw.text((width // 2, 450), name.upper(), fill=(15, 32, 67), font=font_name, anchor="mm")
+    draw.line([(width // 2 - 350, 500), (width // 2 + 350, 500)], fill=(212, 175, 55), width=3)
+    draw.text((width // 2, 570), "for successfully completing the 6-week conversational course on", fill=(100, 100, 100), font=font_desc, anchor="mm")
+    draw.text((width // 2, 630), "Positive Masculinity & Gender-Based Violence (GBV) Prevention", fill=(15, 32, 67), font=font_course, anchor="mm")
+    draw.line([(350, 830), (650, 830)], fill=(15, 32, 67), width=2)
+    draw.text((500, 860), f"DATE: {date_str}", fill=(100, 100, 100), font=font_subtitle, anchor="mm")
+    draw.line([(width - 650, 830), (width - 350, 830)], fill=(15, 32, 67), width=2)
+    draw.text((width - 500, 800), "Tobi", fill=(15, 32, 67), font=font_course, anchor="mm")
+    draw.text((width - 500, 860), "COURSE FACILITATOR", fill=(100, 100, 100), font=font_subtitle, anchor="mm")
+    
+    v_hash = hashlib.sha256(f"TBR-{user_id}-{date_str}".encode()).hexdigest()[:12].upper()
+    draw.text((width // 2, 980), f"VERIFICATION ID: TBR-{v_hash}", fill=(150, 150, 150), font=font_footer, anchor="mm")
+    
+    output_path = f"assets/certificate_{user_id}.png"
+    img.save(output_path)
+    return output_path
+
+async def handle_graduation_and_certificate(update: Update, context: ContextTypes.DEFAULT_TYPE, pledge: str) -> None:
+    """Acknowledge pledge, compile dynamic certificate, broadcast to community, and send final graduation card."""
+    import datetime
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    processing_msg = {
+        "en": "Generating your official Certificate of Completion... 🎓 Please hold on a moment, brother.",
+        "pcm": "We dey compile your official Certificate of Completion now... 🎓 Abeg wait small, brother.",
+        "ha": "Ana hada Takardar Shaidarku ta kammala karatu... 🎓 Dan Allah jira kadan.",
+        "yo": "A n ṣẹda Iwe-ẹri Ipari osise rẹ... 🎓 Jọwọ duro diẹ, arakunrin.",
+        "ig": "Anyị na-akwadebe Asambodo Mmezu gị nke ọha... 🎓 Biko nwee ndidi, nwanne m."
+    }.get(lang, "Generating your Certificate...")
+    
+    await update.message.reply_text(processing_msg)
+    
+    learner_name = update.effective_user.full_name
+    current_date = datetime.datetime.now().strftime("%B %d, %Y")
+    certificate_file = generate_certificate_image(learner_name, current_date, user_id)
+    
+    congrats_text = get_text("course_complete", lang)
+    
+    try:
+        with open(certificate_file, "rb") as cert:
+            await update.message.reply_photo(
+                photo=cert,
+                caption=congrats_text,
+                reply_markup=get_main_menu_buttons(lang)
+            )
+    except Exception as e:
+        logger.error(f"Error sending certificate photo: {e}")
+        await update.message.reply_text(congrats_text)
+    finally:
+        if os.path.exists(certificate_file):
+            try:
+                os.remove(certificate_file)
+            except Exception:
+                pass
+                
+    community_chat_id = os.getenv("COMMUNITY_CHAT_ID")
+    if community_chat_id:
+        try:
+            broadcast_text = f"🤜🤛 *New Brother Pledge Posted!*\n\n*Learner:* {learner_name}\n*Pledge:* \"{pledge}\"\n\nWelcome our new graduate and Peer Champion!"
+            await context.application.bot.send_message(
+                chat_id=community_chat_id,
+                text=broadcast_text,
+                parse_mode="Markdown"
+            )
+        except Exception as e:
+            logger.error(f"Error broadcasting pledge to community: {e}")
+
+async def reminder_scheduler(application: Application) -> None:
+    """Persistent background asynchronous worker for scheduling nudges and weekly reminders."""
+    logger.info("Background reminder scheduler started successfully!")
+    while True:
+        try:
+            # 1. Weekly Pledge Reminders
+            pending_reminders = get_pending_reminders()
+            for user_id, reminder_type, pledge_text, reminders_sent, lang in pending_reminders:
+                try:
+                    reminder_msg = {
+                        "en": f"🤜🤛 *Your Personal Weekly Pledge Reminder*\n\nHey brother! Here is the pledge you made to stand against GBV and lead by example:\n\n*\"{pledge_text}\"*\n\nKeep living as a champion in your family and community! 💪",
+                        "pcm": f"🤜🤛 *Your Personal Weekly Pledge Reminder*\n\nHow far brother! See the pledge wey you make to stand against GBV and lead by example:\n\n*\"{pledge_text}\"*\n\nKeep living as champion inside your family and community! 💪",
+                        "ha": f"🤜🤛 *Tunasar Alkawarinka na Mako-mako*\n\nSannu brother! Ga alkawarin da ka dauka don yaki da GBV:\n\n*\"{pledge_text}\"*\n\nCi gaba da zama abin koyi ga danginka da al'ummarku! 💪",
+                        "yo": f"🤜🤛 *Iranti Ipolongo Ara Ẹni ti Ọsẹ*\n\nẸ ku abọ brother! Eyi ni ipinnu ti o ṣe lati duro lodi si GBV:\n\n*\"{pledge_text}\"*\n\nTẹsiwaju lati jẹ apẹẹrẹ rere! 💪",
+                        "ig": f"🤜🤛 *Ihe Ncheta Nkwa Gị Nke Izu*\n\nKedu nwanne m! Nke a bụ nkwa ị kweri na ị ga-eguzo megide GBV:\n\n*\"{pledge_text}\"*\n\nGaa n'ihu na-adị ndụ dị ka ọchịchị! 💪"
+                    }.get(lang, f"Your Pledge Reminder:\n\n\"{pledge_text}\"")
+                    
+                    await application.bot.send_message(
+                        chat_id=user_id,
+                        text=reminder_msg,
+                        parse_mode="Markdown"
+                    )
+                    update_reminder_sent(user_id, reminder_type)
+                    logger.info(f"Dispatched weekly pledge reminder to user {user_id} ({reminders_sent+1}/4)")
+                except Exception as e:
+                    logger.error(f"Failed to send weekly reminder to {user_id}: {e}")
+
+            # 2. Inactive Learner Nudges (4 Days)
+            inactive_learners = get_inactive_learners()
+            for user_id, current_module, current_lesson, lang in inactive_learners:
+                try:
+                    nudge_msg = {
+                        "en": "Hey brother! 👋 Just checking in. I'm here to guide you through the course whenever you are ready. Let's keep learning! Tap /next to continue.",
+                        "pcm": "How far brother! 👋 Just checking in. I dey here to guide you through the course. Let's continue! Tap /next make we continue.",
+                        "ha": "Sannu brother! 👋 Ina duba ku. Ina nan don ci gaba da taimaka muku. Kunna /next don ci gaba.",
+                        "yo": "Hey brother! 👋 Mo kan n ṣayẹwo rẹ. Mo wa nibi lati tọ ọ si eko naa. Kunna /next lati tẹsiwaju.",
+                        "ig": "Kedu nwanne m! 👋 Naanị ịlele gị. A nọ m ebe a iji duzie gị na akwukwo. Kunna /next iji gaa n'ihu."
+                    }.get(lang, "Hey brother! Just checking in. Let's keep learning! Tap /next to continue.")
+                    
+                    await application.bot.send_message(
+                        chat_id=user_id,
+                        text=nudge_msg
+                    )
+                    # Resets activity timestamp by updating current progress state
+                    update_learner_progress(user_id, current_module, current_lesson)
+                    logger.info(f"Dispatched inactive learner nudge to user {user_id}")
+                except Exception as e:
+                    logger.error(f"Failed to send inactive nudge to {user_id}: {e}")
+
+        except Exception as e:
+            logger.error(f"Error in background reminder worker loop: {e}")
+        
+        # Check every 1 hour
+        await asyncio.sleep(3600)
+
+# ============== ADMINISTRATIVE DASHBOARD & EXPORTER ==============
+
+async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Admin dashboard command."""
+    user_id = update.effective_user.id
+    
+    # Secure admin authentication
+    admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+    admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+    
+    if admin_ids and user_id not in admin_ids:
+        await send_reply(update, "🚫 You are not authorized to view the Admin Dashboard.")
+        return
+        
+    dashboard_text = (
+        "📊 *The Brothers' Room - Admin Dashboard*\n\n"
+        "Welcome to your management command center. Use the controls below to monitor active learners and identify Peer Facilitators.\n\n"
+        "👇 Select an action:"
+    )
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("📈 Peer Facilitator Leaderboard", callback_data="admin_leaderboard")],
+        [InlineKeyboardButton("📁 Export Progress Report (CSV)", callback_data="admin_export_csv")]
+    ])
+    
+    await send_reply(update, dashboard_text, reply_markup=keyboard, parse_mode="Markdown")
+
+async def show_admin_leaderboard(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show the Peer Facilitator Leaderboard ranking top learners."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    leaderboard = get_engagement_leaderboard()
+    
+    if not leaderboard:
+        # Secure back button
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]])
+        await send_reply(update, "📭 No learners registered in the database yet.", reply_markup=keyboard)
+        return
+        
+    text = "🏆 *Peer Facilitator Leaderboard (Engagement Rankings)*\n\n"
+    text += "Ranks are computed based on: *Progress (10 pts)* + *First-Attempt Quizzes (5 pts)* + *AI Inquiries (3 pts)*.\n\n"
+    
+    for idx, item in enumerate(leaderboard[:10]):
+        badge = "🥇" if idx == 0 else "🥈" if idx == 1 else "🥉" if idx == 2 else "👤"
+        text += f"{badge} *Rank {idx + 1}:* User `{item['user_id']}`\n"
+        text += f"   • Engagement Score: *{item['engagement_score']}*\n"
+        text += f"   • Modules Completed: {item['modules_completed']}/12\n"
+        text += f"   • First-Attempt Quizzes: {item['first_attempt_quizzes']}\n"
+        text += f"   • AI Assistant Queries: {item['ai_questions_count']}\n"
+        if item['post_test_score'] >= 0:
+            text += f"   • Exit Exam Score: *{item['post_test_score']}/50* (GRADUATED)\n"
+        text += "\n"
+        
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]
+    ])
+    
+    await send_reply(update, text, reply_markup=keyboard, parse_mode="Markdown")
+
+async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Generate a detailed CSV progress report and send as a Telegram document."""
+    user_id = update.effective_user.id
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT user_id, current_module_id, current_lesson_id, quiz_completed, 
+               language_preference, enrollment_date, post_test_score, pledge_text,
+               ai_questions_count, first_attempt_quizzes
+        FROM learners
+    """)
+    rows = cursor.fetchall()
+    conn.close()
+    
+    if not rows:
+        keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]])
+        await send_reply(update, "📭 No data available to export.", reply_markup=keyboard)
+        return
+        
+    csv_file_path = "assets/learner_progress_report.csv"
+    
+    with open(csv_file_path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow([
+            "User ID", "Current Module", "Current Lesson", "Quiz Status", 
+            "Language Preference", "Enrollment Date", "Post-Test Score", "Personal Pledge",
+            "AI Questions Asked", "First-Attempt Quizzes Passed"
+        ])
+        for row in rows:
+            writer.writerow(row)
+            
+    try:
+        chat_msg = update.callback_query.message if update.callback_query else update.message
+        with open(csv_file_path, "rb") as csv_file:
+            await chat_msg.reply_document(
+                document=csv_file,
+                filename="learner_progress_report.csv",
+                caption="📁 *The Brothers' Room - Learner Progress CSV Report*\n\nHere is your full data export.",
+                parse_mode="Markdown"
+            )
+    except Exception as e:
+        logger.error(f"Error sending CSV report: {e}")
+        await send_reply(update, "❌ Failed to send the CSV report file.")
+    finally:
+        if os.path.exists(csv_file_path):
+            try:
+                os.remove(csv_file_path)
+            except Exception:
+                pass
+
+# ==================================================================
+
+async def accessibility_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Toggle voice response accessibility for visually impaired users."""
+    user_id = update.effective_user.id
+    current_status = get_voice_responses(user_id)
+    new_status = not current_status
+    set_voice_responses(user_id, new_status)
+    
+    status_text = {
+        "en": f"Accessibility Voice Replies have been {'ENABLED' if new_status else 'DISABLED'}. The bot will now {'send audio voice notes alongside text messages' if new_status else 'only send text messages'}.",
+        "pcm": f"Accessibility Voice Replies don {'START' if new_status else 'STOP'}. Bot go now {'dey send voice notes as well' if new_status else 'dey send text only'}.",
+        "ha": f"Accessibility Voice Replies an {'KUNNA' if new_status else 'KASHE'}.",
+        "yo": f"Accessibility Voice Replies ti jẹ́ {'MÚ KÚN' if new_status else 'MÚ KÚRÒ'}.",
+        "ig": f"Accessibility Voice Replies abanyela {'MERE' if new_status else 'PAA'}."
+    }
+    lang = get_language_preference(user_id)
+    response_msg = status_text.get(lang, status_text["en"])
+    
+    await send_reply(update, response_msg)
+
+async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle incoming voice messages by transcribing them via Whisper and piping to text handler."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    try:
+        # Download user voice note (.ogg format)
+        voice_file = await update.message.voice.get_file()
+        ogg_path = f"assets/voice_input_{user_id}.ogg"
+        await voice_file.download_to_drive(ogg_path)
+        
+        # Transcribe using Whisper
+        transcription = transcribe_voice(ogg_path)
+        
+        # Clean up temporary audio file
+        if os.path.exists(ogg_path):
+            os.remove(ogg_path)
+            
+        if transcription:
+            # Display transcribed text back for clarity
+            heard_msg = {
+                "en": f"🎤 *I heard:* \"{transcription}\"",
+                "pcm": f"🎤 *Wetin I hear:* \"{transcription}\"",
+                "ha": f"🎤 *Abin da na ji:* \"{transcription}\"",
+                "yo": f"🎤 *Ohun tí mo gbọ́:* \"{transcription}\"",
+                "ig": f"🎤 *Ihe m nụrụ:* \"{transcription}\""
+            }.get(lang, f"🎤 *I heard:* \"{transcription}\"")
+            
+            await update.message.reply_text(heard_msg, parse_mode="Markdown")
+            
+            # Pipe transcription text straight into handle_message handler
+            update.message.text = transcription
+            await handle_message(update, context)
+        else:
+            fail_msg = {
+                "en": "Sorry, I couldn't understand that voice message. Please try speaking clearly or typing instead.",
+                "pcm": "Sorry, I no hear that voice message well. Abeg try talk clear or type am.",
+                "ha": "Yi hakuri, ban gane wannan sakon murya ba. Don Allah yi magana a fili ko rubuta maimakon haka.",
+                "yo": "Binu, mi o loye ifiranṣẹ ohun yẹn. Jọwọ sọrọ ni kedere tabi kọ ọ dipo.",
+                "ig": "Ndo, aghotaghị m ozi olu ahụ. Biko gbalịa kwuo okwu nke ọma ma ọ bụ pịaji."
+            }.get(lang, "Sorry, I couldn't understand that voice message.")
+            await update.message.reply_text(fail_msg)
+            
+    except Exception as e:
+        logger.error(f"Error handling voice message: {e}")
+        await update.message.reply_text(get_text("error_generic", lang))
+
 # ============== BUTTON CALLBACK HANDLERS ==============
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -564,6 +1022,42 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     # Command buttons
     lang = get_language_preference(user_id)
+    
+    # Intercept post-test callbacks
+    if data == "posttest_start":
+        await query.delete_message()
+        context.user_data["posttest_answers"] = {}
+        context.user_data["posttest_current"] = 0
+        await send_post_test_question(update, context, 0)
+        return
+        
+    elif data.startswith("posttest_ans|"):
+        parts = data.split("|")
+        q_idx = int(parts[1])
+        selected_choice = parts[2]
+        
+        if "posttest_answers" not in context.user_data:
+            context.user_data["posttest_answers"] = {}
+        context.user_data["posttest_answers"][q_idx] = selected_choice
+        
+        await query.delete_message()
+        await send_post_test_question(update, context, q_idx + 1)
+        return
+        
+    elif data == "cmd_admin":
+        await query.delete_message()
+        await admin_command(update, context)
+        return
+        
+    elif data == "admin_leaderboard":
+        await query.delete_message()
+        await show_admin_leaderboard(update, context)
+        return
+        
+    elif data == "admin_export_csv":
+        await query.delete_message()
+        await export_admin_csv(update, context)
+        return
     
     if data == "cmd_next":
         await query.delete_message()
@@ -621,6 +1115,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             correct_answer = module["quiz"]["answer"]
             if selected_answer == correct_answer:
                 # CORRECT ANSWER
+                # Check if this is the first attempt (quiz_completed == 0)
+                progress = get_learner_progress(user_id)
+                if progress and progress[2] == 0:
+                    increment_first_attempt_quizzes(user_id)
+                
                 update_quiz_status(user_id, 1)
                 await query.edit_message_text(
                     get_text("quiz_correct", lang),
@@ -645,6 +1144,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
 
+    # Intercept personal pledges for graduations
+    if context.user_data.get("awaiting_pledge"):
+        context.user_data.pop("awaiting_pledge", None)
+        save_pledge(user_id, user_message)
+        await handle_graduation_and_certificate(update, context, user_message)
+        return
+
     # Check for navigation keywords
     if user_message.lower().strip() in ["next", "continue", "go next", "move on"]:
         await next_lesson_handler(update, context)
@@ -667,6 +1173,9 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     is_course_related = any(keyword in message_lower for keyword in course_keywords)
 
     if is_course_related:
+        # Increment active AI queries for the peer facilitator calculations
+        increment_ai_questions(user_id)
+        
         # Use AI to answer course-related questions
         result = get_learner_progress(user_id)
         full_course_text = json.dumps(COURSE_CONTENT)
@@ -704,11 +1213,15 @@ async def post_init(application: Application) -> None:
         BotCommand("progress", "Check your current module and lesson"),
         BotCommand("menu", "View the full course outline"),
         BotCommand("language", "Change your language preference"),
+        BotCommand("accessibility", "Toggle voice replies for visual accessibility"),
+        BotCommand("admin", "Admin Dashboard & Peer Facilitator Leaderboard"),
         BotCommand("community", "Join our WhatsApp community"),
         BotCommand("reset", "Reset progress completely and restart"),
         BotCommand("help", "Get help and list commands")
     ]
     await application.bot.set_my_commands(commands)
+    # Start background reminder and nudge scheduler clock
+    asyncio.create_task(reminder_scheduler(application))
 
 def main() -> None:
     """Start the bot."""
@@ -731,9 +1244,12 @@ def main() -> None:
     application.add_handler(CommandHandler("next", next_lesson_handler))
     application.add_handler(CommandHandler("quiz", quiz_command))
     application.add_handler(CommandHandler("language", language_command))
+    application.add_handler(CommandHandler("accessibility", accessibility_command))
+    application.add_handler(CommandHandler("admin", admin_command))
 
-    # Message and button handlers
+    # Message, voice, and button handlers
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
     application.add_handler(CallbackQueryHandler(button_handler))
 
     # Run the bot

@@ -224,5 +224,129 @@
     "ha": "Jiya, wani abu ya dace. Tunna ka sake gwada.",
     "yo": "E pẹ, ohun kan o dara. Jọwọ tun bã ṣe.",
     "ig": "E jọọ, ihe ụfọdụ adịghị mma. Biko zaa ṣee."
+  },
+  "post_test": {
+    "questions": [
+      {
+        "question": {
+          "en": "What is a key characteristic of positive masculinity?",
+          "pcm": "Wetin be correct trait of positive masculinity?",
+          "ha": "Wacece siffa ta gari ta namiji mai kirki?",
+          "yo": "Kini ami pataki ti okunrin rere?",
+          "ig": "Kedu ihe bụ isi njirimara nke ezigbo nwoke?"
+        },
+        "options": {
+          "en": ["A) Suppressing emotions to appear strong", "B) Empathy, respect, and emotional intelligence", "C) Dominating conversations in relationships", "D) Ignoring gender stereotypes completely"],
+          "pcm": ["A) Force clear emotions down to show power", "B) Empathy, respect, and emotional intelligence", "C) Command talk for inside relationship", "D) Leave gender talk completely"],
+          "ha": ["A) Boye bacin rai don nuna karfi", "B) Jin kai, girmamawa da wayewar kai", "C) Mulki a cikin zamantakewa", "D) Kyalewa batun maza da mata kwata-kwata"],
+          "yo": ["A) Mimu ibinu pam lati farahan bi alagbara", "B) Aanu, owo, ati emotional intelligence", "C) Jije olori ninu ibaraẹnisọrọ ibasepọ", "D) Gbigbagbe awon igbagbo ti ko to"],
+          "ig": ["A) Ichebe iwe onwe anyi ka anyi di ike", "B) Ebere, ugwu, na emotional intelligence", "C) Iburu onye isi n'ihe omume obodo", "D) Ileghara uzo oche nwoke na nwanyị anya"]
+        },
+        "answer": "B"
+      },
+      {
+        "question": {
+          "en": "Which of the following is NOT a form of Gender-Based Violence (GBV)?",
+          "pcm": "Wetin follow for here wey NO be GBV?",
+          "ha": "Wanne ne a cikin wadannan BA nau'in cin zarafi na jinsi (GBV) ba ne?",
+          "yo": "Wọn lori eyi ti KỌ jẹ irisi Ijagba lori Eya (GBV)?",
+          "ig": "Kedu nke na-abụghị ụdị ime ihe ike dabere na nwoke na nwanyị (GBV)?"
+        },
+        "options": {
+          "en": ["A) Denying a partner financial autonomy", "B) Unwanted comments or sexual advances in public", "C) Disagreeing respectfully with someone's opinion", "D) Forcing a spouse into sexual acts against their will"],
+          "pcm": ["A) Gbanzari partner make e no hold money", "B) Slut-shaming or touch touching for public", "C) Argument wey respect dey inside", "D) Force spouse into sexual acts against their will"],
+          "ha": ["A) Hana abokin zama ikon kudi na kansa", "B) Kalaman cin zarafi ko taba mutum a fili", "C) Sabani cikin girmamawa da ra'ayin wani", "D) Tursasa abokin zama yin jima'i da karfi"],
+          "yo": ["A) Kiko lati fun alabaṣepọ ni ominira owo", "B) Oro tabi ifẹkufẹ ibalopo ni gbangba", "C) Gbigba iyatọ ti o tọ pẹlu ero eniyan", "D) Fi agbara mu alabaṣepọ si ibalopo lai fẹ"],
+          "ig": ["A) Ikwusi onye otu gi inweta ego nke ya", "B) Okwu ruru arụ ma ọ bụ mkpasu iwe n'ihu ọha", "C) Esemokwu nwere ugwu na echiche mmadụ", "D) Iji ike manye di ma ọ bụ nwunye n'omume mmekọahụ"]
+        },
+        "answer": "C"
+      },
+      {
+        "question": {
+          "en": "What is the most critical element of enthusiastic consent?",
+          "pcm": "Wetin be the main part of enthusiastic consent?",
+          "ha": "Menene mafi mahimmancin sashi na yarda ta gari?",
+          "yo": "Kini ohun pataki julọ fun iyọnda to gbangba?",
+          "ig": "Kedu ihe kacha mkpa na nkwenye doro anya?"
+        },
+        "options": {
+          "en": ["A) The absence of a clear 'No' from the partner", "B) A silent agreement based on standard social rules", "C) An active, ongoing, freely-given, and reversible 'Yes'", "D) Agreeing once at the start of a relationship"],
+          "pcm": ["A) Say partner no say 'No' directly", "B) Keep quiet follow what dey happen", "C) Active, ongoing, freely-given, and reversible 'Yes'", "D) Say 'Yes' only once for beginning of love"],
+          "ha": ["A) Rashin fadin 'A'a' a fili daga abokin zama", "B) Shiru da ke nuna yarda bisa ka'ida", "C) Ee mai aiki, mai dorewa, wadda aka bayar kyauta", "D) Yarda sau daya kawai a farkon soyayya"],
+          "yo": ["A) Aisi 'Bẹ́ẹ̀ kọ́' ti o han gbangba lati ọdọ alabaṣepọ", "B) Adehun lẹnu lai sọrọ", "C) Bẹ́ẹ̀ ni ti o gbona, ti o tẹsiwaju, ti ominira", "D) Gbigba lẹkan ṣoṣo ni ibẹrẹ ibatan"],
+          "ig": ["A) Enweghị 'Mba' doro anya sitere na onye ọzọ", "B) Nkwekọrịta dị jụụ dabere na omenala", "C) Ee dị iru, na-aga n'ihu, n'efu, na nke enwere ike ịgbanwe", "D) Ikwu ee otu ugboro ná mmalite mmekọrịta"]
+        },
+        "answer": "C"
+      },
+      {
+        "question": {
+          "en": "If a friend makes a sexually abusive or harmful joke in a group chat, what is the best bystander response?",
+          "pcm": "If friend clear dry bad joke for group chat, wetin you suppose do?",
+          "ha": "Idan aboki ya yi barkwanci na cin zarafi ko cutarwa a rukunin hira, menene mafi kyawun amsa?",
+          "yo": "Ti ọrẹ kan ba ṣe awada ibalopo tabi ti o lewu ninu ibaraẹnisọrọ ẹgbẹ, kini idahun to dara julọ?",
+          "ig": "Ọ bụrụ na enyi gị emee egwuregwu mkparị ma ọ bụ nke na-emerụ ahụ na nkata otu, kedu ihe kacha mma ịme?"
+        },
+        "options": {
+          "en": ["A) Say nothing to avoid starting an argument", "B) Speak out or privately message them to explain why the joke is harmful", "C) Laugh along with the group to maintain peace", "D) Report them to the police immediately without speaking to them"],
+          "pcm": ["A) Keep quiet make argument no start", "B) Speak out or dm them make they know say bad joke be that", "C) Laugh along make peace dey", "D) Call police report am sharply"],
+          "ha": ["A) Yin shiru don guje wa sabani", "B) Yin magana a fili ko aika sako na sirri don bayyana illar hakan", "C) Dariya tare da sauran don kiyaye zaman lafiya", "D) Kai kararsa ga 'yan sanda ba tare da yi masa magana ba"],
+          "yo": ["A) Mase sọ ohunkohun lati yago fun ariyanjiyan", "B) Sọrọ tabi fi ifiranṣẹ ranṣẹ si wọn lati ṣalaye idi ti awada naa fi lewu", "C) Rẹrin pẹlu ẹgbẹ lati ṣetọju alaafia", "D) Jabo wọn si ọlọpa lẹsẹkẹsẹ lai sọrọ pẹlu wọn"],
+          "ig": ["A) Agwala ihe ọ bụla ka ịzenarị esemokwu", "B) Kwuo okwu ma ọ bụ zitere ha ozi na nzuzo iji kọwaa ihe kpatara egwuregwu ahụ ji dị njọ", "C) Soro ndị ọzọ chịa ọchị ka udo dị", "D) Kọọrọ ndị uwe ojii ozugbo na-agwaghị ha okwu"]
+        },
+        "answer": "B"
+      },
+      {
+        "question": {
+          "en": "What does it mean for a young man to be a real agent of change in his community?",
+          "pcm": "Wetin e mean for young man to be real agent of change for community?",
+          "ha": "Menene ma'anar matashi ya kasance mai kawo canji na gaskiya a al'ummarsa?",
+          "yo": "Kini itumọ fun ọdọ ọkunrin lati jẹ aṣoju iyipada gidi ninu agbegbe rẹ?",
+          "ig": "Kedu ihe ọ pụtara na nwoke na-eto eto bụ ezigbo onye na-eweta mgbanwe n'obodo ya?"
+        },
+        "options": {
+          "en": ["A) Telling other men what to do without reflecting on his own behavior", "B) Challenging patriarchal privileges and actively promoting gender equality in everyday actions", "C) Only speaking about GBV during public campaigns or events", "D) Believing that GBV is a private issue that doesn't concern men"],
+          "pcm": ["A) Tell other men wetin to do but no look yourself", "B) Challenge patriarchal powers and support gender equality for everyday action", "C) Talk about GBV only for public show or campaign", "D) Believe say GBV na private talk wey no concern men"],
+          "ha": ["A) Fada wa sauran maza abin da za su yi ba tare da duba halinka ba", "B) Kalubalantar dabi'un mulkin maza da tallata daidaiton jinsi a ayyukan yau da kullum", "C) Magana kan GBV kawai a lokatim kamfe na jama'a", "D) Gaskata cewa GBV wani lamari ne na sirri wanda bai shafi maza ba"],
+          "yo": ["A) Sísọ fún àwọn ọkùnrin yòókù ohun tí wọ́n máa ṣe láì wo àwọn ìṣe ti ara rẹ̀", "B) Kiko fun awọn anfaani patriarchal ati didagbasoke dọgba eya ni gbogbo ọjọ", "C) Sọrọ nipa GBV nikan ni akoko awọn ipolongo", "D) Gbigbagbọ pe GBV jẹ ọrọ ikọkọ ti ko kan awọn ọkunrin"],
+          "ig": ["A) Agwa ndị ikom ndị ọzọ ihe ha ga-eme n'eleghị anya n'omume nke gị", "B) Ịgba mgba megide uru nke di na-achị ma na-akwalite nha nhata nwoke na nwanyị n'omume kwa ụbọchị", "C) Na-ekwu naanị maka GBV n'oge mkpọsa ọha na eze", "D) Ikwere na GBV bụ okwu nzuzo na-adịghị emetụta ndị ikom"]
+        },
+        "answer": "B"
+      }
+    ],
+    "welcome": {
+      "en": "🎓 Welcome to the Final Exit Post-Test Exam!\n\nThis is a 5-question comprehensive quiz covering the lessons you've learned. Each question is worth 10 points.\n\n⚠️ You need a cutoff mark of at least 35/50 (4 out of 5 correct answers) to pass and receive your certificate!\n\nPress the button below when you are ready to begin:",
+      "pcm": "🎓 Welcome to the Final Exit Post-Test Exam!\n\nThis is a 5-question comprehensive quiz. Each question dey carry 10 points.\n\n⚠️ You need to score at least 35/50 (4 correct answers) make you pass and get certificate!\n\nClick the button make you start:",
+      "ha": "🎓 Barka da zuwa Jarrabawar Karshe!\n\nWannan wata tambayoyi ce guda 5 da ta shafi darussan da kuka koya. Kowane tambaya tana da maki 10.\n\n⚠️ Kuna buƙatar maki akalla 35/50 (amsoshi 4 daidai) don cin jarrabawar kuma ku sami takardar shaida!\n\nDanna maɓallin da ke ƙasa lokacin da kuke shirye don farawa:",
+      "yo": "🎓 Kaabo si Idanwo Idanwo Ikẹhin!\n\nEyi jẹ idanwo to gbooro pẹlu awọn ibeere 5. Ibere kọọkan jẹ ami 10.\n\n⚠️ O nilo lati gba ami 35/50 (idanwo 4 ti o tọ) lati kọja ati gba iwe-ẹri rẹ!\n\nTẹ bọtini ni isalẹ nigbati o ba ṣetan lati bẹrẹ:",
+      "ig": "🎓 Nnọọ na Ule Ikpeazụ nke Ọpụpụ!\n\nNke a bụ ajụjụ ruru ise na-ekpuchi ihe ọmụmụ ị mụtara. Ajụjụ nke ọ bụla ruru akara iri.\n\n⚠️ Ị chọrọ akara dịkarịa ala 35/50 (azịza ziri ezi 4 n'ime 5) ka ị gafee wee nweta asambodo gị!\n\nKpachapụ bọtini dị n'okpuru ebe a mgbe ị dị njikere ịmalite:"
+    },
+    "start_button": {
+      "en": "✍️ Start Post-Test",
+      "pcm": "✍️ Start Post-Test",
+      "ha": "✍️ Fara Jarrabawa",
+      "yo": "✍️ Bẹrẹ Idanwo",
+      "ig": "✍️ Malite Ule"
+    },
+    "retry_button": {
+      "en": "🔄 Retake Post-Test",
+      "pcm": "🔄 Retake Post-Test",
+      "ha": "🔄 Sake Jarrabawa",
+      "yo": "🔄 Tun Idanwo Ṣe",
+      "ig": "🔄 Nwaa Ule Ọzọ"
+    },
+    "passed": {
+      "en": "🎉 Congratulations! You have PASSED the Post-Test Exam!\n\nYour Score: {score}/50\n\nYou have proven yourself to be a true advocate of healthy masculinity and GBV prevention in your community!\n\nNow, let's draft your personal pledge to end GBV and lead by example. Please type your pledge below:",
+      "pcm": "🎉 Congratulations! You don PASS the Post-Test Exam!\n\nYour Score: {score}/50\n\nYou be correct champion for healthy masculinity and GBV prevention now!\n\nMake we write your personal pledge make we build beta community. Type your pledge now:",
+      "ha": "🎉 Taya murna! Kun CIN Jarrabawar Karshe!\n\nMakin ku: {score}/50\n\nKun tabbatar da kanku a matsayin mai ba da shawara na gaskiya don kawar da GBV a al'ummarku!\n\nYanzu, bari mu rubuta alkawarin ku na kashin kai. Rubuta alkawarin ku a kasa:",
+      "yo": "🎉 Oriire! O ti KỌJA Idanwo Ikẹhin!\n\nAmi rẹ: {score}/50\n\nO ti fihan pe o jẹ aṣoju iyipada gidi fun okunrin rere ati kawar GBV!\n\nYanzu, ẹ jẹ ki a kọ ipinnu rẹ. Kọ ipinnu rẹ si isalẹ:",
+      "ig": "🎉 Otú ọma! Ị GAFEE Ule Ikpeazụ!\n\nAkara gị: {score}/50\n\nỊ gosipụtala onwe gị dị ka ezigbo onye na-akwado dị mma na mgbochi GBV n'obodo gị!\n\nYanzu, ka anyị deere nkwa nke gị. Pịaji nkwa gị n'okpuru ebe a:"
+    },
+    "failed": {
+      "en": "😔 You scored {score}/50. Unfortunately, this is below the passing mark of 35/50.\n\nBut do not discourage, learning is a journey! We encourage you to review the lessons or try again. Click the button below to retake the test:",
+      "pcm": "😔 You score {score}/50. Unfortunately, this is below the pass mark of 35/50.\n\nNo worry, learning na journey! We encourage you make you try again. Click the button below make you retake the test:",
+      "ha": "😔 Makin ku: {score}/50. Abin takaici, wannan yana kasa da makin cin jarrabawa na 35/50.\n\nKada ku damu, koyo tafiya ce! Muna ƙarfafa ku da ku sake gwadawa. Danna maɓallin da ke ƙasa don sake jarrabawar:",
+      "yo": "😔 O gba ami {score}/50. Eyi wa ni isalẹ ami ireti ti 35/50.\n\nMa kabamọ, ẹkọ jẹ irin-ajo! A gba ọ niyanju lati tun gbiyanju. Tẹ bọtini ni isalẹ lati tun idanwo naa ṣe:",
+      "ig": "😔 Ị nwetara {score}/50. Nke a dị n'okpuru akara ngafe nke 35/50.\n\nMa echela iwe, ịmụta ihe bụ njem! Anyị na-agba gị ume ka ị nwaa ọzọ. Kpachapụ bọtini dị n'okpuru ebe a ka ị nwaa ule ahụ ọzọ:"
+    }
   }
 }
