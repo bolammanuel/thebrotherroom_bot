@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 # Load environment variables
 load_dotenv()
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from db_manager import (
     init_db, enroll_learner, get_learner_progress, update_learner_progress, 
@@ -176,6 +176,17 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if result and result[0]:
         # Returning learner — welcome them back
         current_module_id, current_lesson_id, quiz_completed, lang = result
+        
+        # Check if they have completed the entire course (last module, last lesson, quiz completed)
+        next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
+        if next_module_id is None and next_lesson_id is None and quiz_completed in [1, 2]:
+            await send_reply(
+                update,
+                get_text("course_complete", lang),
+                reply_markup=get_main_menu_buttons(lang)
+            )
+            return
+
         module, lesson = get_module_lesson(current_module_id, current_lesson_id)
         
         if module and lesson:
@@ -571,6 +582,19 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             reply_markup=get_main_menu_buttons(lang)
         )
 
+async def post_init(application: Application) -> None:
+    """Set bot commands in Telegram's menu."""
+    commands = [
+        BotCommand("start", "Begin or restart the course"),
+        BotCommand("next", "Go to the next lesson"),
+        BotCommand("quiz", "Take the quiz for the current module"),
+        BotCommand("progress", "Check your current module and lesson"),
+        BotCommand("menu", "View the full course outline"),
+        BotCommand("language", "Change your language preference"),
+        BotCommand("help", "Get help and list commands")
+    ]
+    await application.bot.set_my_commands(commands)
+
 def main() -> None:
     """Start the bot."""
     init_db()
@@ -580,7 +604,7 @@ def main() -> None:
         logger.error("TELEGRAM_BOT_TOKEN environment variable not set.")
         return
 
-    application = Application.builder().token(token).build()
+    application = Application.builder().token(token).post_init(post_init).build()
 
     # Command handlers
     application.add_handler(CommandHandler("start", start))

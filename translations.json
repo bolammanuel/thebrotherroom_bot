@@ -11,11 +11,11 @@
   },
 
   "start_welcome": {
-    "en": "\"Ekaabo!\" (Welcome!) to the \"{course_title}\" course, designed just for young Nigerian men like you.\n\n{course_description}\n\nType /next to begin your first lesson or /help for a list of commands.",
-    "pcm": "\"How far!\" (Welcome!) to the \"{course_title}\" course, wey we design for young Nigerian men like you.\n\n{course_description}\n\nType /next to start your first lesson or /help to see wetin you fit do.",
-    "ha": "\"Sannu!\" (Maraba!) ga jerin aiki \"{course_title}\", wanda aka tsara ga samari Nijeriya kamar ku.\n\n{course_description}\n\nKunna /next don fara jerin ko /help don jerin umarnin.",
-    "yo": "\"O ku abo!\" (Kaabo!) si eko \"{course_title}\", ti a dida fun awọn ọkunrin araba ti Naijiria gẹgẹ bi yin.\n\n{course_description}\n\nKunna /next lati bẹrẹ eko akọkọ rẹ tabi /help fun akojọ awọn aṣayan.",
-    "ig": "\"Kedu!\" (Ndewo!) na echiche \"{course_title}\", emebere maka ụmụ nwoke Nigeria dika unu.\n\n{course_description}\n\nBiko kunna /next iji malite akwukwo mbụ gị ma /help maka onyonyo."
+    "en": "\"Ekaabo!\" (Welcome!) to the \"{course_title}\" course, designed just for young Nigerian men like you.\n\n{course_description}\n\nHere are the buttons you can use to learn:\n📖 Next — Go to the next lesson\n📝 Quiz — Test your knowledge at the end of each module\n📊 Progress — See where you are in the course\n📚 Menu — View the course outline\n🌍 Language — Change your preferred language\n❓ Help — Show this help message again\n\nClick 📖 Next below to begin your first lesson!",
+    "pcm": "\"How far!\" (Welcome!) to the \"{course_title}\" course, wey we design for young Nigerian men like you.\n\n{course_description}\n\nSee the buttons wey you fit use to learn:\n📖 Next — Go to the next lesson\n📝 Quiz — Do the quiz for the module\n📊 Progress — Check where you dey for the course\n📚 Menu — See the full course outline\n🌍 Language — Change language\n❓ Help — Show these commands again\n\nClick 📖 Next below to start your first lesson!",
+    "ha": "\"Sannu!\" (Maraba!) ga jerin aiki \"{course_title}\", wanda aka tsara ga samari Nijeriya kamar ku.\n\n{course_description}\n\nGa kuma batuttukan da za ka iya amfani da su don koyo:\n📖 Next — Wuce ga darasi na gaba\n📝 Quiz — Yi jarrabawar module\n📊 Progress — Dubi matsayinka a cikin darasin\n📚 Menu — Dubi fasalin darussan duka\n🌍 Language — Canza yare da kake so\n❓ Help — Taimako da umarni\n\nDanna 📖 Next da ke ƙasa don fara darasi na farko!",
+    "yo": "\"O ku abo!\" (Kaabo!) si eko \"{course_title}\", ti a dida fun awọn ọkunrin araba ti Naijiria gẹgẹ bi yin.\n\n{course_description}\n\nEyi ni awọn bọtini ti o le lo fun ẹkọ rẹ:\n📖 Next — Lọ si ẹkọ atẹle\n📝 Quiz — Ṣe idanwo fun module yii\n📊 Progress — Wo ibi ti o wa ninu eto\n📚 Menu — Wo eto ẹkọ rẹ ni kikun\n🌍 Language — Yi ede rẹ padà\n❓ Help — Iranlọwọ ati aṣayan gbogbo\n\nTẹ 📖 Next ni isalẹ lati bẹrẹ ẹkọ akọkọ rẹ!",
+    "ig": "\"Kedu!\" (Ndewo!) na echiche \"{course_title}\", emebere maka ụmụ nwoke Nigeria dika unu.\n\n{course_description}\n\nNdị a bụ bọtini ị nwere ike iji mụọ ihe:\n📖 Next — Gaa na cashị ọzọ\n📝 Quiz — Mee ajụjụ maka modul a\n📊 Progress — Lelee ebe ị nọ n'ụkpụrụ a\n📚 Menu — Lelee ụkpụrụ akwụkwọ gị niile\n🌍 Language — Gbanwe asụsụ gị\n❓ Help — Enyemaka na onyonyo\n\nKpachapụ 📖 Next n'okpuru ebe a ka ịmalite cashị mbụ gị!"
   },
 
   "help_menu": {
