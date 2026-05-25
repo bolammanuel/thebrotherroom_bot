@@ -1,12 +1,16 @@
 import openai
 import os
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 def get_openai_response(prompt, course_content):
     try:
         response = openai.chat.completions.create(
-            model="gpt-4.1-mini", # Using the specified model
+            model="gpt-4o-mini", # Using the specified model
             messages=[
                 {"role": "system", "content": f"You are a helpful assistant for a course titled \"Young Men Against Gender Based Violence\". The course content is: {course_content}"},
                 {"role": "user", "content": prompt}

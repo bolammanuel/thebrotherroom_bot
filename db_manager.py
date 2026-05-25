@@ -1,16 +1,58 @@
 import os
 import psycopg2
 from psycopg2 import sql
+from dotenv import load_dotenv
+
+# Load environment variables
+load_dotenv()
 
 # Get database URL from environment (Railway provides this automatically)
 DATABASE_URL = os.getenv("DATABASE_URL")
 
+class CompatibleCursor:
+    def __init__(self, cursor, is_sqlite):
+        self.cursor = cursor
+        self.is_sqlite = is_sqlite
+
+    def execute(self, query, params=None):
+        if self.is_sqlite:
+            query = query.replace("%s", "?")
+        if params is not None:
+            return self.cursor.execute(query, params)
+        return self.cursor.execute(query)
+
+    def fetchone(self):
+        return self.cursor.fetchone()
+
+    def fetchall(self):
+        return self.cursor.fetchall()
+
+    def close(self):
+        return self.cursor.close()
+
+class CompatibleConnection:
+    def __init__(self, conn, is_sqlite):
+        self.conn = conn
+        self.is_sqlite = is_sqlite
+
+    def cursor(self):
+        return CompatibleCursor(self.conn.cursor(), self.is_sqlite)
+
+    def commit(self):
+        return self.conn.commit()
+
+    def close(self):
+        return self.conn.close()
+
 def get_connection():
-    """Get a database connection."""
+    """Get a database connection, falling back to SQLite locally if DATABASE_URL is not set."""
     if DATABASE_URL:
-        return psycopg2.connect(DATABASE_URL)
+        conn = psycopg2.connect(DATABASE_URL)
+        return CompatibleConnection(conn, is_sqlite=False)
     else:
-        raise Exception("DATABASE_URL environment variable not set. Please add a PostgreSQL database to your Railway project.")
+        import sqlite3
+        conn = sqlite3.connect("learner_progress.db")
+        return CompatibleConnection(conn, is_sqlite=True)
 
 def init_db():
     """Initialize the database with required tables."""
