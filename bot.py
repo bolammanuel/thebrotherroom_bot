@@ -538,15 +538,28 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # Language selection
     if data.startswith("lang_"):
         lang_code = data.split("_")[1]
+        
+        # Check if user is already enrolled (prior to calling enroll_learner)
+        progress = get_learner_progress(user_id)
+        is_new_user = progress is None
+        
         enroll_learner(user_id, lang_code)
         
-        # Show welcome message
-        welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
-        
-        await query.edit_message_text(
-            welcome_text,
-            reply_markup=get_main_menu_buttons(lang_code)
-        )
+        if is_new_user or context.user_data.get('awaiting_language_selection'):
+            context.user_data.pop('awaiting_language_selection', None)
+            # Show welcome message
+            welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
+            await query.edit_message_text(
+                welcome_text,
+                reply_markup=get_main_menu_buttons(lang_code)
+            )
+        else:
+            # Mid-course language change
+            success_msg = get_text("language_changed", lang_code)
+            await query.edit_message_text(
+                success_msg,
+                reply_markup=get_main_menu_buttons(lang_code)
+            )
         return
     
     # Command buttons
