@@ -1,23 +1,32 @@
 {
-  "languages": ["English", "Pidgin", "Hausa", "Yoruba", "Igbo"],
-  "language_codes": ["en", "pcm", "ha", "yo", "ig"],
-  
+  "languages": [
+    "English",
+    "Pidgin",
+    "Hausa",
+    "Yoruba",
+    "Igbo"
+  ],
+  "language_codes": [
+    "en",
+    "pcm",
+    "ha",
+    "yo",
+    "ig"
+  ],
   "language_selection": {
-    "en": "🌍 Please select your preferred language:\n\n📌 Select one:",
-    "pcm": "🌍 Abeg pick the language wey you wan use:\n\n📌 Pick one:",
-    "ha": "🌍 Zaɓi harshe da kake so:\n\n📌 Zaɓi daya:",
-    "yo": "🌍 Jọwọ yan ede ti o fẹ lo:\n\n📌 Yan ọkan:",
-    "ig": "🌍 Biko horo asụsụ ọ na-ahọrọ:\n\n📌 Horo otu:"
+    "en": "The Brothers' Room\n\nWelcome, brother.\n\nMy name is Tobi — I will be your guide through this course.\n\nThis is a free 6-week programme for men who want to understand gender-based violence, challenge harmful norms, and become real agents of change in their communities.\n\nNo judgment here. Na just us brothers talking honestly.\n\nFirst things first — which language would you like to use?",
+    "pcm": "The Brothers' Room\n\nWelcome, brother.\n\nMy name is Tobi — I will be your guide through this course.\n\nThis is a free 6-week programme for men who want to understand gender-based violence, challenge harmful norms, and become real agents of change in their communities.\n\nNo judgment here. Na just us brothers talking honestly.\n\nFirst things first — which language would you like to use?",
+    "ha": "The Brothers' Room\n\nWelcome, brother.\n\nMy name is Tobi — I will be your guide through this course.\n\nThis is a free 6-week programme for men who want to understand gender-based violence, challenge harmful norms, and become real agents of change in their communities.\n\nNo judgment here. Na just us brothers talking honestly.\n\nFirst things first — which language would you like to use?",
+    "yo": "The Brothers' Room\n\nWelcome, brother.\n\nMy name is Tobi — I will be your guide through this course.\n\nThis is a free 6-week programme for men who want to understand gender-based violence, challenge harmful norms, and become real agents of change in their communities.\n\nNo judgment here. Na just us brothers talking honestly.\n\nFirst things first — which language would you like to use?",
+    "ig": "The Brothers' Room\n\nWelcome, brother.\n\nMy name is Tobi — I will be your guide through this course.\n\nThis is a free 6-week programme for men who want to understand gender-based violence, challenge harmful norms, and become real agents of change in their communities.\n\nNo judgment here. Na just us brothers talking honestly.\n\nFirst things first — which language would you like to use?"
   },
-
   "start_welcome": {
-    "en": "\"Ekaabo!\" (Welcome!) to the \"{course_title}\" course, designed just for young Nigerian men like you.\n\n{course_description}\n\nHere are the buttons you can use to learn:\n📖 Next — Go to the next lesson\n📝 Quiz — Test your knowledge at the end of each module\n📊 Progress — See where you are in the course\n📚 Menu — View the course outline\n🌍 Language — Change your preferred language\n❓ Help — Show this help message again\n\nClick 📖 Next below to begin your first lesson!",
-    "pcm": "\"How far!\" (Welcome!) to the \"{course_title}\" course, wey we design for young Nigerian men like you.\n\n{course_description}\n\nSee the buttons wey you fit use to learn:\n📖 Next — Go to the next lesson\n📝 Quiz — Do the quiz for the module\n📊 Progress — Check where you dey for the course\n📚 Menu — See the full course outline\n🌍 Language — Change language\n❓ Help — Show these commands again\n\nClick 📖 Next below to start your first lesson!",
-    "ha": "\"Sannu!\" (Maraba!) ga jerin aiki \"{course_title}\", wanda aka tsara ga samari Nijeriya kamar ku.\n\n{course_description}\n\nGa kuma batuttukan da za ka iya amfani da su don koyo:\n📖 Next — Wuce ga darasi na gaba\n📝 Quiz — Yi jarrabawar module\n📊 Progress — Dubi matsayinka a cikin darasin\n📚 Menu — Dubi fasalin darussan duka\n🌍 Language — Canza yare da kake so\n❓ Help — Taimako da umarni\n\nDanna 📖 Next da ke ƙasa don fara darasi na farko!",
-    "yo": "\"O ku abo!\" (Kaabo!) si eko \"{course_title}\", ti a dida fun awọn ọkunrin araba ti Naijiria gẹgẹ bi yin.\n\n{course_description}\n\nEyi ni awọn bọtini ti o le lo fun ẹkọ rẹ:\n📖 Next — Lọ si ẹkọ atẹle\n📝 Quiz — Ṣe idanwo fun module yii\n📊 Progress — Wo ibi ti o wa ninu eto\n📚 Menu — Wo eto ẹkọ rẹ ni kikun\n🌍 Language — Yi ede rẹ padà\n❓ Help — Iranlọwọ ati aṣayan gbogbo\n\nTẹ 📖 Next ni isalẹ lati bẹrẹ ẹkọ akọkọ rẹ!",
-    "ig": "\"Kedu!\" (Ndewo!) na echiche \"{course_title}\", emebere maka ụmụ nwoke Nigeria dika unu.\n\n{course_description}\n\nNdị a bụ bọtini ị nwere ike iji mụọ ihe:\n📖 Next — Gaa na cashị ọzọ\n📝 Quiz — Mee ajụjụ maka modul a\n📊 Progress — Lelee ebe ị nọ n'ụkpụrụ a\n📚 Menu — Lelee ụkpụrụ akwụkwọ gị niile\n🌍 Language — Gbanwe asụsụ gị\n❓ Help — Enyemaka na onyonyo\n\nKpachapụ 📖 Next n'okpuru ebe a ka ịmalite cashị mbụ gị!"
+    "en": "\"Ekaabo!\" (Welcome!) to the \"{course_title}\" course.\n\nHere is a preview of the outline of what we will learn together:\n\n*12 modules — 6 weeks · 2 modules per week · Mon & Thu*\n\n*1*\n*Understanding Gender & Masculinity*\nSex vs Gender · Power · Norms · Masculinity basics — Week 1, Monday\n\n*2*\n*Harmful Norms & Toxic Masculinity*\nGender norms · Patriarchy · Toxic masculinity · Real-life impact — Week 1, Thursday\n\n*3*\n*Introduction to SGBV*\nWhat SGBV is · Types · Impacts on individuals and communities — Week 2, Monday\n\n*4*\n*Root Causes of SGBV*\nPower imbalance · Culture · Economy · Socialisation — Week 2, Thursday\n\n*5*\n*Role of Men as Change Agents*\nChallenging stereotypes · Allyship · Personal responsibility — Week 3, Monday\n\n*6*\n*Healthy Masculinity & Relationships*\nConsent · Communication · Emotional intelligence — Week 3, Thursday\n\n*7*\n*Bystander Intervention*\nRecognising abuse · Safe intervention · Supporting survivors — Week 4, Monday\n\n*8*\n*Peer Influence & Leadership*\nUsing influence positively · Advocacy · Becoming a role model — Week 4, Thursday\n\n*9*\n*Community Action & Advocacy*\nCampaigns · Storytelling · Community engagement — Week 5, Monday\n\n*10*\n*Networks & Movement Building*\nYoung Men's Network · Collaboration · Sustainability — Week 5, Thursday\n\n*11*\n*Policy & Legal Awareness*\nGBV laws · Rights · Reporting pathways in Nigeria — Week 6, Monday\n\n*12*\n*Personal Action Plan*\nCommitment · Daily actions · Accountability · Public pledge — Week 6, Thursday\n\nLet's start our journey. Click Next below to begin Module 1!",
+    "pcm": "\"How far!\" (Welcome!) to the \"{course_title}\" course.\n\nSee the outline of wetin we go learn together:\n\n*12 modules — 6 weeks · 2 modules per week · Mon & Thu*\n\n*1*\n*Understanding Gender & Masculinity*\nSex vs Gender · Power · Norms · Masculinity basics — Week 1, Monday\n\n*2*\n*Harmful Norms & Toxic Masculinity*\nGender norms · Patriarchy · Toxic masculinity · Real-life impact — Week 1, Thursday\n\n*3*\n*Introduction to SGBV*\nWetin SGBV be · Types · How e dey affect people and community — Week 2, Monday\n\n*4*\n*Root Causes of SGBV*\nPower imbalance · Culture · Economy · Socialisation — Week 2, Thursday\n\n*5*\n*Role of Men as Change Agents*\nChallenging stereotypes · Allyship · Personal responsibility — Week 3, Monday\n\n*6*\n*Healthy Masculinity & Relationships*\nConsent · Communication · Emotional intelligence — Week 3, Thursday\n\n*7*\n*Bystander Intervention*\nHow to know say abuse dey happen · Safe way to stop am · How to help survivors — Week 4, Monday\n\n*8*\n*Peer Influence & Leadership*\nHow to use your power for good · Advocacy · How to be role model — Week 4, Thursday\n\n*9*\n*Community Action & Advocacy*\nCampaigns · Storytelling · Community engagement — Week 5, Monday\n\n*10*\n*Networks & Movement Building*\nYoung Men's Network · How we go work together · Sustainability — Week 5, Thursday\n\n*11*\n*Policy & Legal Awareness*\nGBV laws · Your rights · Where you fit report for Nigeria — Week 6, Monday\n\n*12*\n*Personal Action Plan*\nCommitment · Daily action · Accountability · Public pledge — Week 6, Thursday\n\nMake we start the journey. Click Next below to start Module 1!",
+    "ha": "\"Sannu!\" (Maraba!) ga darasin \"{course_title}\".\n\nGa taƙaitaccen bayani kan abubuwan da za mu koya tare:\n\n*Modul 12 — Makonni 6 · Modul 2 a mako guda · Litinin & Alhamis*\n\n*1*\n*Understanding Gender & Masculinity*\nSex vs Gender · Power · Norms · Masculinity basics — Mako na 1, Litinin\n\n*2*\n*Harmful Norms & Toxic Masculinity*\nGender norms · Patriarchy · Toxic masculinity · Real-life impact — Mako na 1, Alhamis\n\n*3*\n*Introduction to SGBV*\nMenene SGBV · Nau'o'i · Tasirinsa ga mutane da al'umma — Mako na 2, Litinin\n\n*4*\n*Root Causes of SGBV*\nPower imbalance · Al'ada · Tattalin Arziki · Socialisation — Mako na 2, Alhamis\n\n*5*\n*Role of Men as Change Agents*\nKaryata ra'ayoyin gargajiya · Allyship · Alhakin kai — Mako na 3, Litinin\n\n*6*\n*Healthy Masculinity & Relationships*\nYarda (Consent) · Sadarwa · Hankalin tunani (Emotional intelligence) — Mako na 3, Alhamis\n\n*7*\n*Bystander Intervention*\nGane cin zarafi · Hanyar shiga mai aminci · Taimaka wa waɗanda aka zalunta — Mako na 4, Litinin\n\n*8*\n*Peer Influence & Leadership*\nAmfani da tasiri ta hanya mai kyau · Advocacy · Zama abin koyi — Mako na 4, Alhamis\n\n*9*\n*Community Action & Advocacy*\nKamfe · Labari · Haɗin gwiwar al'umma — Mako na 5, Litinin\n\n*10*\n*Networks & Movement Building*\nHanyar Matasa (Young Men's Network) · Haɗin gwiwa · Dorewa — Mako na 5, Alhamis\n\n*11*\n*Policy & Legal Awareness*\nDokokin GBV · Haƙƙoƙi · Hanyoyin rahoto a Najeriya — Mako na 6, Litinin\n\n*12*\n*Personal Action Plan*\nSadaukarwa · Ayyukan yau da kullum · Tattaunawar gaskiya · Alƙawari ga jama'a — Mako na 6, Alhamis\n\nBari mu fara tafiyarmu. Danna Next da ke ƙasa don fara Modul 1!",
+    "yo": "\"O ku abo!\" (Kaabo!) si ẹkọ \"{course_title}\".\n\nEyi ni awotẹlẹ ohun ti a o kọ pẹlu ara wa:\n\n*Module 12 — Ọsẹ 6 · Module 2 lọsẹ · Ọjọ Aje & Ọjọbọ*\n\n*1*\n*Understanding Gender & Masculinity*\nSex vs Gender · Power · Norms · Masculinity basics — Ọsẹ 1, Ọjọ Aje\n\n*2*\n*Harmful Norms & Toxic Masculinity*\nGender norms · Patriarchy · Toxic masculinity · Real-life impact — Ọsẹ 1, Ọjọbọ\n\n*3*\n*Introduction to SGBV*\nKini SGBV · Orisi · Ipa rẹ lori eniyan ati agbegbe — Ọsẹ 2, Ọjọ Aje\n\n*4*\n*Root Causes of SGBV*\nPower imbalance · Asa · Oro aje · Socialisation — Ọsẹ 2, Ọjọbọ\n\n*5*\n*Role of Men as Change Agents*\nBibori awọn igbagbọ ti ko tọ · Allyship · Ojuse ara ẹni — Ọsẹ 3, Ọjọ Aje\n\n*6*\n*Healthy Masculinity & Relationships*\nIyọnda (Consent) · Ibaraẹnisọrọ · Emotional intelligence — Ọsẹ 3, Ọjọbọ\n\n*7*\n*Bystander Intervention*\nMimọ ijagba · Ona ati dabobo · Iranlọwọ fun awọn ti o farapa — Ọsẹ 4, Ọjọ Aje\n\n*8*\n*Peer Influence & Leadership*\nLilo ipa for rere · Advocacy · Kikọ ẹkọ lati jẹ apẹẹrẹ — Ọsẹ 4, Ọjọbọ\n\n*9*\n*Community Action & Advocacy*\nIpolongo · Itan-akọọlẹ · Ibaraṣepọ agbegbe — Ọsẹ 5, Ọjọ Aje\n\n*10*\n*Networks & Movement Building*\nYoung Men's Network · Ifọwọsowọpọ · Sustainability — Ọsẹ 5, Ọjọbọ\n\n*11*\n*Policy & Legal Awareness*\nOfin GBV · Awọn ẹtọ · Ọna lati jabo ni Naijiria — Ọsẹ 6, Ọjọ Aje\n\n*12*\n*Personal Action Plan*\nIpinnu · Iṣe lojoojumọ · Ipinnu gbangba — Ọsẹ 6, Ọjọbọ\n\nẸ jẹ ki a bẹrẹ irin-ajo wa. Tẹ Next ni isalẹ lati bẹrẹ Module 1!",
+    "ig": "\"Kedu!\" (Ndewo!) na echiche \"{course_title}\".\n\nNke a bụ ụkpụrụ ihe anyị ga-amụta ọnụ:\n\n*Modul 12 — Izu 6 · Modul 2 n'izu · Mọnde & Tọnde*\n\n*1*\n*Understanding Gender & Masculinity*\nSex vs Gender · Power · Norms · Masculinity basics — Izu 1, Mọnde\n\n*2*\n*Harmful Norms & Toxic Masculinity*\nGender norms · Patriarchy · Toxic masculinity · Real-life impact — Izu 1, Tọnde\n\n*3*\n*Introduction to SGBV*\nKedu ihe SGBV bụ · Oriri · Nduru ya n'ahụ mmadụ na obodo — Izu 2, Mọnde\n\n*4*\n*Root Causes of SGBV*\nPower imbalance · Omenala · Tattalin Arziki · Socialisation — Izu 2, Tọnde\n\n*5*\n*Role of Men as Change Agents*\nChallenging stereotypes · Allyship · Personal responsibility — Izu 3, Mọnde\n\n*6*\n*Healthy Masculinity & Relationships*\nConsent · Communication · Emotional intelligence — Izu 3, Tọnde\n\n*7*\n*Bystander Intervention*\nRecognising abuse · Safe intervention · Supporting survivors — Izu 4, Mọnde\n\n*8*\n*Peer Influence & Leadership*\nUsing influence positively · Advocacy · Becoming a role model — Izu 4, Tọnde\n\n*9*\n*Community Action & Advocacy*\nCampaigns · Storytelling · Community engagement — Izu 5, Mọnde\n\n*10*\n*Networks & Movement Building*\nYoung Men's Network · Ifọwọsowọpọ · Sustainability — Izu 5, Tọnde\n\n*11*\n*Policy & Legal Awareness*\nOfin GBV · Ikike gị · Ebe ị ga-akọ na Nigeria — Izu 6, Mọnde\n\n*12*\n*Personal Action Plan*\nCommitment · Daily actions · Accountability · Public pledge — Izu 6, Tọnde\n\nKa anyị malite njem anyị. Kpachapụ Next n'okpuru ebe a ka ịmalite Modul 1!"
   },
-
   "help_menu": {
     "en": "Here are the commands you can use:\n\n/start - Begin or restart the course\n/next - Move to the next lesson\n/quiz - Take the quiz for the current module\n/progress - Check your current module and lesson\n/language - Change your language\n/menu - View course outline\n/help - Show this help message",
     "pcm": "Na these commands you fit use:\n\n/start - Begin or restart the course\n/next - Go to the next lesson\n/quiz - Do quiz for this module\n/progress - Check where you dey now\n/language - Change your language\n/menu - See course outline\n/help - Show this help message",
@@ -25,7 +34,6 @@
     "yo": "Eyi ni awọn aṣayan ti o le lo:\n\n/start - Bẹrẹ tabi tun bẹrẹ eko naa\n/next - Lo si eko atẹle\n/quiz - Ṣe idinku fun modul lọwọlọwọ\n/progress - Yaworan modul ati eko lọwọlọwọ\n/language - Yi ede naa\n/menu - Wo ọkọ eko naa\n/help - Fihan ifiranṣẹ iranlọwọ",
     "ig": "Ndị bụ onyonyo ị nwere ike iji:\n\n/start - Malite ma ọ bụ malite ọzọ akwukwo\n/next - Gaa na akwukwo ọzọ\n/quiz - Eme ajụjụ maka modul ugbu a\n/progress - Lelee modul na akwukwo ugbu a\n/language - Gbanwe asụsụ gị\n/menu - Lelee ụkpụrụ akwukwo\n/help - Igosi ozi inyere"
   },
-
   "progress_message": {
     "en": "📊 Your Progress:\n\n📖 Module {module_num}/{total_modules}: {module_title}\n📝 Current Lesson: {lesson_title}\n\nType /next to continue learning.",
     "pcm": "📊 Where You Dey:\n\n📖 Module {module_num}/{total_modules}: {module_title}\n📝 Current Lesson: {lesson_title}\n\nType /next to continue.",
@@ -33,7 +41,6 @@
     "yo": "📊 Iṣẹ Ẹ:\n\n📖 Modul {module_num}/{total_modules}: {module_title}\n📝 Eko Lọwọlọwọ: {lesson_title}\n\nKunna /next lati tẹsiwaju ẹkọ.",
     "ig": "📊 Ime Gị:\n\n📖 Modul {module_num}/{total_modules}: {module_title}\n📝 Akwukwo Ugbu a: {lesson_title}\n\nBiko kunna /next iji gaa n'ihu."
   },
-
   "lesson_header": {
     "en": "📖 *Module: {module_title}*\n📝 *Lesson: {lesson_title}*",
     "pcm": "📖 *Module: {module_title}*\n📝 *Lesson: {lesson_title}*",
@@ -41,7 +48,6 @@
     "yo": "📖 *Modul: {module_title}*\n📝 *Eko: {lesson_title}*",
     "ig": "📖 *Modul: {module_title}*\n📝 *Akwukwo: {lesson_title}*"
   },
-
   "lessons_complete": {
     "en": "✅ You've completed all lessons in \"{module_title}\"!\n\nTime for a quick quiz to test your knowledge. Type /quiz to begin.",
     "pcm": "✅ You don finish all the lessons for \"{module_title}\"!\n\nTime to do small quiz. Type /quiz to start.",
@@ -49,7 +55,6 @@
     "yo": "✅ Ẹ ti parí gbogbo eko ninu \"{module_title}\"!\n\nAkoko fun idinku kekere lati lo imọ yin. Kunna /quiz lati bẹrẹ.",
     "ig": "✅ Ị gachasịla akwukwo nile na \"{module_title}\"!\n\nOgbe maka ajụjụ mma maka ịmụta gị. Kunna /quiz iji malite."
   },
-
   "quiz_instructions": {
     "en": "📝 *Quiz for: {module_title}*\n\n{quiz_question}\n\n👇 Select your answer below by clicking the button:",
     "pcm": "📝 *Quiz for: {module_title}*\n\n{quiz_question}\n\n👇 Click the answer wey you think dey correct:",
@@ -57,7 +62,6 @@
     "yo": "📝 *Idinku fun: {module_title}*\n\n{quiz_question}\n\n👇 Yan awọn idahon nisi ni okanlọ:",
     "ig": "📝 *Ajụjụ maka: {module_title}*\n\n{quiz_question}\n\n👇 Horo azịza gị nke ọma site na ịpakpu ọgụ:"
   },
-
   "quiz_correct": {
     "en": "\"Ehen!\" Correct! 🎉 That's the right answer!\n\nYou've passed the quiz for this module. Type /next to continue your learning journey.",
     "pcm": "\"Ehen!\" Correct! 🎉 Na the right answer be that!\n\nYou don pass the quiz for this module. Type /next to continue.",
@@ -65,7 +69,6 @@
     "yo": "\"Daadiiu!\" O tọ! 🎉 Iyẹn ni idahon ti o tọ!\n\nẼ ti redi fun idinku fun modul yii. Kunna /next lati tẹsiwaju ẹkọ yin.",
     "ig": "\"Mma!\" Ziri! 🎉 Ọ bụ azịza ziri!\n\nỊ gachasịla ajụjụ maka modul a. Kunna /next iji gaa n'ihu."
   },
-
   "quiz_incorrect": {
     "en": "\"Chai!\" Not quite right. The correct answer was {correct_answer}.\n\nDon't worry — learning is a journey! Want to try again or move forward?",
     "pcm": "\"Chai!\" E no correct. The right answer na {correct_answer}.\n\nNo worry — learning na journey! You wan try again or move forward?",
@@ -73,7 +76,6 @@
     "yo": "\"Aye!\" Kò tọ daidai. Idahon ti o tọ ni {correct_answer}.\n\nKu maarun — ẹkọ ni orin! Se o ba fẹ gbiyanju lẹhin tabi lọ siwaju?",
     "ig": "\"Ehé!\" Ọ naghị ziri. Azịza ziri bụ {correct_answer}.\n\nKadụ na-eche iwe — ịmụta bụ njem! Ọ na-achọ iji ka gbanwee ma ọ bụ ka mwu aga?"
   },
-
   "quiz_retry_button": {
     "en": "🔄 Try Again",
     "pcm": "🔄 Try Again",
@@ -81,15 +83,13 @@
     "yo": "🔄 Gbiyanju Lẹhin",
     "ig": "🔄 Nwaa Ọzọ"
   },
-
   "quiz_not_completed": {
-  "en": "Hold on! 🎯\n\nYou need to complete the quiz for \"{module_title}\" before moving to the next module.\n\nDon't worry — you don't have to get it right, just take the quiz!\n\nType /quiz to begin.",
-  "pcm": "Wait small! 🎯\n\nYou need to do the quiz for \"{module_title}\" before you fit move.\n\nNo pressure — you no need get am right, just try am!\n\nType /quiz to start.",
-  "ha": "Jiya! 🎯\n\nKana bukatar yin quiz na \"{module_title}\" kafin mu ci gaba.\n\nKada ku damuwa — ba kuna bukatan saukar, kawai yi gwada!\n\nKunna /quiz don fara.",
-  "yo": "Jẹ́ kẹ́! 🎯\n\nẸ nilo lati ṣe idinku fun \"{module_title}\" ṣaaju ki ẹ lo siwaju.\n\nKu maarun — ẹ ko nilo lati redi, kawẹ yi gbiyanju!\n\nKunna /quiz lati bẹrẹ.",
-  "ig": "Chere! 🎯\n\nỊ nwere ike ịrụchasi ajụjụ maka \"{module_title}\" tupu ị gaa n'ihu.\n\nKadụ na-eche iwe — ị naghị achọ izi, naanị nwaa!\n\nBiko kunna /quiz iji malite."
-},
-
+    "en": "Hold on! 🎯\n\nYou need to complete the quiz for \"{module_title}\" before moving to the next module.\n\nDon't worry — you don't have to get it right, just take the quiz!\n\nType /quiz to begin.",
+    "pcm": "Wait small! 🎯\n\nYou need to do the quiz for \"{module_title}\" before you fit move.\n\nNo pressure — you no need get am right, just try am!\n\nType /quiz to start.",
+    "ha": "Jiya! 🎯\n\nKana bukatar yin quiz na \"{module_title}\" kafin mu ci gaba.\n\nKada ku damuwa — ba kuna bukatan saukar, kawai yi gwada!\n\nKunna /quiz don fara.",
+    "yo": "Jẹ́ kẹ́! 🎯\n\nẸ nilo lati ṣe idinku fun \"{module_title}\" ṣaaju ki ẹ lo siwaju.\n\nKu maarun — ẹ ko nilo lati redi, kawẹ yi gbiyanju!\n\nKunna /quiz lati bẹrẹ.",
+    "ig": "Chere! 🎯\n\nỊ nwere ike ịrụchasi ajụjụ maka \"{module_title}\" tupu ị gaa n'ihu.\n\nKadụ na-eche iwe — ị naghị achọ izi, naanị nwaa!\n\nBiko kunna /quiz iji malite."
+  },
   "quiz_skip_button": {
     "en": "⏭️ Move Forward",
     "pcm": "⏭️ Go Ahead",
@@ -97,7 +97,6 @@
     "yo": "⏭️ Lọ Si Iwaju",
     "ig": "⏭️ Gaa n'ihu"
   },
-
   "quiz_continue_button": {
     "en": "➡️ Next Module",
     "pcm": "➡️ Next Module",
@@ -105,7 +104,6 @@
     "yo": "➡️ Module Atẹle",
     "ig": "➡️ Module Na-esote"
   },
-
   "quiz_already_completed": {
     "en": "You have already completed the quiz for this module. Type /next to continue.",
     "pcm": "You don already do the quiz for this module. Type /next to continue.",
@@ -113,15 +111,13 @@
     "yo": "Ẹ ti parí idinku fun modul yii. Kunna /next lati tẹsiwaju.",
     "ig": "Ị gachasịla ajụjụ maka modul a. Kunna /next iji gaa n'ihu."
   },
-
   "quiz_not_ready": {
-  "en": "Not yet! 🚫\n\nYou need to complete all lessons in \"{module_title}\" before taking the quiz.\n\nKeep learning! Use /next to continue.",
-  "pcm": "E no time yet! 🚫\n\nYou need to finish all lessons for \"{module_title}\" before quiz time.\n\nContinue learning! Type /next.",
-  "ha": "Ba yanzu ba! 🚫\n\nKana bukatar gama duk darasi a cikin \"{module_title}\" kafin quiz.\n\nKi ci gaba da ilimi! Kunna /next.",
-  "yo": "Kò àkókò ẹ! 🚫\n\nẸ nilo lati parí gbogbo eko ni \"{module_title}\" ṣaaju ki ẹ ṣe idinku.\n\nTẹsiwaju ẹkọ! Kunna /next.",
-  "ig": "Ọ naghị oge! 🚫\n\nỊ nwere ike igwu akwukwo nile na \"{module_title}\" tupu ajụjụ.\n\nGaa n'ihu na ịmụta! Kunna /next."
-},
-
+    "en": "Not yet! 🚫\n\nYou need to complete all lessons in \"{module_title}\" before taking the quiz.\n\nKeep learning! Use /next to continue.",
+    "pcm": "E no time yet! 🚫\n\nYou need to finish all lessons for \"{module_title}\" before quiz time.\n\nContinue learning! Type /next.",
+    "ha": "Ba yanzu ba! 🚫\n\nKana bukatar gama duk darasi a cikin \"{module_title}\" kafin quiz.\n\nKi ci gaba da ilimi! Kunna /next.",
+    "yo": "Kò àkókò ẹ! 🚫\n\nẸ nilo lati parí gbogbo eko ni \"{module_title}\" ṣaaju ki ẹ ṣe idinku.\n\nTẹsiwaju ẹkọ! Kunna /next.",
+    "ig": "Ọ naghị oge! 🚫\n\nỊ nwere ike igwu akwukwo nile na \"{module_title}\" tupu ajụjụ.\n\nGaa n'ihu na ịmụta! Kunna /next."
+  },
   "course_complete": {
     "en": "🎉 Congratulations! You have completed all available lessons and quizzes!\n\nYou are now a champion for positive masculinity and GBV prevention.\n\nType /progress to review your achievement or /start to retake the course.",
     "pcm": "🎉 Congrats! You don finish all the lessons and quizzes!\n\nYou be champion now for positive masculinity and GBV prevention.\n\nType /progress to check your achievement or /start to do the course again.",
@@ -129,7 +125,13 @@
     "yo": "🎉 Oriire! Ẹ ti parí gbogbo eko ati idinku!\n\nẸ jẹ champion fun okunrin rere ati kawar GBV.\n\nKunna /progress lati yan awọ aseyọri rẹ tabi /start lati tun ṣe eko naa.",
     "ig": "🎉 Otú! Ị gachasịla akwukwo na ajụjụ nile!\n\nỊ bụ ọchịchị maka dị mma na ikpirikpi GBV.\n\nBiko kunna /progress iji lebanya ụnwụ gị ma /start iji ṣee akwukwo ọzọ."
   },
-
+  "language_change": {
+    "en": "🌍 Please select your preferred language:\n\n📌 Select one:",
+    "pcm": "🌍 Abeg pick the language wey you wan use:\n\n📌 Pick one:",
+    "ha": "🌍 Zaɓi harshe da kake so:\n\n📌 Zaɓi daya:",
+    "yo": "🌍 Jọwọ yan ede ti o fẹ lo:\n\n📌 Yan ọkan:",
+    "ig": "🌍 Biko horo asụsụ ọ na-ahọrọ:\n\n📌 Horo otu:"
+  },
   "not_started": {
     "en": "It seems you haven't started the course yet. Type /start to begin!",
     "pcm": "E be like say you never start the course. Type /start to begin!",
@@ -137,7 +139,6 @@
     "yo": "O dipo pe ẹ ko ti bẹrẹ eko naa. Kunna /start lati bẹrẹ!",
     "ig": "Ọ dị ka ị megbeeru akwukwo ahụ. Kunna /start iji malite!"
   },
-
   "menu_header": {
     "en": "📚 *Course Outline*",
     "pcm": "📚 *Course Outline*",
@@ -145,7 +146,6 @@
     "yo": "📚 *Ọkọ Eko*",
     "ig": "📚 *Ụkpụrụ Akwukwo*"
   },
-
   "menu_continue": {
     "en": "Type /next to continue from where you left off.",
     "pcm": "Type /next to continue from where you stop.",
@@ -153,52 +153,50 @@
     "yo": "Kunna /next lati tẹsiwaju lati ibo ti ẹ ba le.",
     "ig": "Kunna /next iji gaa n'ihu site na ebe ị kwụsịrị."
   },
-
   "command_buttons": {
     "next": {
-      "en": "📖 Next",
-      "pcm": "📖 Next",
-      "ha": "📖 Gida",
-      "yo": "📖 Atẹle",
-      "ig": "📖 Ọzọ"
+      "en": "Next",
+      "pcm": "Next",
+      "ha": "Gida",
+      "yo": "Atẹle",
+      "ig": "Ọzọ"
     },
     "quiz": {
-      "en": "📝 Quiz",
-      "pcm": "📝 Quiz",
-      "ha": "📝 Quiz",
-      "yo": "📝 Idinku",
-      "ig": "📝 Ajụjụ"
+      "en": "Quiz",
+      "pcm": "Quiz",
+      "ha": "Quiz",
+      "yo": "Idinku",
+      "ig": "Ajụjụ"
     },
     "progress": {
-      "en": "📊 Progress",
-      "pcm": "📊 Progress",
-      "ha": "📊 Gwarwarki",
-      "yo": "📊 Iṣẹ",
-      "ig": "📊 Ime"
+      "en": "Progress",
+      "pcm": "Progress",
+      "ha": "Gwarwarki",
+      "yo": "Iṣẹ",
+      "ig": "Ime"
     },
     "menu": {
-      "en": "📚 Menu",
-      "pcm": "📚 Menu",
-      "ha": "📚 Menu",
-      "yo": "📚 Akọsọ",
-      "ig": "📚 Akwụkwọ"
+      "en": "Menu",
+      "pcm": "Menu",
+      "ha": "Menu",
+      "yo": "Akọsọ",
+      "ig": "Akwụkwọ"
     },
     "help": {
-      "en": "❓ Help",
-      "pcm": "❓ Help",
-      "ha": "❓ Taimakon",
-      "yo": "❓ Iranlọwọ",
-      "ig": "❓ Nyere"
+      "en": "Help",
+      "pcm": "Help",
+      "ha": "Taimakon",
+      "yo": "Iranlọwọ",
+      "ig": "Nyere"
     },
     "language": {
-      "en": "🌍 Language",
-      "pcm": "🌍 Language",
-      "ha": "🌍 Harshe",
-      "yo": "🌍 Ede",
-      "ig": "🌍 Asụsụ"
+      "en": "Language",
+      "pcm": "Language",
+      "ha": "Harshe",
+      "yo": "Ede",
+      "ig": "Asụsụ"
     }
   },
-
   "language_changed": {
     "en": "Language changed to English! 🎉",
     "pcm": "Language don change to Pidgin! 🎉",
@@ -206,7 +204,6 @@
     "yo": "Ede ti yi lọ si Yoruba! 🎉",
     "ig": "Asụsụ gbanworo gaa na Igbo! 🎉"
   },
-
   "friendly_nudge": {
     "en": "Hey brother! I'm here to guide you through the course. Use the buttons below or try these:\n\n📖 /next — Continue your lesson\n📝 /quiz — Take the module quiz\n📊 /progress — See where you are\n📚 /menu — View course outline\n\nYou can also ask me questions about the course content!",
     "pcm": "How far brother! I dey here to guide you through the course. Use the buttons below or try these:\n\n📖 /next — Continue your lesson\n📝 /quiz — Do the quiz\n📊 /progress — Check where you dey\n📚 /menu — See course outline\n\nYou fit also ask me questions about the course!",
@@ -214,7 +211,6 @@
     "yo": "Hey brother! Mo wa nibi lati tọ ọ si eko naa. Lo awọn bọtini ni isalẹ tabi gbiyanju awọn wọnyi:\n\n📖 /next — Tẹsiwaju eko rẹ\n📝 /quiz — Ṣe idinku\n📊 /progress — Wo ibi ti o wa\n📚 /menu — Wo ọkọ eko\n\nO le beere awọn ibeere nipa eko naa!",
     "ig": "Hey brother! A nọ ebe a iji duzie gị na akwukwo. Jiri bọtini ndị dị n'okpuru ma ọ bụ nwaa ndị a:\n\n📖 /next — Gaa n'ihu na akwukwo\n📝 /quiz — Mee ajụjụ\n📊 /progress — Lee ebe ị nọ\n📚 /menu — Lee ụkpụrụ akwukwo\n\nỊ nwekwara ike ịjụ m ajụjụ banyere akwukwo!"
   },
-
   "welcome_back": {
     "en": "Welcome back, brother! 💪\n\nYou're currently on:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nTap /next to continue where you left off, or /menu to see the full course outline.",
     "pcm": "Welcome back, brother! 💪\n\nYou dey currently on:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nTap /next to continue where you stop, or /menu to see the full course.",
@@ -222,7 +218,6 @@
     "yo": "Ẹ ku abọ, brother! 💪\n\nẸ wa lori:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nKunna /next lati tẹsiwaju, tabi /menu lati ri gbogbo eto.",
     "ig": "Nnọọ, brother! 💪\n\nỊ nọ ugbu a na:\n📖 Module: {module_title}\n📝 Lesson: {lesson_title}\n\nKunna /next iji gaa n'ihu, ma ọ bụ /menu iji hụ ụkpụrụ."
   },
-
   "error_generic": {
     "en": "Sorry, something went wrong. Please try again.",
     "pcm": "Sorry, something no work well. Abeg try again.",

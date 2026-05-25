@@ -70,12 +70,12 @@ def get_main_menu_buttons(lang='en'):
 def get_help_keyboard_buttons(lang='en'):
     """Get keyboard buttons specifically for the help menu containing all commands."""
     start_label = {
-        "en": "🚀 Start / Restart",
-        "pcm": "🚀 Start / Restart",
-        "ha": "🚀 Fara / Sake Fara",
-        "yo": "🚀 Bẹrẹ / Tun Bẹrẹ",
-        "ig": "🚀 Malite / Malite Ọzọ"
-    }.get(lang, "🚀 Start / Restart")
+        "en": "Start / Restart",
+        "pcm": "Start / Restart",
+        "ha": "Fara / Sake Fara",
+        "yo": "Bẹrẹ / Tun Bẹrẹ",
+        "ig": "Malite / Malite Ọzọ"
+    }.get(lang, "Start / Restart")
 
     buttons = [
         [InlineKeyboardButton(start_label, callback_data="cmd_start")],
@@ -468,7 +468,7 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     """Change language preference."""
     await send_reply(
         update,
-        TRANSLATIONS["language_selection"]["en"],
+        TRANSLATIONS["language_change"]["en"],
         reply_markup=get_language_selection_buttons()
     )
 
@@ -522,7 +522,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     elif data == "cmd_language":
         await query.edit_message_text(
-            TRANSLATIONS["language_selection"]["en"],
+            TRANSLATIONS["language_change"]["en"],
             reply_markup=get_language_selection_buttons()
         )
     
