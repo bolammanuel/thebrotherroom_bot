@@ -38,12 +38,29 @@ MODULES = COURSE_CONTENT["modules"]
 # ============== TRANSLATION HELPER FUNCTIONS ==============
 
 def get_text(key, lang='en', **kwargs):
-    """Get translated text with variable substitution."""
+    """Get translated text with variable substitution, supporting dotted keys for nested dicts."""
     try:
-        text = TRANSLATIONS.get(key, {}).get(lang, TRANSLATIONS.get(key, {}).get('en', ''))
+        # Resolve dotted key path (e.g., 'command_buttons.next')
+        parts = key.split('.')
+        obj = TRANSLATIONS
+        for part in parts:
+            if isinstance(obj, dict):
+                obj = obj.get(part)
+            else:
+                obj = None
+                break
+        
+        # If successfully found the translation object, get the language value
+        if isinstance(obj, dict):
+            text = obj.get(lang, obj.get('en', ''))
+        else:
+            # Fallback to direct top-level key lookup
+            text = TRANSLATIONS.get(key, {}).get(lang, TRANSLATIONS.get(key, {}).get('en', ''))
+            
         # Replace variables in curly braces
         for var, value in kwargs.items():
-            text = text.replace('{' + var + '}', str(value))
+            if text:
+                text = text.replace('{' + var + '}', str(value))
         return text
     except Exception as e:
         logger.error(f"Translation error for key {key}: {e}")
@@ -77,6 +94,14 @@ def get_help_keyboard_buttons(lang='en'):
         "ig": "Malite / Malite Ọzọ"
     }.get(lang, "Start / Restart")
 
+    community_label = {
+        "en": "Join WhatsApp Community",
+        "pcm": "Join WhatsApp Group",
+        "ha": "Shiga Rukunin WhatsApp",
+        "yo": "Darapọ mọ Agbegbe WhatsApp",
+        "ig": "Soro na Otu WhatsApp"
+    }.get(lang, "Join WhatsApp Community")
+
     buttons = [
         [InlineKeyboardButton(start_label, callback_data="cmd_start")],
         [InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next"),
@@ -84,7 +109,8 @@ def get_help_keyboard_buttons(lang='en'):
         [InlineKeyboardButton(get_command_button("progress", lang), callback_data="cmd_progress"),
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
-         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")]
+         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
+        [InlineKeyboardButton(community_label, url="https://chat.whatsapp.com/YOUR_GROUP_LINK")]
     ]
     return InlineKeyboardMarkup(buttons)
 
@@ -250,6 +276,33 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
     # Redirect to the start command directly to show onboarding
     await start(update, context)
+
+async def community_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Prompt user to join the WhatsApp community."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    prompt = {
+        "en": "🤜🤛 *Join The Brothers' Room WhatsApp Community!*\n\nContinue the conversation with other brothers, challenge harmful norms together, and get access to exclusive events.\n\nJoin here: https://chat.whatsapp.com/YOUR_GROUP_LINK",
+        "pcm": "🤜🤛 *Join The Brothers' Room WhatsApp Group!*\n\nMake we continue this talk with other brothers, work together, and get beta information.\n\nJoin here: https://chat.whatsapp.com/YOUR_GROUP_LINK",
+        "ha": "🤜🤛 *Shiga Rukunin WhatsApp na The Brothers' Room!*\n\nCi gaba da tattaunawa da sauran 'yan uwa, ƙalubalanci al'adun da ba su da kyau tare.\n\nShiga nan: https://chat.whatsapp.com/YOUR_GROUP_LINK",
+        "yo": "🤜🤛 *Darapọ mọ Agbegbe WhatsApp ti The Brothers' Room!*\n\nTẹsiwaju ibaraẹnisọrọ pẹlu awọn arakunrin miiran, ati ifọwọsowọpọ fun rere.\n\nDarapọ mọ nibi: https://chat.whatsapp.com/YOUR_GROUP_LINK",
+        "ig": "🤜🤛 *Soro na Otu WhatsApp nke The Brothers' Room!*\n\nGaa n'ihu na nkata gị na ụmụnne gị ndị ọzọ, ma rụọ ọrụ ọnụ.\n\nSoro na ebe a: https://chat.whatsapp.com/YOUR_GROUP_LINK"
+    }.get(lang, "en")
+    
+    button_label = {
+        "en": "Join WhatsApp Community",
+        "pcm": "Join WhatsApp Group",
+        "ha": "Shiga Rukunin WhatsApp",
+        "yo": "Darapọ mọ Agbegbe WhatsApp",
+        "ig": "Soro na Otu WhatsApp"
+    }.get(lang, "Join WhatsApp Community")
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(button_label, url="https://chat.whatsapp.com/YOUR_GROUP_LINK")]
+    ])
+    
+    await send_reply(update, prompt, parse_mode="Markdown", reply_markup=keyboard)
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Help command."""
@@ -638,6 +691,7 @@ async def post_init(application: Application) -> None:
         BotCommand("progress", "Check your current module and lesson"),
         BotCommand("menu", "View the full course outline"),
         BotCommand("language", "Change your language preference"),
+        BotCommand("community", "Join our WhatsApp community"),
         BotCommand("reset", "Reset progress completely and restart"),
         BotCommand("help", "Get help and list commands")
     ]
@@ -657,6 +711,7 @@ def main() -> None:
     # Command handlers
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CommandHandler("reset", reset_command))
+    application.add_handler(CommandHandler("community", community_command))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("menu", menu_command))
     application.add_handler(CommandHandler("progress", progress_command))
