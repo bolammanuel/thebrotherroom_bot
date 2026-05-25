@@ -10,7 +10,8 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotComm
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from db_manager import (
     init_db, enroll_learner, get_learner_progress, update_learner_progress, 
-    update_quiz_status, update_language_preference, get_language_preference
+    update_quiz_status, update_language_preference, get_language_preference,
+    get_connection
 )
 from openai_utils import get_openai_response 
 
@@ -180,23 +181,44 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         # Check if they have completed the entire course (last module, last lesson, quiz completed)
         next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
         if next_module_id is None and next_lesson_id is None and quiz_completed in [1, 2]:
-            await send_reply(
-                update,
-                get_text("course_complete", lang),
-                reply_markup=get_main_menu_buttons(lang)
-            )
-            return
+            # They want to retake the course (as stated in the course_complete message)!
+            # Reset progress in database
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM learners WHERE user_id = %s", (user_id,))
+            conn.commit()
+            conn.close()
+            # Clear user_data and continue to onboarding selection
+            context.user_data.clear()
+        else:
+            module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+            if module and lesson:
+                welcome_back = get_text("welcome_back", lang, module_title=module['title'], lesson_title=lesson['title'])
+                await send_reply(
+                    update,
+                    welcome_back,
+                    reply_markup=get_main_menu_buttons(lang)
+                )
+                return
 
-        module, lesson = get_module_lesson(current_module_id, current_lesson_id)
-        
-        if module and lesson:
-            welcome_back = get_text("welcome_back", lang, module_title=module['title'], lesson_title=lesson['title'])
-            await send_reply(
-                update,
-                welcome_back,
-                reply_markup=get_main_menu_buttons(lang)
-            )
-            return
+async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Reset learner progress completely."""
+    user_id = update.effective_user.id
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM learners WHERE user_id = %s", (user_id,))
+    conn.commit()
+    conn.close()
+    
+    context.user_data.clear()
+    
+    await send_reply(
+        update,
+        "🔄 Your progress has been reset successfully! Starting a new learning session...",
+    )
+    # Redirect to the start command directly to show onboarding
+    await start(update, context)
     
     # New learner — show language selection
     await send_reply(
@@ -591,6 +613,7 @@ async def post_init(application: Application) -> None:
         BotCommand("progress", "Check your current module and lesson"),
         BotCommand("menu", "View the full course outline"),
         BotCommand("language", "Change your language preference"),
+        BotCommand("reset", "Reset progress completely and restart"),
         BotCommand("help", "Get help and list commands")
     ]
     await application.bot.set_my_commands(commands)
@@ -608,6 +631,7 @@ def main() -> None:
 
     # Command handlers
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("reset", reset_command))
     application.add_handler(CommandHandler("help", help_command))
     application.add_handler(CommandHandler("menu", menu_command))
     application.add_handler(CommandHandler("progress", progress_command))
