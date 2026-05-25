@@ -67,6 +67,27 @@ def get_main_menu_buttons(lang='en'):
     ]
     return InlineKeyboardMarkup(buttons)
 
+def get_help_keyboard_buttons(lang='en'):
+    """Get keyboard buttons specifically for the help menu containing all commands."""
+    start_label = {
+        "en": "🚀 Start / Restart",
+        "pcm": "🚀 Start / Restart",
+        "ha": "🚀 Fara / Sake Fara",
+        "yo": "🚀 Bẹrẹ / Tun Bẹrẹ",
+        "ig": "🚀 Malite / Malite Ọzọ"
+    }.get(lang, "🚀 Start / Restart")
+
+    buttons = [
+        [InlineKeyboardButton(start_label, callback_data="cmd_start")],
+        [InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next"),
+         InlineKeyboardButton(get_command_button("quiz", lang), callback_data="cmd_quiz")],
+        [InlineKeyboardButton(get_command_button("progress", lang), callback_data="cmd_progress"),
+         InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
+        [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
+         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")]
+    ]
+    return InlineKeyboardMarkup(buttons)
+
 def get_language_selection_buttons():
     """Get language selection buttons."""
     buttons = [
@@ -238,7 +259,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await send_reply(
         update,
         get_text("help_menu", lang),
-        reply_markup=get_main_menu_buttons(lang)
+        reply_markup=get_help_keyboard_buttons(lang)
     )
 
 async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -482,6 +503,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         # Call next_lesson_handler via update object
         await next_lesson_handler(update, context)
+        
+    elif data == "cmd_start":
+        await query.delete_message()
+        await start(update, context)
     
     elif data == "cmd_quiz":
         await query.delete_message()
