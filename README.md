@@ -4,29 +4,41 @@ This project is a Telegram bot designed to serve as a conversational Learning Ma
 
 ## Features
 
-- **Welcoming & Enrollment**: Greets new learners and enrolls them automatically.
-- **Structured Lessons**: Delivers course content step-by-step, allowing learners to progress by typing "next" or similar commands.
-- **Modular Course Structure**: Organizes content into modules, each containing multiple lessons.
-- **Module Quizzes**: Quizzes learners after each module to test their understanding.
-- **Progress Tracking**: Tracks individual learner progress, including current lesson/module and quiz completion status.
-- **Conversational Tone**: Engages learners with a tone suited for young Nigerian men.
-- **Commands**: Supports `/start`, `/progress`, `/next`, `/quiz`, `/help`, and `/menu`.
-- **Contextual Responses**: Uses OpenAI API (gpt-4.1-mini) to generate contextual responses to learner questions based on course content.
+- **Multilingual Localization**: Full support for 5 native languages: English, Pidgin, Hausa, Yoruba, and Igbo. Onboarding, lessons, quizzes, and help documentation are dynamically translated based on learner preferences.
+- **Structured Lessons & Progress Tracking**: Delivers modular learning content step-by-step. Automatically enrolls learners and saves progress (current module, lesson, and quiz completion status) in a persistent SQLite database.
+- **Dynamic Module Quizzes**: Quick, context-aware interactive quizzes at the end of each module to validate learning, complete with retry and skip mechanisms.
+- **Scored Exit Post-Test Exam**: A comprehensive 5-question final exam covering key course themes. Requires a cutoff mark of at least 35/50 (4 out of 5 correct) to pass and graduate.
+- **Custom Pledge & Peer Broadcast**: Prompts successful graduates to make a personal commitment pledge to stand against GBV, which is automatically broadcasted to the community group.
+- **Dynamic Certificate Generation**: Dynamically compiles and renders a high-quality, professional Certificate of Completion using Pillow, featuring the learner's full name, completion date, and a secure verification ID.
+- **WhatsApp Community Integration**: Encourages graduates to join a WhatsApp community group via post-course completion cards and the `/community` command to sustain engagement.
+- **Background Reminders & Nudges**: 
+  - **Weekly Pledge Reminders**: Automatically messages graduates with their personal pledges to remind them of their commitment.
+  - **Inactivity Nudges**: Automatically sends gentle check-in reminders to inactive learners after 4 days of inactivity.
+- **Conversational AI Companion**: Leverages OpenAI API (`gpt-4-mini`) to answer learner questions contextually based on the course materials, supporting both text and speech-to-text voice interactions.
 
-## Course Details
+## Interactive Commands
 
-- **Title**: "Young Men Against Gender Based Violence"
-- **Topic**: Positive masculinity & GBV prevention
-- **Audience**: Young Nigerian men
+The bot supports the following persistent commands in the menu:
+- `/start` - Start or restart the onboarding flow, including language selection.
+- `/next` - Progress to the next structured lesson or module quiz.
+- `/quiz` - Trigger the module quiz (available at the end of each module).
+- `/progress` - View detailed module and lesson progress.
+- `/language` - Change translation preference (English, Pidgin, Hausa, Yoruba, or Igbo) at any point.
+- `/menu` - View the interactive course syllabus/outline.
+- `/community` - Retrieve quick-join links to the WhatsApp group.
+- `/help` - Show a comprehensive list of commands with quick-action buttons.
+- `/reset` - Completely reset all database progress to start the course brand new.
 
 ## Technical Stack
 
-- **Language**: Python
-- **Telegram Bot Library**: `python-telegram-bot`
-- **Database**: SQLite (for learner progress tracking)
-- **Course Content Storage**: JSON file (`course_content.json`)
-- **AI Integration**: OpenAI API (gpt-4.1-mini)
-- **Deployment**: Railway (with `Procfile` and `railway.json`)
+- **Language**: Python 3
+- **Telegram Bot Library**: `python-telegram-bot` (v20+)
+- **Database**: SQLite (for persistent user progress, pledges, score history, and activity timestamps)
+- **Course Content**: Modular JSON storage (`course_content.json`)
+- **Localization**: Native translations file (`translations.json`)
+- **AI Integration**: OpenAI API (`gpt-4o-mini` / Whisper for voice transcripts / TTS for audio accessibility)
+- **Graphics Rendering**: Pillow (PIL) for certificate generation using beautiful custom fonts
+- **Deployment**: Configured for Railway using `Procfile` and `railway.json`
 
 ## Project Structure
 
