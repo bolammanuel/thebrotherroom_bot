@@ -1189,8 +1189,7 @@ async def show_admin_analytics(update: Update, context: ContextTypes.DEFAULT_TYP
         f"Average Pre-Test Score: {stats['avg_pre_test']}/50\n\n"
         f"Course Graduates: {stats['graduates_count']}\n"
         f"Average Post-Test Score: {stats['avg_post_test']}/50\n\n"
-        f"Average Knowledge Shift: {stats['avg_shift']}/50\n"
-        f"Total Private Journal Reflections Written: {stats['total_reflections']}\n\n"
+        f"Average Knowledge Shift: {stats['avg_shift']}/50\n\n"
         "This report aggregates active baseline shift and program engagement to provide evidence for funders and partner organizations."
     )
     
