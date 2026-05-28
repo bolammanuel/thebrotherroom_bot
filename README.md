@@ -5,6 +5,8 @@ This project is a Telegram bot designed to serve as a conversational Learning Ma
 ## Features
 
 - **Multilingual Localization**: Full support for 5 native languages: English, Pidgin, Hausa, Yoruba, and Igbo. Onboarding, lessons, quizzes, and help documentation are dynamically translated based on learner preferences.
+- **Visual Accessibility Toggle**: Dynamic inline buttons (**Voice: ON 🔊 / Voice: OFF 🔇**) automatically localized in all 5 languages are embedded in both the main menu and help keyboards. Tapping them toggles spoken audio replies on/off immediately.
+- **Speech-to-Text & Text-to-Speech**: Visually impaired or low-literacy users can speak directly to the bot by sending standard Telegram voice notes (transcribed via Whisper). When voice mode is enabled, the bot synthesizes all lessons and quiz alerts into audio voice notes using OpenAI TTS.
 - **Structured Lessons & Progress Tracking**: Delivers modular learning content step-by-step. Automatically enrolls learners and saves progress (current module, lesson, and quiz completion status) in a persistent SQLite database.
 - **Dynamic Module Quizzes**: Quick, context-aware interactive quizzes at the end of each module to validate learning, complete with retry and skip mechanisms.
 - **Scored Exit Post-Test Exam**: A comprehensive 5-question final exam covering key course themes. Requires a cutoff mark of at least 35/50 (4 out of 5 correct) to pass and graduate.

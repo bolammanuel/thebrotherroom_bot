@@ -1,0 +1,14 @@
+# Environment variables (contains secrets!)
+.env
+
+# Python caching
+__pycache__/
+*.pyc
+
+# Local SQLite databases
+*.db
+learner_progress.db
+
+# Generated / Synthesized temporary assets
+assets/voice_reply_*.ogg
+assets/certificate_*.png

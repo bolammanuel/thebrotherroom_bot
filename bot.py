@@ -79,20 +79,69 @@ def get_command_button(button_name, lang='en'):
 
 # ============== INLINE BUTTON HELPER ==============
 
-def get_main_menu_buttons(lang='en'):
-    """Get context-aware main menu buttons."""
+def get_main_menu_buttons(lang='en', user_id=None):
+    """Get context-aware main menu buttons with a dynamic accessibility toggle."""
+    voice_enabled = False
+    if user_id:
+        try:
+            voice_enabled = get_voice_responses(user_id)
+        except Exception:
+            pass
+            
+    if voice_enabled:
+        voice_label = {
+            "en": "Voice: ON 🔊",
+            "pcm": "Voice: ON 🔊",
+            "ha": "Murya: A KUNNE 🔊",
+            "yo": "Ohun: MÚ KÚN 🔊",
+            "ig": "Olu: MERE 🔊"
+        }.get(lang, "Voice: ON 🔊")
+    else:
+        voice_label = {
+            "en": "Voice: OFF 🔇",
+            "pcm": "Voice: OFF 🔇",
+            "ha": "Murya: A KASHE 🔇",
+            "yo": "Ohun: MÚ KÚRÒ 🔇",
+            "ig": "Olu: PAA 🔇"
+        }.get(lang, "Voice: OFF 🔇")
+
     buttons = [
         [InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next")],
         [InlineKeyboardButton(get_command_button("quiz", lang), callback_data="cmd_quiz")],
         [InlineKeyboardButton(get_command_button("progress", lang), callback_data="cmd_progress"),
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
-         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")]
+         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
+        [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
     ]
     return InlineKeyboardMarkup(buttons)
 
-def get_help_keyboard_buttons(lang='en'):
-    """Get keyboard buttons specifically for the help menu containing all commands."""
+def get_help_keyboard_buttons(lang='en', user_id=None):
+    """Get keyboard buttons specifically for the help menu containing all commands with an accessibility toggle."""
+    voice_enabled = False
+    if user_id:
+        try:
+            voice_enabled = get_voice_responses(user_id)
+        except Exception:
+            pass
+            
+    if voice_enabled:
+        voice_label = {
+            "en": "Voice: ON 🔊",
+            "pcm": "Voice: ON 🔊",
+            "ha": "Murya: A KUNNE 🔊",
+            "yo": "Ohun: MÚ KÚN 🔊",
+            "ig": "Olu: MERE 🔊"
+        }.get(lang, "Voice: ON 🔊")
+    else:
+        voice_label = {
+            "en": "Voice: OFF 🔇",
+            "pcm": "Voice: OFF 🔇",
+            "ha": "Murya: A KASHE 🔇",
+            "yo": "Ohun: MÚ KÚRÒ 🔇",
+            "ig": "Olu: PAA 🔇"
+        }.get(lang, "Voice: OFF 🔇")
+
     start_label = {
         "en": "Start / Restart",
         "pcm": "Start / Restart",
@@ -117,6 +166,7 @@ def get_help_keyboard_buttons(lang='en'):
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
          InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
+        [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")],
         [InlineKeyboardButton(community_label, url="https://chat.whatsapp.com/YOUR_GROUP_LINK")]
     ]
     return InlineKeyboardMarkup(buttons)
@@ -277,7 +327,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 await send_reply(
                     update,
                     welcome_back,
-                    reply_markup=get_main_menu_buttons(lang)
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
                 )
                 return
     
@@ -290,7 +340,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     
     # Store that we're waiting for language selection
     context.user_data['awaiting_language_selection'] = True
-
+ 
 async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Reset learner progress completely."""
     user_id = update.effective_user.id
@@ -309,7 +359,7 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     )
     # Redirect to the start command directly to show onboarding
     await start(update, context)
-
+ 
 async def community_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Prompt user to join the WhatsApp community."""
     user_id = update.effective_user.id
@@ -336,7 +386,7 @@ async def community_command(update: Update, context: ContextTypes.DEFAULT_TYPE) 
     ])
     
     await send_reply(update, prompt, parse_mode="Markdown", reply_markup=keyboard)
-
+ 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Help command."""
     user_id = update.effective_user.id
@@ -345,7 +395,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await send_reply(
         update,
         get_text("help_menu", lang),
-        reply_markup=get_help_keyboard_buttons(lang)
+        reply_markup=get_help_keyboard_buttons(lang, user_id=user_id)
     )
 
 async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -367,7 +417,7 @@ async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         update,
         menu_text,
         parse_mode="Markdown",
-        reply_markup=get_main_menu_buttons(lang)
+        reply_markup=get_main_menu_buttons(lang, user_id=user_id)
     )
 
 async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -380,7 +430,7 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await send_reply(
             update,
             get_text("not_started", lang),
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
 
@@ -408,13 +458,13 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await send_reply(
             update,
             progress_text,
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
     else:
         await send_reply(
             update,
             get_text("error_generic", lang),
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
 
 async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -427,7 +477,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await send_reply(
             update,
             get_text("not_started", lang),
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
 
@@ -441,7 +491,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await send_reply(
             update,
             get_text("quiz_not_completed", lang, module_title=module['title']),
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
 
@@ -465,7 +515,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 update,
                 f"{lesson_header}\n\n{lesson['content']}",
                 parse_mode="Markdown",
-                reply_markup=get_main_menu_buttons(lang)
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
 
             # If this is last lesson, prompt for quiz
@@ -473,13 +523,13 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 await send_reply(
                     update,
                     get_text("lessons_complete", lang, module_title=module['title']),
-                    reply_markup=get_main_menu_buttons(lang)
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
                 )
         else:
             await send_reply(
                 update,
                 get_text("error_generic", lang),
-                reply_markup=get_main_menu_buttons(lang)
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
     else:
         # Course complete — Route to the scored exit post-test exam!
@@ -495,7 +545,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await send_reply(
             update,
             get_text("not_started", lang),
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
 
@@ -506,7 +556,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await send_reply(
             update,
             get_text("quiz_already_completed", lang),
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
   # ✅ NEW: Check if at last lesson
@@ -515,7 +565,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await send_reply(
             update,
             get_text("quiz_not_ready", lang, module_title=module['title']),
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
 
@@ -543,7 +593,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         await send_reply(
             update,
             get_text("error_generic", lang),
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
 
 async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -725,7 +775,7 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
             await update.message.reply_photo(
                 photo=cert,
                 caption=congrats_text,
-                reply_markup=get_main_menu_buttons(lang)
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
     except Exception as e:
         logger.error(f"Error sending certificate photo: {e}")
@@ -1089,6 +1139,59 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     elif data == "cmd_help":
         await query.delete_message()
         await help_command(update, context)
+        
+    elif data == "cmd_accessibility":
+        current_status = get_voice_responses(user_id)
+        new_status = not current_status
+        set_voice_responses(user_id, new_status)
+        
+        status_text = {
+            "en": f"Voice Replies {'ENABLED' if new_status else 'DISABLED'}! 🔊",
+            "pcm": f"Voice Replies {'START' if new_status else 'STOP'}! 🔊",
+            "ha": f"An {'KUNNA' if new_status else 'KASHE'} Murya! 🔊",
+            "yo": f"Ohun ti jẹ́ {'MÚ KÚN' if new_status else 'MÚ KÚRÒ'}! 🔊",
+            "ig": f"Olu abanyela {'MERE' if new_status else 'PAA'}! 🔊"
+        }
+        toast_msg = status_text.get(lang, status_text["en"])
+        
+        await query.answer(text=toast_msg, show_alert=True)
+        
+        message_text = query.message.text or ""
+        is_help_menu = "help_menu" in TRANSLATIONS and any(
+            h_text[:30] in message_text for h_text in TRANSLATIONS["help_menu"].values() if h_text
+        )
+        
+        if is_help_menu:
+            reply_markup = get_help_keyboard_buttons(lang, user_id=user_id)
+        else:
+            reply_markup = get_main_menu_buttons(lang, user_id=user_id)
+            
+        await query.edit_message_reply_markup(reply_markup=reply_markup)
+        
+        if new_status:
+            voice_status_full = {
+                "en": "Accessibility Voice Replies have been ENABLED. The bot will now send audio voice notes alongside text messages.",
+                "pcm": "Accessibility Voice Replies don START. Bot go now dey send voice notes as well.",
+                "ha": "Accessibility Voice Replies an KUNNA.",
+                "yo": "Accessibility Voice Replies ti jẹ́ MÚ KÚN.",
+                "ig": "Accessibility Voice Replies abanyela MERE."
+            }.get(lang, "Accessibility Voice Replies have been ENABLED.")
+            
+            output_filename = f"assets/voice_reply_{user_id}.ogg"
+            success = synthesize_speech(voice_status_full, output_filename)
+            if success:
+                try:
+                    with open(output_filename, "rb") as voice_file:
+                        await query.message.reply_voice(voice=voice_file)
+                except Exception as e:
+                    logger.error(f"Error sending synthesized voice activation reply: {e}")
+                finally:
+                    if os.path.exists(output_filename):
+                        try:
+                            os.remove(output_filename)
+                        except Exception:
+                            pass
+        return
     
     # Quiz retry - show quiz again
     elif data == "quiz_retry":
@@ -1135,7 +1238,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         else:
             await query.edit_message_text(
                 get_text("error_generic", lang),
-                reply_markup=get_main_menu_buttons(lang)
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -1194,14 +1297,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         response = get_openai_response(user_message, context_for_openai)
         await update.message.reply_text(
             response,
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
     else:
         # Friendly nudge for non-course messages
         nudge = get_text("friendly_nudge", lang)
         await update.message.reply_text(
             nudge,
-            reply_markup=get_main_menu_buttons(lang)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
 
 async def post_init(application: Application) -> None:
