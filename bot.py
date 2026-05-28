@@ -17,7 +17,7 @@ from db_manager import (
     get_connection, increment_ai_questions, increment_first_attempt_quizzes,
     set_voice_responses, get_voice_responses, update_post_test_score,
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
-    get_inactive_learners, update_pre_test_score, get_pre_test_score
+    get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
 
@@ -997,7 +997,7 @@ async def show_admin_leaderboard(update: Update, context: ContextTypes.DEFAULT_T
     
     for idx, item in enumerate(leaderboard[:10]):
         badge = "🥇" if idx == 0 else "🥈" if idx == 1 else "🥉" if idx == 2 else "👤"
-        text += f"{badge} *Rank {idx + 1}:* User `{item['user_id']}`\n"
+        text += f"{badge} *Rank {idx + 1}:* {item['full_name']} (ID: `{item['user_id']}`)\n"
         text += f"   • Engagement Score: *{item['engagement_score']}*\n"
         text += f"   • Modules Completed: {item['modules_completed']}/12\n"
         text += f"   • First-Attempt Quizzes: {item['first_attempt_quizzes']}\n"
@@ -1019,7 +1019,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT user_id, current_module_id, current_lesson_id, quiz_completed, 
+        SELECT user_id, full_name, current_module_id, current_lesson_id, quiz_completed, 
                language_preference, enrollment_date, post_test_score, pledge_text,
                ai_questions_count, first_attempt_quizzes
         FROM learners
@@ -1037,12 +1037,14 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     with open(csv_file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "User ID", "Current Module", "Current Lesson", "Quiz Status", 
+            "User ID", "Full Name", "Current Module", "Current Lesson", "Quiz Status", 
             "Language Preference", "Enrollment Date", "Post-Test Score", "Personal Pledge",
             "AI Questions Asked", "First-Attempt Quizzes Passed"
         ])
         for row in rows:
-            writer.writerow(row)
+            # Format rows nicely (replace None with empty string or 'N/A')
+            formatted_row = [x if x is not None else "" for x in row]
+            writer.writerow(formatted_row)
             
     try:
         chat_msg = update.callback_query.message if update.callback_query else update.message
@@ -1164,7 +1166,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         progress = get_learner_progress(user_id)
         is_new_user = progress is None
         
-        enroll_learner(user_id, lang_code)
+        full_name = query.from_user.full_name if query.from_user else None
+        enroll_learner(user_id, lang_code, full_name=full_name)
         
         if is_new_user or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
@@ -1398,6 +1401,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         context.user_data.pop("awaiting_cert_name", None)
         cert_name = user_message.strip()
         context.user_data["cert_name"] = cert_name
+        update_full_name(user_id, cert_name)  # Save to DB permanently!
         
         # Move to pledge writing step
         context.user_data["awaiting_pledge"] = True

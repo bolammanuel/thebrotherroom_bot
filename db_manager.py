@@ -98,7 +98,8 @@ def init_db():
         "pledge_text": "TEXT DEFAULT NULL",
         "ai_questions_count": "INTEGER DEFAULT 0",
         "first_attempt_quizzes": "INTEGER DEFAULT 0",
-        "voice_responses_enabled": "INTEGER DEFAULT 0"
+        "voice_responses_enabled": "INTEGER DEFAULT 0",
+        "full_name": "TEXT DEFAULT NULL"
     }
     
     for col, col_def in new_cols.items():
@@ -108,7 +109,7 @@ def init_db():
     conn.commit()
     conn.close()
 
-def enroll_learner(user_id, language='en'):
+def enroll_learner(user_id, language='en', full_name=None):
     """Enroll a new learner or update language preference."""
     conn = get_connection()
     cursor = conn.cursor()
@@ -118,17 +119,22 @@ def enroll_learner(user_id, language='en'):
     existing = cursor.fetchone()
     
     if existing:
-        # Update language preference if already enrolled
-        cursor.execute(
-            "UPDATE learners SET language_preference = %s WHERE user_id = %s",
-            (language, user_id)
-        )
+        if full_name:
+            cursor.execute(
+                "UPDATE learners SET language_preference = %s, full_name = %s WHERE user_id = %s",
+                (language, full_name, user_id)
+            )
+        else:
+            cursor.execute(
+                "UPDATE learners SET language_preference = %s WHERE user_id = %s",
+                (language, user_id)
+            )
     else:
         # Enroll new learner
         cursor.execute("""
-            INSERT INTO learners (user_id, current_module_id, current_lesson_id, language_preference)
-            VALUES (%s, %s, %s, %s)
-        """, (user_id, "module_1", "lesson_1_1", language))
+            INSERT INTO learners (user_id, current_module_id, current_lesson_id, language_preference, full_name)
+            VALUES (%s, %s, %s, %s, %s)
+        """, (user_id, "module_1", "lesson_1_1", language, full_name))
     
     conn.commit()
     conn.close()
@@ -290,6 +296,19 @@ def get_pre_test_score(user_id):
     conn.close()
     return result[0] if result else -1
 
+def update_full_name(user_id, full_name):
+    """Update learner's registered full name."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET full_name = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (full_name, user_id))
+    conn.commit()
+    conn.close()
+
+
 
 def save_pledge(user_id, pledge_text):
     """Save personal pledge and schedule a 4-week weekly reminder cycle."""
@@ -356,7 +375,7 @@ def get_engagement_leaderboard():
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT user_id, current_module_id, first_attempt_quizzes, ai_questions_count, post_test_score
+        SELECT user_id, current_module_id, first_attempt_quizzes, ai_questions_count, post_test_score, full_name
         FROM learners
     """)
     rows = cursor.fetchall()
@@ -364,7 +383,7 @@ def get_engagement_leaderboard():
     
     leaderboard = []
     for row in rows:
-        user_id, current_module_id, first_attempt_quizzes, ai_questions_count, post_test_score = row
+        user_id, current_module_id, first_attempt_quizzes, ai_questions_count, post_test_score, full_name = row
         
         # Calculate modules completed based on sequential curriculum progress
         modules_completed = 0
@@ -383,6 +402,7 @@ def get_engagement_leaderboard():
         
         leaderboard.append({
             "user_id": user_id,
+            "full_name": full_name or f"User {user_id}",
             "modules_completed": modules_completed,
             "first_attempt_quizzes": first_attempt_quizzes,
             "ai_questions_count": ai_questions_count,
