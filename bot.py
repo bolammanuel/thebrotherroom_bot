@@ -773,8 +773,8 @@ async def grade_post_test(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # PASSED (score >= 35)
         passed_text = get_text("post_test.passed", lang, score=score)
         await send_reply(update, passed_text)
-        # Put user into a state waiting for their pledge
-        context.user_data["awaiting_pledge"] = True
+        # Put user into a state waiting for their preferred name
+        context.user_data["awaiting_cert_name"] = True
     else:
         # FAILED
         failed_text = get_text("post_test.failed", lang, score=score)
@@ -846,7 +846,7 @@ def generate_certificate_image(name, date_str, user_id):
     img.save(output_path)
     return output_path
 
-async def handle_graduation_and_certificate(update: Update, context: ContextTypes.DEFAULT_TYPE, pledge: str) -> None:
+async def handle_graduation_and_certificate(update: Update, context: ContextTypes.DEFAULT_TYPE, pledge: str, cert_name: str = None) -> None:
     """Acknowledge pledge, compile dynamic certificate, broadcast to community, and send final graduation card."""
     import datetime
     user_id = update.effective_user.id
@@ -862,7 +862,7 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
     
     await update.message.reply_text(processing_msg)
     
-    learner_name = update.effective_user.full_name
+    learner_name = cert_name if cert_name else update.effective_user.full_name
     current_date = datetime.datetime.now().strftime("%B %d, %Y")
     certificate_file = generate_certificate_image(learner_name, current_date, user_id)
     
@@ -1393,11 +1393,24 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
 
+    # Intercept preferred name for certificate
+    if context.user_data.get("awaiting_cert_name"):
+        context.user_data.pop("awaiting_cert_name", None)
+        cert_name = user_message.strip()
+        context.user_data["cert_name"] = cert_name
+        
+        # Move to pledge writing step
+        context.user_data["awaiting_pledge"] = True
+        pledge_prompt = get_text("post_test.pledge_prompt", lang, name=cert_name)
+        await update.message.reply_text(pledge_prompt)
+        return
+
     # Intercept personal pledges for graduations
     if context.user_data.get("awaiting_pledge"):
         context.user_data.pop("awaiting_pledge", None)
         save_pledge(user_id, user_message)
-        await handle_graduation_and_certificate(update, context, user_message)
+        cert_name = context.user_data.pop("cert_name", update.effective_user.full_name)
+        await handle_graduation_and_certificate(update, context, pledge=user_message, cert_name=cert_name)
         return
 
     # Check for navigation keywords

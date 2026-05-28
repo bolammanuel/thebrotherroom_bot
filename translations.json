@@ -358,11 +358,18 @@
       "ig": "🔄 Nwaa Ule Ọzọ"
     },
     "passed": {
-      "en": "🎉 Congratulations! You have PASSED the Post-Test Exam!\n\nYour Score: {score}/50\n\nYou have proven yourself to be a true advocate of healthy masculinity and GBV prevention in your community!\n\nNow, let's draft your personal pledge to end GBV and lead by example. Please type your pledge below:",
-      "pcm": "🎉 Congratulations! You don PASS the Post-Test Exam!\n\nYour Score: {score}/50\n\nYou be correct champion for healthy masculinity and GBV prevention now!\n\nMake we write your personal pledge make we build beta community. Type your pledge now:",
-      "ha": "🎉 Taya murna! Kun CIN Jarrabawar Karshe!\n\nMakin ku: {score}/50\n\nKun tabbatar da kanku a matsayin mai ba da shawara na gaskiya don kawar da GBV a al'ummarku!\n\nYanzu, bari mu rubuta alkawarin ku na kashin kai. Rubuta alkawarin ku a kasa:",
-      "yo": "🎉 Oriire! O ti KỌJA Idanwo Ikẹhin!\n\nAmi rẹ: {score}/50\n\nO ti fihan pe o jẹ aṣoju iyipada gidi fun okunrin rere ati kawar GBV!\n\nYanzu, ẹ jẹ ki a kọ ipinnu rẹ. Kọ ipinnu rẹ si isalẹ:",
-      "ig": "🎉 Otú ọma! Ị GAFEE Ule Ikpeazụ!\n\nAkara gị: {score}/50\n\nỊ gosipụtala onwe gị dị ka ezigbo onye na-akwado dị mma na mgbochi GBV n'obodo gị!\n\nYanzu, ka anyị deere nkwa nke gị. Pịaji nkwa gị n'okpuru ebe a:"
+      "en": "🎉 Congratulations! You have PASSED the Post-Test Exam!\n\nYour Score: {score}/50\n\nYou have proven yourself to be a true advocate of healthy masculinity and GBV prevention in your community!\n\nTo generate your official Certificate of Completion, please type the **Full Name** you would like printed on it:",
+      "pcm": "🎉 Congratulations! You don PASS the Post-Test Exam!\n\nYour Score: {score}/50\n\nYou be correct champion for healthy masculinity and GBV prevention now!\n\nMake we generate your official Certificate of Completion, abeg type the **Full Name** wey you want make we put inside the certificate:",
+      "ha": "🎉 Taya murna! Kun CIN Jarrabawar Karshe!\n\nMakin ku: {score}/50\n\nKun tabbatar da kanku a matsayin mai ba da shawara na gaskiya don kawar da GBV a al'ummarku!\n\nDon fitar da takardar shaidarku ta kammala karatu, da fatan za a rubuta **Cikakken Sunan ku (Full Name)** da kuke so mu rubuta a kai:",
+      "yo": "🎉 Oriire! O ti KỌJA Idanwo Ikẹhin!\n\nAmi rẹ: {score}/50\n\nO ti fihan pe o jẹ aṣoju iyipada gidi fun okunrin rere ati kawar GBV!\n\nLati ṣẹda Iwe-ẹri Ipari rẹ, jọwọ kọ **Cikakken Orukọ rẹ (Full Name)** ti o fẹ ki a tẹ si i:",
+      "ig": "🎉 Otú ọma! Ị GAFEE Ule Ikpeazụ!\n\nAkara gị: {score}/50\n\nỊ gosipụtala onwe gị dị ka ezigbo onye na-akwado dị mma na mgbochi GBV n'obodo gị!\n\nIji meere gị Asambodo Mmezu gị, biko pịaji **Cikakken Aha gị (Full Name)** nke ị ga-achọ ka e bipụta na ya:"
+    },
+    "pledge_prompt": {
+      "en": "Thank you, {name}! 🤜🤛\n\nNow, let's make a personal commitment pledge to stand against Gender-Based Violence and promote positive masculinity in your everyday life. Please type your pledge below:",
+      "pcm": "Thank you, {name}! 🤜🤛\n\nNow, make we do personal commitment pledge to stand against Gender-Based Violence and support positive masculinity in your life. Type your pledge below:",
+      "ha": "Na gode, {name}! 🤜🤛\n\nYanzu, bari mu yi alkawari don tsayawa da cin zarafin mata da mazaje da kuma tallafawa kyakkyawar dabi'a. Rubuta alkawarin ku a kasa:",
+      "yo": "O ṣeun, {name}! 🤜🤛\n\nYanzu, jẹ ki a ṣe ipinnu lati duro lodi si Gender-Based Violence ati igbelaruge okunrin rere ninu igbesi aye rẹ. Kọ ipinnu rẹ si isalẹ:",
+      "ig": "Daaalụ, {name}! 🤜🤛\n\nYanzu, ka anyị deere nkwa nke gị iji guzogide ime ihe ike dabere na nwoke na nwanyị. Pịaji nkwa gị n'okpuru ebe a:"
     },
     "failed": {
       "en": "😔 You scored {score}/50. Unfortunately, this is below the passing mark of 35/50.\n\nBut do not discourage, learning is a journey! We encourage you to review the lessons or try again. Click the button below to retake the test:",
