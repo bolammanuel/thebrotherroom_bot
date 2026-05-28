@@ -327,12 +327,57 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
                     except Exception:
                         pass
 
+# ============== GRADUATION HOOKS FOR A4 CERTIFICATE LIFECYCLE ==============
+
+def is_user_graduated(user_id):
+    """Check if the user has successfully passed the course post-test (score >= 35)."""
+    # Secure developer/admin bypass
+    admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+    admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+    if user_id in admin_ids:
+        return False  # Admins and developers are never blocked from testing!
+        
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT post_test_score FROM learners WHERE user_id = %s", (user_id,))
+        row = cursor.fetchone()
+        conn.close()
+        
+        score = row[0] if row else -1
+        return score >= 35
+    except Exception as e:
+        logger.error(f"Error checking graduation status: {e}")
+        return False
+
+async def send_graduation_dashboard(update, context, lang, user_id):
+    """Display a warm congratulatory dashboard for graduated champions."""
+    grad_msg = {
+        "en": "🌟 *Welcome Back, Peer Champion!* 🎓\n\nYou have successfully completed *The Brothers' Room* course and earned your Certificate of Completion!\n\nKeep living as a champion, standing against Gender-Based Violence, and leading by example in your family and community. \n\nUse the menu buttons below to check your outline, review lessons, or ask Tobi any questions in the chat!",
+        "pcm": "🌟 *Welcome Back, Peer Champion!* 🎓\n\nHow far brother! You don finish *The Brothers' Room* course and get your Certificate of Completion!\n\nKeep living as champion inside your family and community. You fit use the menu buttons below to see all lessons, or ask Tobi any question here!",
+        "ha": "🌟 *Barka da Dawowa, Abokin Alkawari!* 🎓\n\nKun sami nasarar kammala karatun *The Brothers' Room* kuma kun sami Takardar Shaidarku!\n\nCi gaba da zama abin koyi ga al'ummarku da yaki da GBV. Kuna iya duba darussan a cikin *Tsarin Darussa*, ko kuma ku tambaye ni komai a nan!",
+        "yo": "🌟 *Ẹ ku abọ, Peer Champion!* 🎓\n\nO ti parí eko *The Brothers' Room* ati gba Iwe-ẹri Ipari rẹ!\n\nTesiwaju lati jẹ apeere rere fun alagbegbe rẹ ati duro lodi si GBV. O le tẹsiwaju lati wo eko rẹ ninu *Ilana Ẹkọ* tabi beere lọwọ mi nibi!",
+        "ig": "🌟 *Nnọọ, Onye Mgbanwe!* 🎓\n\nỊ gachasịla akwụkwọ *The Brothers' Room* wee nweta Asambodo Mmezu gị!\n\nGaa n'ihu na-abụ onye ndu n'obodo gị na-eguzogide GBV. Ị nwere ike ịgụ ihe ọmụmụ gị na *Ụkpụrụ Akwụkwọ*, ma ọ bụ jụọ m ajụjụ n'ebe a!"
+    }.get(lang, "You have successfully completed the course!")
+
+    await send_reply(
+        update,
+        grad_msg,
+        reply_markup=get_main_menu_buttons(lang, user_id=user_id),
+        parse_mode="Markdown"
+    )
+
 # ============== COMMAND HANDLERS ==============
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Start command - show language selection or welcome back returning learners."""
     user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
     
+    if is_user_graduated(user_id):
+        await send_graduation_dashboard(update, context, lang, user_id)
+        return
+        
     # Check if learner already has progress
     result = get_learner_progress(user_id)
     
@@ -536,6 +581,12 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /next command and next button."""
     user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    if is_user_graduated(user_id):
+        await send_graduation_dashboard(update, context, lang, user_id)
+        return
+        
     result = get_learner_progress(user_id)
 
     if not result or not result[0]:
@@ -765,6 +816,10 @@ async def send_post_test_welcome(update: Update, context: ContextTypes.DEFAULT_T
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
+    if is_user_graduated(user_id):
+        await send_graduation_dashboard(update, context, lang, user_id)
+        return
+        
     welcome_text = get_text("post_test.welcome", lang)
     start_label = get_text("post_test.start_button", lang)
     
@@ -1411,6 +1466,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # Intercept post-test callbacks
     if data == "posttest_start":
+        if is_user_graduated(user_id):
+            await query.delete_message()
+            await send_graduation_dashboard(update, context, lang, user_id)
+            return
+            
         await query.delete_message()
         context.user_data["posttest_answers"] = {}
         context.user_data["posttest_current"] = 0
