@@ -841,63 +841,126 @@ async def grade_post_test(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await send_reply(update, failed_text, reply_markup=keyboard)
 
 def generate_certificate_image(name, date_str, user_id):
-    """Generate a highly aesthetic, premium certificate of completion using Pillow."""
+    """Generate a highly aesthetic, premium, high-resolution certificate of completion using Pillow."""
     import hashlib
     from PIL import Image, ImageDraw, ImageFont
     
-    width, height = 1920, 1080
+    width, height = 2000, 1418
     
-    template_path = "assets/certificate_template.png"
-    if os.path.exists(template_path):
-        img = Image.open(template_path).convert("RGB")
-    else:
-        img = Image.new("RGB", (width, height), (252, 250, 242))
-        draw = ImageDraw.Draw(img)
-        draw.rectangle([40, 40, width - 40, height - 40], outline=(15, 32, 67), width=8)
-        draw.rectangle([55, 55, width - 55, height - 55], outline=(212, 175, 55), width=3)
-        margin = 55
-        for x, y in [(margin, margin), (width - margin, margin), (margin, height - margin), (width - margin, height - margin)]:
-            draw.regular_polygon((x, y, 15), 4, rotation=45, fill=(212, 175, 55))
-            
+    # Base background (Cream color matching the sample)
+    img = Image.new("RGB", (width, height), (232, 226, 213))
     draw = ImageDraw.Draw(img)
     
+    assets_dir = "assets"
+    
+    # Helper to paste transparent PNG dynamically scaled
+    def paste_transparent(filename, x, y, target_width=None, align_right=False, align_bottom=False):
+        path = os.path.join(assets_dir, filename)
+        if os.path.exists(path):
+            try:
+                logo = Image.open(path).convert("RGBA")
+                if target_width:
+                    aspect = logo.height / logo.width
+                    target_height = int(target_width * aspect)
+                    logo = logo.resize((target_width, target_height), Image.Resampling.LANCZOS)
+                else:
+                    target_width, target_height = logo.size
+                
+                final_x = x - target_width if align_right else x
+                final_y = y - target_height if align_bottom else y
+                img.paste(logo, (final_x, final_y), logo)
+                return target_width, target_height
+            except Exception as e:
+                logger.error(f"Error pasting {filename}: {e}")
+        return 0, 0
+
+    # Paste corner accents at the absolute bounds
+    paste_transparent("top_right_corner.png", 2000, 0, target_width=180, align_right=True)
+    paste_transparent("bottom_left_corner.png", 0, 1418, target_width=250, align_bottom=True)
+    
+    # Paste top-left Ford Foundation logo (scale to width = 240)
+    paste_transparent("ford_logo.png", 120, 100, target_width=240)
+    
+    # Paste top-right organization logos (scale to width = 220)
+    paste_transparent("org_logos.png", 2000 - 120, 95, target_width=220, align_right=True)
+
+    # Outer navy border line
+    draw.rectangle([40, 40, width - 40, height - 40], outline=(15, 32, 67), width=6)
+    # Inner gold border line
+    draw.rectangle([52, 52, width - 52, height - 52], outline=(219, 161, 71), width=2)
+
+    # Typography and Colors
+    c_green = (44, 145, 70)      # Forest green matching sample
+    c_gold = (219, 161, 71)      # Gold lines and badge
+    c_charcoal = (30, 30, 30)    # Sleek dark grey text
+    c_gray = (100, 100, 100)     # Muted grey text
+    c_navy = (15, 32, 67)        # Deep navy headers and course title
+    c_sig_blue = (25, 45, 95)    # Cursive signature blue ink
+
+    # Load fonts
+    fonts_dir = "assets/fonts"
     try:
-        font_header = ImageFont.truetype("assets/fonts/Outfit-Regular.ttf", 36)
-        font_title = ImageFont.truetype("assets/fonts/NotoSerif-Bold.ttf", 64)
-        font_subtitle = ImageFont.truetype("assets/fonts/Outfit-Regular.ttf", 28)
-        font_name = ImageFont.truetype("assets/fonts/DancingScript-Bold.ttf", 96)
-        font_desc = ImageFont.truetype("assets/fonts/Outfit-Regular.ttf", 26)
-        font_course = ImageFont.truetype("assets/fonts/NotoSerif-Bold.ttf", 34)
-        font_footer = ImageFont.truetype("assets/fonts/Outfit-Regular.ttf", 20)
-    except Exception:
+        font_cert = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 110)
+        font_of_completion = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 46)
+        font_presented = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 32)
+        font_name = ImageFont.truetype(os.path.join(fonts_dir, "DancingScript-Bold.ttf"), 105)
+        font_change_agent = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 34)
+        font_desc = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 26)
+        font_course = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 36)
+        font_sig = ImageFont.truetype(os.path.join(fonts_dir, "DancingScript-Bold.ttf"), 58)
+        font_sig_name = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 32)
+        font_sig_title = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 26)
+        font_footer = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 20)
+    except Exception as e:
+        logger.error(f"Font loading error: {e}, falling back to defaults")
         try:
-            font_header = ImageFont.truetype("Arial.ttf", 36)
-            font_title = ImageFont.truetype("Times New Roman.ttf", 64)
-            font_subtitle = ImageFont.truetype("Arial.ttf", 28)
-            font_name = ImageFont.truetype("Times New Roman.ttf", 72)
+            font_cert = ImageFont.truetype("Arial.ttf", 110)
+            font_of_completion = ImageFont.truetype("Arial.ttf", 46)
+            font_presented = ImageFont.truetype("Arial.ttf", 32)
+            font_name = ImageFont.truetype("Times New Roman.ttf", 105)
+            font_change_agent = ImageFont.truetype("Arial.ttf", 34)
             font_desc = ImageFont.truetype("Arial.ttf", 26)
-            font_course = ImageFont.truetype("Times New Roman.ttf", 34)
+            font_course = ImageFont.truetype("Times New Roman.ttf", 36)
+            font_sig = ImageFont.truetype("Times New Roman.ttf", 58)
+            font_sig_name = ImageFont.truetype("Arial.ttf", 32)
+            font_sig_title = ImageFont.truetype("Arial.ttf", 26)
             font_footer = ImageFont.truetype("Arial.ttf", 20)
         except Exception:
-            font_header = font_title = font_subtitle = font_name = font_desc = font_course = font_footer = ImageFont.load_default()
-            
-    draw.text((width // 2, 150), "THE BROTHERS' ROOM", fill=(15, 32, 67), font=font_header, anchor="mm")
-    draw.line([(width // 2 - 150, 185), (width // 2 + 150, 185)], fill=(212, 175, 55), width=2)
-    draw.text((width // 2, 260), "CERTIFICATE OF COMPLETION", fill=(15, 32, 67), font=font_title, anchor="mm")
-    draw.text((width // 2, 360), "This is proudly awarded to", fill=(100, 100, 100), font=font_subtitle, anchor="mm")
-    draw.text((width // 2, 440), name.title(), fill=(15, 32, 67), font=font_name, anchor="mm")
-    draw.text((width // 2, 510), "CHANGE AGENT", fill=(212, 175, 55), font=font_course, anchor="mm")
-    draw.line([(width // 2 - 350, 540), (width // 2 + 350, 540)], fill=(212, 175, 55), width=3)
-    draw.text((width // 2, 600), "for successfully completing the 6-week conversational course on", fill=(100, 100, 100), font=font_desc, anchor="mm")
-    draw.text((width // 2, 660), "Positive Masculinity & Gender-Based Violence (GBV) Prevention", fill=(15, 32, 67), font=font_course, anchor="mm")
-    draw.line([(350, 830), (650, 830)], fill=(15, 32, 67), width=2)
-    draw.text((500, 860), f"DATE: {date_str}", fill=(100, 100, 100), font=font_subtitle, anchor="mm")
-    draw.line([(width - 650, 830), (width - 350, 830)], fill=(15, 32, 67), width=2)
-    draw.text((width - 500, 800), "Tobi", fill=(15, 32, 67), font=font_course, anchor="mm")
-    draw.text((width - 500, 860), "COURSE FACILITATOR", fill=(100, 100, 100), font=font_subtitle, anchor="mm")
+            font_cert = font_of_completion = font_presented = font_name = font_change_agent = font_desc = font_course = font_sig = font_sig_name = font_sig_title = font_footer = ImageFont.load_default()
+
+    # Draw Text Elements (Center horizontal = 1000)
+    # Header Section
+    draw.text((1000, 390), "CERTIFICATE", fill=c_green, font=font_cert, anchor="mm")
+    draw.text((1000, 470), "OF COMPLETION", fill=c_charcoal, font=font_of_completion, anchor="mm")
     
+    # Recipient Section
+    draw.text((1000, 570), "Presented to", fill=c_gray, font=font_presented, anchor="mm")
+    draw.text((1000, 690), name.title(), fill=c_navy, font=font_name, anchor="mm")
+    
+    # Badge Section
+    draw.text((1000, 780), "CHANGE AGENT", fill=c_gold, font=font_change_agent, anchor="mm")
+    draw.line([(1000 - 400, 820), (1000 + 400, 820)], fill=c_gold, width=3)
+    
+    # Description Section
+    draw.text((1000, 880), "for successfully completing the 6-week conversational course on", fill=c_gray, font=font_desc, anchor="mm")
+    draw.text((1000, 940), "Positive Masculinity & Gender-Based Violence (GBV) Prevention", fill=c_navy, font=font_course, anchor="mm")
+    
+    # Bottom Left - Rotimi Olawale (Executive Director) Signatory
+    sig_x = 480
+    draw.text((sig_x, 1110), "Rotimi Olawale", fill=c_sig_blue, font=font_sig, anchor="mm")
+    draw.line([(sig_x - 180, 1145), (sig_x + 180, 1145)], fill=c_gold, width=3)
+    draw.text((sig_x, 1190), "Rotimi Olawale", fill=c_charcoal, font=font_sig_name, anchor="mm")
+    draw.text((sig_x, 1235), "Executive Director", fill=c_green, font=font_sig_title, anchor="mm")
+    
+    # Bottom Right - Date of Issuance
+    date_x = 2000 - 480
+    draw.line([(date_x - 180, 1145), (date_x + 180, 1145)], fill=c_navy, width=3)
+    draw.text((date_x, 1190), date_str, fill=c_charcoal, font=font_sig_name, anchor="mm")
+    draw.text((date_x, 1235), "DATE OF ISSUANCE", fill=c_gray, font=font_sig_title, anchor="mm")
+    
+    # Verification ID at the very bottom
     v_hash = hashlib.sha256(f"TBR-{user_id}-{date_str}".encode()).hexdigest()[:12].upper()
-    draw.text((width // 2, 980), f"VERIFICATION ID: TBR-{v_hash}", fill=(150, 150, 150), font=font_footer, anchor="mm")
+    draw.text((1000, 1345), f"VERIFICATION ID: TBR-{v_hash}", fill=c_gray, font=font_footer, anchor="mm")
     
     output_path = f"assets/certificate_{user_id}.png"
     img.save(output_path)
