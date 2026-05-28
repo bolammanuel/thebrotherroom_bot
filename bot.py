@@ -17,7 +17,7 @@ from db_manager import (
     get_connection, increment_ai_questions, increment_first_attempt_quizzes,
     set_voice_responses, get_voice_responses, update_post_test_score,
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
-    get_inactive_learners
+    get_inactive_learners, update_pre_test_score, get_pre_test_score
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
 
@@ -80,11 +80,17 @@ def get_command_button(button_name, lang='en'):
 # ============== INLINE BUTTON HELPER ==============
 
 def get_main_menu_buttons(lang='en', user_id=None):
-    """Get context-aware main menu buttons with a dynamic accessibility toggle."""
+    """Get context-aware main menu buttons with a dynamic accessibility toggle and dynamically hidden quiz button."""
     voice_enabled = False
+    show_quiz = False
     if user_id:
         try:
             voice_enabled = get_voice_responses(user_id)
+            progress = get_learner_progress(user_id)
+            if progress and progress[0]:
+                current_module_id, current_lesson_id, quiz_completed, _ = progress
+                if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
+                    show_quiz = True
         except Exception:
             pass
             
@@ -105,23 +111,36 @@ def get_main_menu_buttons(lang='en', user_id=None):
             "ig": "Olu: PAA 🔇"
         }.get(lang, "Voice: OFF 🔇")
 
-    buttons = [
-        [InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next")],
-        [InlineKeyboardButton(get_command_button("quiz", lang), callback_data="cmd_quiz")],
+    buttons = []
+    
+    # Only show Next button if we aren't displaying the Quiz as the primary next action
+    buttons.append([InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next")])
+    
+    # Dynamic Quiz button visibility
+    if show_quiz:
+        buttons.append([InlineKeyboardButton(get_command_button("quiz", lang), callback_data="cmd_quiz")])
+        
+    buttons.extend([
         [InlineKeyboardButton(get_command_button("progress", lang), callback_data="cmd_progress"),
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
          InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
         [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
-    ]
+    ])
     return InlineKeyboardMarkup(buttons)
 
 def get_help_keyboard_buttons(lang='en', user_id=None):
-    """Get keyboard buttons specifically for the help menu containing all commands with an accessibility toggle."""
+    """Get keyboard buttons specifically for the help menu containing all commands with dynamic quiz visibility."""
     voice_enabled = False
+    show_quiz = False
     if user_id:
         try:
             voice_enabled = get_voice_responses(user_id)
+            progress = get_learner_progress(user_id)
+            if progress and progress[0]:
+                current_module_id, current_lesson_id, quiz_completed, _ = progress
+                if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
+                    show_quiz = True
         except Exception:
             pass
             
@@ -159,16 +178,28 @@ def get_help_keyboard_buttons(lang='en', user_id=None):
     }.get(lang, "Join WhatsApp Community")
 
     buttons = [
-        [InlineKeyboardButton(start_label, callback_data="cmd_start")],
-        [InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next"),
-         InlineKeyboardButton(get_command_button("quiz", lang), callback_data="cmd_quiz")],
+        [InlineKeyboardButton(start_label, callback_data="cmd_start")]
+    ]
+    
+    # Context-aware commands row
+    if show_quiz:
+        buttons.append([
+            InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next"),
+            InlineKeyboardButton(get_command_button("quiz", lang), callback_data="cmd_quiz")
+        ])
+    else:
+        buttons.append([
+            InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next")
+        ])
+        
+    buttons.extend([
         [InlineKeyboardButton(get_command_button("progress", lang), callback_data="cmd_progress"),
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
          InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
         [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")],
         [InlineKeyboardButton(community_label, url="https://chat.whatsapp.com/YOUR_GROUP_LINK")]
-    ]
+    ])
     return InlineKeyboardMarkup(buttons)
 
 def get_language_selection_buttons():
@@ -604,7 +635,74 @@ async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         reply_markup=get_language_selection_buttons()
     )
 
-# ============== CERTIFICATE AND EXIT POST-TEST ENGINES ==============
+# ============== CERTIFICATE AND ONBOARDING PRE-TEST & EXIT POST-TEST ENGINES ==============
+
+async def send_pre_test_question(update: Update, context: ContextTypes.DEFAULT_TYPE, question_idx: int) -> None:
+    """Send a specific pre-test question."""
+    user_id = update.effective_user.id if update.effective_user else None
+    if not user_id and update.callback_query:
+        user_id = update.callback_query.from_user.id
+            
+    lang = get_language_preference(user_id)
+    
+    questions = TRANSLATIONS["post_test"]["questions"]  # We reuse the exact same questions for pre-test baseline
+    if question_idx < 0 or question_idx >= len(questions):
+        # Done with all questions — grade the pre-test!
+        await grade_pre_test(update, context)
+        return
+        
+    question_data = questions[question_idx]
+    q_text = f"📝 *Pre-Test Question {question_idx + 1}/5*\n\n" + question_data["question"].get(lang, question_data["question"]["en"])
+    options = question_data["options"].get(lang, question_data["options"]["en"])
+    
+    # Store current question index in user_data
+    context.user_data["pretest_current"] = question_idx
+    
+    # Build buttons
+    buttons = []
+    for option in options:
+        choice_char = option[0] # e.g. 'A'
+        buttons.append([InlineKeyboardButton(option, callback_data=f"pretest_ans|{question_idx}|{choice_char}")])
+        
+    keyboard = InlineKeyboardMarkup(buttons)
+    
+    await send_reply(update, q_text, reply_markup=keyboard, parse_mode="Markdown")
+
+async def grade_pre_test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Calculate pre-test score and transition to first lesson."""
+    user_id = update.effective_user.id if update.effective_user else None
+    if not user_id and update.callback_query:
+        user_id = update.callback_query.from_user.id
+        
+    lang = get_language_preference(user_id)
+    
+    # Retrieve answers from user_data
+    answers = context.user_data.get("pretest_answers", {})
+    questions = TRANSLATIONS["post_test"]["questions"]
+    
+    score = 0
+    for idx, q_data in enumerate(questions):
+        correct_ans = q_data["answer"]
+        user_ans = answers.get(idx)
+        if user_ans == correct_ans:
+            score += 10 # 10 points per question
+            
+    # Save pre-test score to database
+    update_pre_test_score(user_id, score)
+    
+    # Clear active test session variables
+    context.user_data.pop("pretest_current", None)
+    context.user_data.pop("pretest_answers", None)
+    
+    # Send completion card
+    welcome_real = get_text("pre_test.completed", lang, score=score)
+    
+    await send_reply(
+        update,
+        welcome_real,
+        reply_markup=get_main_menu_buttons(lang, user_id=user_id),
+        parse_mode="Markdown"
+    )
 
 async def send_post_test_welcome(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Send the welcome message for the exit post-test."""
@@ -831,12 +929,12 @@ async def reminder_scheduler(application: Application) -> None:
             for user_id, current_module, current_lesson, lang in inactive_learners:
                 try:
                     nudge_msg = {
-                        "en": "Hey brother! 👋 Just checking in. I'm here to guide you through the course whenever you are ready. Let's keep learning! Tap /next to continue.",
-                        "pcm": "How far brother! 👋 Just checking in. I dey here to guide you through the course. Let's continue! Tap /next make we continue.",
-                        "ha": "Sannu brother! 👋 Ina duba ku. Ina nan don ci gaba da taimaka muku. Kunna /next don ci gaba.",
-                        "yo": "Hey brother! 👋 Mo kan n ṣayẹwo rẹ. Mo wa nibi lati tọ ọ si eko naa. Kunna /next lati tẹsiwaju.",
-                        "ig": "Kedu nwanne m! 👋 Naanị ịlele gị. A nọ m ebe a iji duzie gị na akwukwo. Kunna /next iji gaa n'ihu."
-                    }.get(lang, "Hey brother! Just checking in. Let's keep learning! Tap /next to continue.")
+                        "en": "Hey brother! 👋 Just checking in. I'm here to guide you through the course whenever you are ready. Let's keep learning! Click Next below to continue.",
+                        "pcm": "How far brother! 👋 Just checking in. I dey here to guide you through the course. Let's continue! Click Next make we continue.",
+                        "ha": "Sannu brother! 👋 Ina duba ku. Ina nan don ci gaba da taimaka muku. Danna Gida a ƙasa don ci gaba.",
+                        "yo": "Hey brother! 👋 Mo kan n ṣayẹwo rẹ. Mo wa nibi lati tọ ọ si eko naa. Tẹ Atẹle ni isalẹ lati tẹsiwaju.",
+                        "ig": "Kedu nwanne m! 👋 Naanị ịlele gị. A nọ m ebe a iji duzie gị na akwukwo. Kpachapụ Ọzọ n'okpuru ebe a iji gaa n'ihu."
+                    }.get(lang, "Hey brother! Just checking in. Let's keep learning! Click Next below to continue.")
                     
                     await application.bot.send_message(
                         chat_id=user_id,
@@ -1055,24 +1153,57 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
         if is_new_user or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
-            # Show welcome message
+            # Show welcome message encouraging Pre-Test
             welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
+            pretest_button_label = {
+                "en": "✍️ Take Pre-Test Quiz",
+                "pcm": "✍️ Start Pre-Test Quiz",
+                "ha": "✍️ Fara Jarrabawar Farko",
+                "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
+                "ig": "✍️ Malite Ule Mbụ"
+            }.get(lang_code, "✍️ Take Pre-Test Quiz")
+            
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
+            ])
             await query.edit_message_text(
                 welcome_text,
-                reply_markup=get_main_menu_buttons(lang_code)
+                reply_markup=keyboard,
+                parse_mode="Markdown"
             )
         else:
             # Mid-course language change
             success_msg = get_text("language_changed", lang_code)
             await query.edit_message_text(
                 success_msg,
-                reply_markup=get_main_menu_buttons(lang_code)
+                reply_markup=get_main_menu_buttons(lang_code, user_id=user_id)
             )
         return
     
     # Command buttons
     lang = get_language_preference(user_id)
     
+    # Intercept pre-test callbacks
+    if data == "pretest_start":
+        await query.delete_message()
+        context.user_data["pretest_answers"] = {}
+        context.user_data["pretest_current"] = 0
+        await send_pre_test_question(update, context, 0)
+        return
+        
+    elif data.startswith("pretest_ans|"):
+        parts = data.split("|")
+        q_idx = int(parts[1])
+        selected_choice = parts[2]
+        
+        if "pretest_answers" not in context.user_data:
+            context.user_data["pretest_answers"] = {}
+        context.user_data["pretest_answers"][q_idx] = selected_choice
+        
+        await query.delete_message()
+        await send_pre_test_question(update, context, q_idx + 1)
+        return
+
     # Intercept post-test callbacks
     if data == "posttest_start":
         await query.delete_message()

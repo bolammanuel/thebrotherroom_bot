@@ -94,6 +94,7 @@ def init_db():
         
     new_cols = {
         "post_test_score": "INTEGER DEFAULT -1",
+        "pre_test_score": "INTEGER DEFAULT -1",
         "pledge_text": "TEXT DEFAULT NULL",
         "ai_questions_count": "INTEGER DEFAULT 0",
         "first_attempt_quizzes": "INTEGER DEFAULT 0",
@@ -267,6 +268,28 @@ def update_post_test_score(user_id, score):
     """, (score, user_id))
     conn.commit()
     conn.close()
+
+def update_pre_test_score(user_id, score):
+    """Save entry pre-test score."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET pre_test_score = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (score, user_id))
+    conn.commit()
+    conn.close()
+
+def get_pre_test_score(user_id):
+    """Get pre-test score."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT pre_test_score FROM learners WHERE user_id = %s", (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else -1
+
 
 def save_pledge(user_id, pledge_text):
     """Save personal pledge and schedule a 4-week weekly reminder cycle."""
