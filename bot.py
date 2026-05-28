@@ -1103,14 +1103,29 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
             os.remove(ogg_path)
             
         if transcription:
+            # Automatically enable voice replies since they are interacting via voice!
+            is_newly_enabled = False
+            if not get_voice_responses(user_id):
+                set_voice_responses(user_id, True)
+                is_newly_enabled = True
+                
             # Display transcribed text back for clarity
-            heard_msg = {
-                "en": f"🎤 *I heard:* \"{transcription}\"",
-                "pcm": f"🎤 *Wetin I hear:* \"{transcription}\"",
-                "ha": f"🎤 *Abin da na ji:* \"{transcription}\"",
-                "yo": f"🎤 *Ohun tí mo gbọ́:* \"{transcription}\"",
-                "ig": f"🎤 *Ihe m nụrụ:* \"{transcription}\""
-            }.get(lang, f"🎤 *I heard:* \"{transcription}\"")
+            if is_newly_enabled:
+                heard_msg = {
+                    "en": f"🎤 *I heard:* \"{transcription}\"\n\n🔊 _Voice replies have been automatically enabled for you!_",
+                    "pcm": f"🎤 *Wetin I hear:* \"{transcription}\"\n\n🔊 _Voice replies don start automatically for you!_",
+                    "ha": f"🎤 *Abin da na ji:* \"{transcription}\"\n\n🔊 _An kunna amsoshin murya ta atomatik a gare ku!_",
+                    "yo": f"🎤 *Ohun tí mo gbọ́:* \"{transcription}\"\n\n🔊 _A ti mu ohun ṣiṣẹ laifọwọyi fun ọ!_",
+                    "ig": f"🎤 *Ihe m nụrụ:* \"{transcription}\"\n\n🔊 _Agbanyere olu azịza na-akpaghị aka maka gị!_"
+                }.get(lang, f"🎤 *I heard:* \"{transcription}\"")
+            else:
+                heard_msg = {
+                    "en": f"🎤 *I heard:* \"{transcription}\"",
+                    "pcm": f"🎤 *Wetin I hear:* \"{transcription}\"",
+                    "ha": f"🎤 *Abin da na ji:* \"{transcription}\"",
+                    "yo": f"🎤 *Ohun tí mo gbọ́:* \"{transcription}\"",
+                    "ig": f"🎤 *Ihe m nụrụ:* \"{transcription}\""
+                }.get(lang, f"🎤 *I heard:* \"{transcription}\"")
             
             await update.message.reply_text(heard_msg, parse_mode="Markdown")
             
