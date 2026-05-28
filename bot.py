@@ -17,7 +17,8 @@ from db_manager import (
     get_connection, increment_ai_questions, increment_first_attempt_quizzes,
     set_voice_responses, get_voice_responses, update_post_test_score,
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
-    get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name
+    get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name,
+    get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
 
@@ -486,6 +487,40 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             lesson_title=lesson['title']
         )
         
+        # Calculate completed modules and badges
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT post_test_score FROM learners WHERE user_id = %s", (user_id,))
+        row = cursor.fetchone()
+        post_test_score = row[0] if row else -1
+        conn.close()
+        
+        completed_modules = []
+        if post_test_score >= 0:
+            completed_modules = [m["module_id"] for m in MODULES]
+        else:
+            for idx in range(module_index):
+                completed_modules.append(MODULES[idx]["module_id"])
+            if quiz_completed in [1, 2]:
+                completed_modules.append(current_module_id)
+                
+        badges_text = ""
+        for m_id in completed_modules:
+            badge_name = TRANSLATIONS.get("badges", {}).get(m_id, {}).get(lang, f"[{m_id} Badge]")
+            badges_text += f"\n- {badge_name}"
+            
+        if badges_text:
+            progress_text += f"\n\nEarned Badges:{badges_text}"
+        else:
+            no_badges_msg = {
+                "en": "No badges earned yet. Complete your first module quiz to earn a digital badge!",
+                "pcm": "You never earn any badge yet. Finish your first module quiz make you get badge!",
+                "ha": "Ba a sami lambobin yabo ba tukuna. Kammala gwajin modul na farko don samun lambar yabo!",
+                "yo": "Ko si ami ti o ti gba sibẹsibẹ. Pari idanwo module akọkọ rẹ lati gba ami-ẹri!",
+                "ig": "Enwebeghị badge ọ bụla ị nwetara. Mezue ajụjụ mbụ gị iji nweta badge!"
+            }.get(lang, "No badges earned yet.")
+            progress_text += f"\n\nEarned Badges:\n- {no_badges_msg}"
+            
         await send_reply(
             update,
             progress_text,
@@ -525,6 +560,27 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
+
+    # Check if they need to submit their personal reflection for the module they just completed
+    if is_last_lesson_of_module(current_module_id, current_lesson_id) and quiz_completed in [1, 2]:
+        from db_manager import get_learner_reflection
+        existing_ref = get_learner_reflection(user_id, current_module_id)
+        if not existing_ref:
+            # Prompt them for the private reflection first
+            ref_questions = TRANSLATIONS.get("reflections", {}).get("questions", {}).get(current_module_id, {})
+            ref_question = ref_questions.get(lang, ref_questions.get("en", "Reflect on this module."))
+            
+            prompt_template = TRANSLATIONS.get("reflections", {}).get("prompt", {}).get(lang, "Mirror Moment:\n\n{question}")
+            prompt_text = prompt_template.replace("{question}", ref_question)
+            
+            context.user_data["awaiting_reflection"] = current_module_id
+            
+            await send_reply(
+                update,
+                prompt_text,
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+            )
+            return
 
     # Get next lesson
     next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
@@ -829,10 +885,11 @@ def generate_certificate_image(name, date_str, user_id):
     draw.line([(width // 2 - 150, 185), (width // 2 + 150, 185)], fill=(212, 175, 55), width=2)
     draw.text((width // 2, 260), "CERTIFICATE OF COMPLETION", fill=(15, 32, 67), font=font_title, anchor="mm")
     draw.text((width // 2, 360), "This is proudly awarded to", fill=(100, 100, 100), font=font_subtitle, anchor="mm")
-    draw.text((width // 2, 450), name.title(), fill=(15, 32, 67), font=font_name, anchor="mm")
-    draw.line([(width // 2 - 350, 500), (width // 2 + 350, 500)], fill=(212, 175, 55), width=3)
-    draw.text((width // 2, 570), "for successfully completing the 6-week conversational course on", fill=(100, 100, 100), font=font_desc, anchor="mm")
-    draw.text((width // 2, 630), "Positive Masculinity & Gender-Based Violence (GBV) Prevention", fill=(15, 32, 67), font=font_course, anchor="mm")
+    draw.text((width // 2, 440), name.title(), fill=(15, 32, 67), font=font_name, anchor="mm")
+    draw.text((width // 2, 510), "CHANGE AGENT", fill=(212, 175, 55), font=font_course, anchor="mm")
+    draw.line([(width // 2 - 350, 540), (width // 2 + 350, 540)], fill=(212, 175, 55), width=3)
+    draw.text((width // 2, 600), "for successfully completing the 6-week conversational course on", fill=(100, 100, 100), font=font_desc, anchor="mm")
+    draw.text((width // 2, 660), "Positive Masculinity & Gender-Based Violence (GBV) Prevention", fill=(15, 32, 67), font=font_course, anchor="mm")
     draw.line([(350, 830), (650, 830)], fill=(15, 32, 67), width=2)
     draw.text((500, 860), f"DATE: {date_str}", fill=(100, 100, 100), font=font_subtitle, anchor="mm")
     draw.line([(width - 650, 830), (width - 350, 830)], fill=(15, 32, 67), width=2)
@@ -902,16 +959,19 @@ async def reminder_scheduler(application: Application) -> None:
     logger.info("Background reminder scheduler started successfully!")
     while True:
         try:
-            # 1. Weekly Pledge Reminders
+            # Initialize Sunday checks for any active learners that don't have them scheduled
+            init_sunday_checks()
+
+            # 1. Weekly Pledge Reminders (Clean, Emoji-Free)
             pending_reminders = get_pending_reminders()
             for user_id, reminder_type, pledge_text, reminders_sent, lang in pending_reminders:
                 try:
                     reminder_msg = {
-                        "en": f"🤜🤛 *Your Personal Weekly Pledge Reminder*\n\nHey brother! Here is the pledge you made to stand against GBV and lead by example:\n\n*\"{pledge_text}\"*\n\nKeep living as a champion in your family and community! 💪",
-                        "pcm": f"🤜🤛 *Your Personal Weekly Pledge Reminder*\n\nHow far brother! See the pledge wey you make to stand against GBV and lead by example:\n\n*\"{pledge_text}\"*\n\nKeep living as champion inside your family and community! 💪",
-                        "ha": f"🤜🤛 *Tunasar Alkawarinka na Mako-mako*\n\nSannu brother! Ga alkawarin da ka dauka don yaki da GBV:\n\n*\"{pledge_text}\"*\n\nCi gaba da zama abin koyi ga danginka da al'ummarku! 💪",
-                        "yo": f"🤜🤛 *Iranti Ipolongo Ara Ẹni ti Ọsẹ*\n\nẸ ku abọ brother! Eyi ni ipinnu ti o ṣe lati duro lodi si GBV:\n\n*\"{pledge_text}\"*\n\nTẹsiwaju lati jẹ apẹẹrẹ rere! 💪",
-                        "ig": f"🤜🤛 *Ihe Ncheta Nkwa Gị Nke Izu*\n\nKedu nwanne m! Nke a bụ nkwa ị kweri na ị ga-eguzo megide GBV:\n\n*\"{pledge_text}\"*\n\nGaa n'ihu na-adị ndụ dị ka ọchịchị! 💪"
+                        "en": f"Your Personal Weekly Pledge Reminder\n\nHey brother! Here is the pledge you made to stand against GBV and lead by example:\n\n\"{pledge_text}\"\n\nKeep living as a champion in your family and community!",
+                        "pcm": f"Your Personal Weekly Pledge Reminder\n\nHow far brother! See the pledge wey you make to stand against GBV and lead by example:\n\n\"{pledge_text}\"\n\nKeep living as champion inside your family and community!",
+                        "ha": f"Tunasar Alkawarinka na Mako-mako\n\nSannu brother! Ga alkawarin da ka dauka don yaki da GBV:\n\n\"{pledge_text}\"\n\nCi gaba da zama abin koyi ga danginka da al'ummarku!",
+                        "yo": f"Iranti Ipolongo Ara Eni ti Ose\n\nE ku abo brother! Eyi ni ipinnu ti o se lati duro lodi si GBV:\n\n\"{pledge_text}\"\n\nTesiwaju lati je apeere rere!",
+                        "ig": f"Ihe Ncheta Nkwa Gi Nke Izu\n\nKedu nwanne m! Nke a bu nkwa i kweri na i ga-eguzo megide GBV:\n\n\"{pledge_text}\"\n\nGaa n'ihu na-adi ndu di ka ochichich!"
                     }.get(lang, f"Your Pledge Reminder:\n\n\"{pledge_text}\"")
                     
                     await application.bot.send_message(
@@ -924,16 +984,16 @@ async def reminder_scheduler(application: Application) -> None:
                 except Exception as e:
                     logger.error(f"Failed to send weekly reminder to {user_id}: {e}")
 
-            # 2. Inactive Learner Nudges (4 Days)
+            # 2. Inactive Learner Nudges (4 Days) (Clean, Emoji-Free)
             inactive_learners = get_inactive_learners()
             for user_id, current_module, current_lesson, lang in inactive_learners:
                 try:
                     nudge_msg = {
-                        "en": "Hey brother! 👋 Just checking in. I'm here to guide you through the course whenever you are ready. Let's keep learning! Click Next below to continue.",
-                        "pcm": "How far brother! 👋 Just checking in. I dey here to guide you through the course. Let's continue! Click Next make we continue.",
-                        "ha": "Sannu brother! 👋 Ina duba ku. Ina nan don ci gaba da taimaka muku. Danna Gida a ƙasa don ci gaba.",
-                        "yo": "Hey brother! 👋 Mo kan n ṣayẹwo rẹ. Mo wa nibi lati tọ ọ si eko naa. Tẹ Atẹle ni isalẹ lati tẹsiwaju.",
-                        "ig": "Kedu nwanne m! 👋 Naanị ịlele gị. A nọ m ebe a iji duzie gị na akwukwo. Kpachapụ Ọzọ n'okpuru ebe a iji gaa n'ihu."
+                        "en": "Hey brother! Just checking in. I'm here to guide you through the course whenever you are ready. Let's keep learning! Click Next below to continue.",
+                        "pcm": "How far brother! Just checking in. I dey here to guide you through the course. Let's continue! Click Next make we continue.",
+                        "ha": "Sannu brother! Ina duba ku. Ina nan don ci gaba da taimaka muku. Danna Gida a kasa don ci gaba.",
+                        "yo": "Hey brother! Mo kan n sayewo re. Mo wa nibi lati to o si eko naa. Te Atele ni isale lati tesiwaju.",
+                        "ig": "Kedu nwanne m! Naani ilele gi. A no m ebe a iji duzie gi na akwukwo. Kpachapu Ozo n'okpuru ebe a iji gaa n'ihu."
                     }.get(lang, "Hey brother! Just checking in. Let's keep learning! Click Next below to continue.")
                     
                     await application.bot.send_message(
@@ -945,6 +1005,42 @@ async def reminder_scheduler(application: Application) -> None:
                     logger.info(f"Dispatched inactive learner nudge to user {user_id}")
                 except Exception as e:
                     logger.error(f"Failed to send inactive nudge to {user_id}: {e}")
+
+            # 3. Sunday Oga Checks (Clean, Emoji-Free)
+            import datetime
+            cutoff = datetime.datetime.now() - datetime.timedelta(days=7)
+            due_sunday_checks = get_due_sunday_checks()
+            for user_id, lang, last_activity in due_sunday_checks:
+                try:
+                    # Parse last_activity
+                    if isinstance(last_activity, str):
+                        try:
+                            val = last_activity.split(".")[0]
+                            dt = datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S")
+                        except Exception:
+                            dt = cutoff - datetime.timedelta(days=1)
+                    else:
+                        dt = last_activity
+                        
+                    is_active = (dt >= cutoff)
+                    
+                    if is_active:
+                        oga_msg = TRANSLATIONS.get("oga_check", {}).get("active", {}).get(
+                            lang, "Hello brother! It's time for our Sunday Check-in. We are celebrating your progress this week. You are doing great work on your learning journey. Keep going!"
+                        )
+                    else:
+                        oga_msg = TRANSLATIONS.get("oga_check", {}).get("inactive", {}).get(
+                            lang, "Hello brother! It's Sunday Check-in. We noticed you've been a bit quiet lately. Remember, this journey to positive masculinity is a support space for you. Whenever you are ready to continue, just click Next below."
+                        )
+                        
+                    await application.bot.send_message(
+                        chat_id=user_id,
+                        text=oga_msg
+                    )
+                    update_sunday_check_sent(user_id)
+                    logger.info(f"Dispatched Sunday check-in to user {user_id} (active={is_active})")
+                except Exception as e:
+                    logger.error(f"Failed to send Sunday check-in to {user_id}: {e}")
 
         except Exception as e:
             logger.error(f"Error in background reminder worker loop: {e}")
@@ -963,18 +1059,19 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
     
     if admin_ids and user_id not in admin_ids:
-        await send_reply(update, "🚫 You are not authorized to view the Admin Dashboard.")
+        await send_reply(update, "You are not authorized to view the Admin Dashboard.")
         return
         
     dashboard_text = (
-        "📊 *The Brothers' Room - Admin Dashboard*\n\n"
-        "Welcome to your management command center. Use the controls below to monitor active learners and identify Peer Facilitators.\n\n"
-        "👇 Select an action:"
+        "*The Brothers' Room - Admin Dashboard*\n\n"
+        "Welcome to your management command center. Use the controls below to monitor active learners, view baseline shift analytics, and identify Peer Facilitators.\n\n"
+        "Select an action:"
     )
     
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("📈 Peer Facilitator Leaderboard", callback_data="admin_leaderboard")],
-        [InlineKeyboardButton("📁 Export Progress Report (CSV)", callback_data="admin_export_csv")]
+        [InlineKeyboardButton("Peer Facilitator Leaderboard", callback_data="admin_leaderboard")],
+        [InlineKeyboardButton("Program Impact Analytics", callback_data="admin_analytics")],
+        [InlineKeyboardButton("Export Progress Report (CSV)", callback_data="admin_export_csv")]
     ])
     
     await send_reply(update, dashboard_text, reply_markup=keyboard, parse_mode="Markdown")
@@ -1008,6 +1105,38 @@ async def show_admin_leaderboard(update: Update, context: ContextTypes.DEFAULT_T
         
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]
+    ])
+    
+    await send_reply(update, text, reply_markup=keyboard, parse_mode="Markdown")
+
+async def show_admin_analytics(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show the Program Impact Analytics report for funders."""
+    user_id = update.effective_user.id
+    
+    # Secure admin authentication
+    admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+    admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+    if admin_ids and user_id not in admin_ids:
+        await send_reply(update, "You are not authorized to view the Admin Dashboard.")
+        return
+        
+    from db_manager import get_program_impact_analytics
+    stats = get_program_impact_analytics()
+    
+    text = (
+        "*Program Impact Analytics Report*\n\n"
+        f"Total Enrolled Learners: {stats['total_learners']}\n"
+        f"Learners Started Pre-Test: {stats['pre_test_count']}\n"
+        f"Average Pre-Test Score: {stats['avg_pre_test']}/50\n\n"
+        f"Course Graduates: {stats['graduates_count']}\n"
+        f"Average Post-Test Score: {stats['avg_post_test']}/50\n\n"
+        f"Average Knowledge Shift: {stats['avg_shift']}/50\n"
+        f"Total Private Journal Reflections Written: {stats['total_reflections']}\n\n"
+        "This report aggregates active baseline shift and program engagement to provide evidence for funders and partner organizations."
+    )
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton("Back to Admin Menu", callback_data="cmd_admin")]
     ])
     
     await send_reply(update, text, reply_markup=keyboard, parse_mode="Markdown")
@@ -1253,6 +1382,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await show_admin_leaderboard(update, context)
         return
         
+    elif data == "admin_analytics":
+        await query.delete_message()
+        await show_admin_analytics(update, context)
+        return
+        
     elif data == "admin_export_csv":
         await query.delete_message()
         await export_admin_csv(update, context)
@@ -1389,12 +1523,24 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 get_text("error_generic", lang),
                 reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
-
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
     user_message = update.message.text
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
+
+    # Intercept private reflections
+    if context.user_data.get("awaiting_reflection"):
+        module_id = context.user_data.pop("awaiting_reflection", None)
+        from db_manager import save_reflection
+        save_reflection(user_id, module_id, user_message)
+        
+        saved_msg = TRANSLATIONS.get("reflections", {}).get("saved", {}).get(lang, "Reflection saved privately in your journal.")
+        await update.message.reply_text(saved_msg)
+        
+        # Move forward automatically
+        await next_lesson_handler(update, context)
+        return
 
     # Intercept preferred name for certificate
     if context.user_data.get("awaiting_cert_name"):
@@ -1422,53 +1568,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await next_lesson_handler(update, context)
         return
 
-    # Course-related keywords to check if the message is about the course
-    course_keywords = [
-        "gbv", "gender", "violence", "masculinity", "masculine", "man", "men",
-        "woman", "women", "abuse", "consent", "relationship", "equality",
-        "norm", "toxic", "positive", "harm", "prevent", "prevention",
-        "module", "lesson", "course", "learn", "teach", "explain",
-        "what is", "what are", "how", "why", "tell me", "define",
-        "example", "meaning", "understand", "sex", "power", "control",
-        "respect", "emotion", "stereotype", "bystander", "ally",
-        "community", "advocacy", "intervention", "healthy", "unhealthy"
-    ]
+    # Increment active AI queries for the peer facilitator calculations
+    increment_ai_questions(user_id)
+    
+    # Use AI to answer questions dynamically
+    result = get_learner_progress(user_id)
+    full_course_text = json.dumps(COURSE_CONTENT)
 
-    # Check if message seems course-related
-    message_lower = user_message.lower()
-    is_course_related = any(keyword in message_lower for keyword in course_keywords)
-
-    if is_course_related:
-        # Increment active AI queries for the peer facilitator calculations
-        increment_ai_questions(user_id)
-        
-        # Use AI to answer course-related questions
-        result = get_learner_progress(user_id)
-        full_course_text = json.dumps(COURSE_CONTENT)
-
-        if result and result[0]:
-            current_module_id, current_lesson_id, _, _ = result
-            module, lesson = get_module_lesson(current_module_id, current_lesson_id)
-            if module and lesson:
-                current_context = f"Current Module: {module['title']}. Current Lesson: {lesson['title']}. Content: {lesson['content']}"
-                context_for_openai = f"Course Overview: {full_course_text}\n\nUser is currently in: {current_context}"
-            else:
-                context_for_openai = full_course_text
+    if result and result[0]:
+        current_module_id, current_lesson_id, _, _ = result
+        module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+        if module and lesson:
+            current_context = f"Current Module: {module['title']}. Current Lesson: {lesson['title']}. Content: {lesson['content']}"
+            context_for_openai = f"Course Overview: {full_course_text}\n\nUser is currently in: {current_context}"
         else:
             context_for_openai = full_course_text
-
-        response = get_openai_response(user_message, context_for_openai)
-        await update.message.reply_text(
-            response,
-            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
-        )
     else:
-        # Friendly nudge for non-course messages
-        nudge = get_text("friendly_nudge", lang)
-        await update.message.reply_text(
-            nudge,
-            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
-        )
+        context_for_openai = full_course_text
+
+    response = get_openai_response(user_message, context_for_openai, language=lang)
+    await update.message.reply_text(
+        response,
+        reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+    )
 
 async def post_init(application: Application) -> None:
     """Set bot commands in Telegram's menu."""

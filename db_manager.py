@@ -84,6 +84,17 @@ def init_db():
         )
     """)
     
+    # Create reflections table for Mirror Moment journal
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS reflections (
+            user_id BIGINT,
+            module_id TEXT,
+            reflection_text TEXT,
+            timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            PRIMARY KEY (user_id, module_id)
+        )
+    """)
+    
     # Run dynamic column migrations if columns do not exist
     if conn.is_sqlite:
         cursor.execute("PRAGMA table_info(learners)")
@@ -431,4 +442,198 @@ def get_inactive_learners():
     results = cursor.fetchall()
     conn.close()
     return results
+
+def save_reflection(user_id, module_id, reflection_text):
+    """Save learner's private reflection for a module."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    if conn.is_sqlite:
+        cursor.execute("""
+            INSERT OR REPLACE INTO reflections (user_id, module_id, reflection_text)
+            VALUES (%s, %s, %s)
+        """, (user_id, module_id, reflection_text))
+    else:
+        cursor.execute("""
+            INSERT INTO reflections (user_id, module_id, reflection_text)
+            VALUES (%s, %s, %s)
+            ON CONFLICT (user_id, module_id)
+            DO UPDATE SET reflection_text = EXCLUDED.reflection_text
+        """, (user_id, module_id, reflection_text))
+        
+    conn.commit()
+    conn.close()
+
+def get_learner_reflection(user_id, module_id):
+    """Get a learner's private reflection for a module."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT reflection_text FROM reflections WHERE user_id = %s AND module_id = %s", (user_id, module_id))
+    row = cursor.fetchone()
+    conn.close()
+    return row[0] if row else None
+
+def get_program_impact_analytics():
+    """Calculate aggregated pre/post test score differences and reflection completions for funders."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # 1. Total enrolled
+    cursor.execute("SELECT COUNT(*) FROM learners")
+    total_learners = cursor.fetchone()[0]
+    
+    # 2. Pre-test started/completed (score >= 0)
+    cursor.execute("SELECT COUNT(*) FROM learners WHERE pre_test_score >= 0")
+    pre_test_count = cursor.fetchone()[0]
+    
+    # 3. Average pre-test score
+    cursor.execute("SELECT AVG(pre_test_score) FROM learners WHERE pre_test_score >= 0")
+    avg_pre_test = cursor.fetchone()[0] or 0.0
+    
+    # 4. Graduates (post-test completed)
+    cursor.execute("SELECT COUNT(*) FROM learners WHERE post_test_score >= 0")
+    graduates_count = cursor.fetchone()[0]
+    
+    # 5. Average post-test score
+    cursor.execute("SELECT AVG(post_test_score) FROM learners WHERE post_test_score >= 0")
+    avg_post_test = cursor.fetchone()[0] or 0.0
+    
+    # 6. Average knowledge shift for completed both
+    cursor.execute("SELECT AVG(post_test_score - pre_test_score) FROM learners WHERE post_test_score >= 0 AND pre_test_score >= 0")
+    avg_shift = cursor.fetchone()[0] or 0.0
+    
+    # 7. Total reflections written
+    cursor.execute("SELECT COUNT(*) FROM reflections")
+    total_reflections = cursor.fetchone()[0]
+    
+    conn.close()
+    
+    return {
+        "total_learners": total_learners,
+        "pre_test_count": pre_test_count,
+        "avg_pre_test": round(float(avg_pre_test), 2),
+        "graduates_count": graduates_count,
+        "avg_post_test": round(float(avg_post_test), 2),
+        "avg_shift": round(float(avg_shift), 2),
+        "total_reflections": total_reflections
+    }
+
+def get_sunday_check_recipients():
+    """Retrieve all enrolled learners and categorize them based on activity in the last 7 days."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    cursor.execute("""
+        SELECT user_id, current_module_id, current_lesson_id, language_preference, last_activity, post_test_score
+        FROM learners
+    """)
+    rows = cursor.fetchall()
+    conn.close()
+    
+    import datetime
+    active = []
+    inactive = []
+    
+    # Calculate cutoff (7 days ago)
+    cutoff = datetime.datetime.now() - datetime.timedelta(days=7)
+    
+    for row in rows:
+        user_id, current_module_id, current_lesson_id, language_preference, last_activity, post_test_score = row
+        
+        # Parse last_activity timestamp (might be string from sqlite or datetime from postgres)
+        if isinstance(last_activity, str):
+            try:
+                # sqlite format typically 'YYYY-MM-DD HH:MM:SS'
+                # but might contain fractional seconds or timezone
+                val = last_activity.split(".")[0]
+                dt = datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S")
+            except Exception:
+                dt = cutoff - datetime.timedelta(days=1)  # Fallback to inactive
+        else:
+            dt = last_activity
+            
+        # If they completed the course, we don't nudge them anymore!
+        if post_test_score >= 0:
+            continue
+            
+        record = (user_id, current_module_id, current_lesson_id, language_preference)
+        if dt >= cutoff:
+            active.append(record)
+        else:
+            inactive.append(record)
+            
+    return active, inactive
+
+def get_due_sunday_checks():
+    """Retrieve users whose Sunday 'Oga Check' is due."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT r.user_id, l.language_preference, l.last_activity
+        FROM reminders r
+        JOIN learners l ON r.user_id = l.user_id
+        WHERE r.reminder_type = 'sunday_check' AND r.next_send_time <= CURRENT_TIMESTAMP AND l.post_test_score = -1
+    """)
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
+def init_sunday_checks():
+    """Ensure every active learner has a scheduled Sunday check."""
+    import datetime
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Get all active learners (not graduated)
+    cursor.execute("SELECT user_id FROM learners WHERE post_test_score = -1")
+    users = [r[0] for r in cursor.fetchall()]
+    
+    # Calculate next Sunday 10:00 AM
+    now = datetime.datetime.now()
+    days_until_sunday = (6 - now.weekday()) % 7
+    if days_until_sunday == 0 and now.hour >= 10:
+        days_until_sunday = 7
+    next_sunday = now + datetime.timedelta(days=days_until_sunday)
+    next_sunday_10am = datetime.datetime(next_sunday.year, next_sunday.month, next_sunday.day, 10, 0, 0)
+    
+    # Format timestamp for SQL depending on DB type
+    ts_str = next_sunday_10am.strftime("%Y-%m-%d %H:%M:%S")
+        
+    for user_id in users:
+        # Check if already exists
+        cursor.execute("SELECT user_id FROM reminders WHERE user_id = %s AND reminder_type = 'sunday_check'", (user_id,))
+        if not cursor.fetchone():
+            cursor.execute("""
+                INSERT INTO reminders (user_id, reminder_type, pledge_text, reminders_sent, next_send_time)
+                VALUES (%s, 'sunday_check', NULL, 0, %s)
+            """, (user_id, ts_str))
+            
+    conn.commit()
+    conn.close()
+
+def update_sunday_check_sent(user_id):
+    """Reschedule the Sunday check to next Sunday at 10 AM."""
+    import datetime
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    now = datetime.datetime.now()
+    # Schedule exactly 7 days from current scheduled time or next Sunday 10 AM
+    days_until_sunday = (6 - now.weekday()) % 7
+    if days_until_sunday == 0 and now.hour >= 10:
+        days_until_sunday = 7
+    next_sunday = now + datetime.timedelta(days=days_until_sunday)
+    next_sunday_10am = datetime.datetime(next_sunday.year, next_sunday.month, next_sunday.day, 10, 0, 0)
+    
+    ts_str = next_sunday_10am.strftime("%Y-%m-%d %H:%M:%S")
+    
+    cursor.execute("""
+        UPDATE reminders 
+        SET next_send_time = %s, reminders_sent = reminders_sent + 1
+        WHERE user_id = %s AND reminder_type = 'sunday_check'
+    """, (ts_str, user_id))
+    
+    conn.commit()
+    conn.close()
+
 

@@ -7,15 +7,27 @@ load_dotenv()
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-def get_openai_response(prompt, course_content):
+def get_openai_response(prompt, course_content, language='en'):
     try:
+        # Construct supportive system prompt that handles Nigerian languages and redirects off-topic questions
+        system_content = (
+            f"You are Tobi, a friendly, professional, and supportive AI facilitator for a course titled "
+            f"\"Young Men Against Gender Based Violence\" (The Brothers' Room) targeted at young Nigerian men. "
+            f"The course content is: {course_content}\n\n"
+            f"Guidelines:\n"
+            f"1. You must answer the user's question politely and constructively in their chosen language (the current language code is '{language}'). "
+            f"2. Your tone must be supportive, brotherly, non-judgmental, clean, and professional. "
+            f"3. Do not use emojis in your response.\n"
+            f"4. If the question is completely unrelated to positive masculinity, GBV prevention, relationship communication, consent, or the course content, "
+            f"gently and politely guide the user back to these course topics, explaining that this is a focused space for us brothers to grow together."
+        )
         response = openai.chat.completions.create(
-            model="gpt-4o-mini", # Using the specified model
+            model="gpt-4o-mini",
             messages=[
-                {"role": "system", "content": f"You are a helpful assistant for a course titled \"Young Men Against Gender Based Violence\". The course content is: {course_content}"},
+                {"role": "system", "content": system_content},
                 {"role": "user", "content": prompt}
             ],
-            max_tokens=150
+            max_tokens=200
         )
         return response.choices[0].message.content.strip()
     except Exception as e:
