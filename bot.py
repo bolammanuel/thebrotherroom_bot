@@ -714,10 +714,12 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         options = quiz_data["options"]
 
         # Create quiz instructions and buttons
-        quiz_header = get_text("quiz_instructions", lang, module_title=module['title'], quiz_question=quiz_data['question'])
+        options_text = "\n".join(options)
+        question_with_options = f"{quiz_data['question']}\n\n{options_text}"
+        quiz_header = get_text("quiz_instructions", lang, module_title=module['title'], quiz_question=question_with_options)
         
-        # Create answer buttons
-        buttons = [[InlineKeyboardButton(option, callback_data=f"quiz|{current_module_id}|{option[0]}")] for option in options]
+        # Create answer buttons in a single row using short letters
+        buttons = [[InlineKeyboardButton(f" {option[0]} ", callback_data=f"quiz|{current_module_id}|{option[0]}") for option in options]]
         reply_markup = InlineKeyboardMarkup(buttons)
 
         await send_reply(
@@ -759,18 +761,17 @@ async def send_pre_test_question(update: Update, context: ContextTypes.DEFAULT_T
         return
         
     question_data = questions[question_idx]
-    q_text = f"📝 *Pre-Test Question {question_idx + 1}/5*\n\n" + question_data["question"].get(lang, question_data["question"]["en"])
+    q_base = f"📝 *Pre-Test Question {question_idx + 1}/5*\n\n" + question_data["question"].get(lang, question_data["question"]["en"])
     options = question_data["options"].get(lang, question_data["options"]["en"])
+    
+    # Format message to include the options inside the text body
+    q_text = q_base + "\n\n" + "\n".join(options)
     
     # Store current question index in user_data
     context.user_data["pretest_current"] = question_idx
     
-    # Build buttons
-    buttons = []
-    for option in options:
-        choice_char = option[0] # e.g. 'A'
-        buttons.append([InlineKeyboardButton(option, callback_data=f"pretest_ans|{question_idx}|{choice_char}")])
-        
+    # Build buttons in a single horizontal row: [ A ] [ B ] [ C ] [ D ]
+    buttons = [[InlineKeyboardButton(f" {option[0]} ", callback_data=f"pretest_ans|{question_idx}|{option[0]}") for option in options]]
     keyboard = InlineKeyboardMarkup(buttons)
     
     await send_reply(update, q_text, reply_markup=keyboard, parse_mode="Markdown")
@@ -841,18 +842,17 @@ async def send_post_test_question(update: Update, context: ContextTypes.DEFAULT_
         return
         
     question_data = questions[question_idx]
-    q_text = f"📝 *Question {question_idx + 1}/5*\n\n" + question_data["question"].get(lang, question_data["question"]["en"])
+    q_base = f"📝 *Question {question_idx + 1}/5*\n\n" + question_data["question"].get(lang, question_data["question"]["en"])
     options = question_data["options"].get(lang, question_data["options"]["en"])
+    
+    # Format message to include the options inside the text body
+    q_text = q_base + "\n\n" + "\n".join(options)
     
     # Store current question index in user_data
     context.user_data["posttest_current"] = question_idx
     
-    # Build buttons
-    buttons = []
-    for option in options:
-        choice_char = option[0] # e.g. 'A'
-        buttons.append([InlineKeyboardButton(option, callback_data=f"posttest_ans|{question_idx}|{choice_char}")])
-        
+    # Build buttons in a single horizontal row: [ A ] [ B ] [ C ] [ D ]
+    buttons = [[InlineKeyboardButton(f" {option[0]} ", callback_data=f"posttest_ans|{question_idx}|{option[0]}") for option in options]]
     keyboard = InlineKeyboardMarkup(buttons)
     
     await send_reply(update, q_text, reply_markup=keyboard, parse_mode="Markdown")
