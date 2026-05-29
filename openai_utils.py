@@ -32,7 +32,14 @@ def get_openai_response(prompt, course_content, language='en'):
         return response.choices[0].message.content.strip()
     except Exception as e:
         print(f"Error communicating with OpenAI: {e}")
-        return "I apologize, but I'm having trouble connecting to the AI at the moment. Please try again later."
+        fallbacks = {
+            "en": "I'm taking a quick moment to reflect on that, brother. Ask me again shortly, or let's keep moving with the lessons!",
+            "pcm": "I dey think about this one small, my brother. Ask me again just now, or make we continue with the lessons!",
+            "ha": "Ina dan yin tunani a kan wannan, brother. Sake tambaya ta nan da kankanin lokaci, ko kuma mu ci gaba da darussan!",
+            "yo": "Mo n ronu lori eyi die, brother. Beere lọwọ mi lẹẹkansi laipẹ, tabi jẹ ki a tẹsiwaju pẹlu awọn ẹkọ!",
+            "ig": "M na-eche echiche banyere nke a obere, nwanne m. Jụọ m ajụjụ ọzọ n'oge na-adịghị anya, ma ọ bụ ka anyị gaa n'ihu na ihe ọmụmụ!"
+        }
+        return fallbacks.get(language, fallbacks["en"])
 
 def transcribe_voice(audio_file_path):
     """Transcribe a voice note (.ogg/.mp3/etc.) using OpenAI Whisper-1."""
