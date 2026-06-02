@@ -1719,7 +1719,7 @@ async def post_init(application: Application) -> None:
         BotCommand("progress", "Check your current module and lesson"),
         BotCommand("menu", "View the full course outline"),
         BotCommand("language", "Change your language preference"),
-        BotCommand("accessibility", "Toggle voice replies for visual accessibility"),
+        # BotCommand("accessibility", "Toggle voice replies for visual accessibility"),
         BotCommand("admin", "Admin Dashboard & Peer Facilitator Leaderboard"),
         BotCommand("community", "Join our WhatsApp community"),
         BotCommand("reset", "Reset progress completely and restart"),
