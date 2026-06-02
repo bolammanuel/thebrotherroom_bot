@@ -526,5 +526,26 @@
     "ha": "\n\n*Raba abubuwan da kuka koya tare da sauran 'yan uwa:*",
     "yo": "\n\n*Pin ohun ti o kọ pẹlu awọn arakunrin miiran lati fun wọn ni iyanju:*",
     "ig": "\n\n*Kọọrọ ụmụnne gị ndị ọzọ ihe ị mụtara ka ha nwee mmasị ya:*"
+  },
+  "reflection_share_prompt": {
+    "en": "Reflection saved privately in your journal! 📝\n\nWould you like to share your takeaway from this module with other brothers to inspire them?",
+    "pcm": "Reflection saved private for your journal! 📝\n\nShow other brothers wetin you learn make they get ginger too?",
+    "ha": "An ajiye tunaninka na sirri a littafinka! 📝\n\nKuna son raba abin da kuka koya tare da sauran 'yan uwa don zaburar da su?",
+    "yo": "A ti fi iṣaro rẹ pamọ si akọsilẹ rẹ ni ikọkọ! 📝\n\nWọ́n fẹ́ pin ohun ti o kọ pẹlu awọn arakunrin miiran lati fun wọn ni iyanju?",
+    "ig": "Echekwala ntụgharị uche gị na nzuzo! 📝\n\nỊ ga-achọ ịkọrọ ụmụnne gị ndị ọzọ ihe ị mụtara ka ha nwee mmasị?"
+  },
+  "reflection_share_message": {
+    "en": "My reflection for Module '{module_title}': \"{takeaway}\"\n\nJoin the 'Young Men Against Gender Based Violence' movement: https://t.me/thebrotherroom_bot",
+    "pcm": "Wetin I learn for Module '{module_title}': \"{takeaway}\"\n\nJoin the 'Young Men Against Gender Based Violence' movement: https://t.me/thebrotherroom_bot",
+    "ha": "Tunanina a kan Modul '{module_title}': \"{takeaway}\"\n\nShiga cikin 'Young Men Against Gender Based Violence': https://t.me/thebrotherroom_bot",
+    "yo": "Iṣaro mi fun Modulu '{module_title}': \"{takeaway}\"\n\nDarapọ mọ 'Young Men Against Gender Based Violence': https://t.me/thebrotherroom_bot",
+    "ig": "Ntụgharị uche m maka Modul '{module_title}': \"{takeaway}\"\n\nSoro anyị na 'Young Men Against Gender Based Violence': https://t.me/thebrotherroom_bot"
+  },
+  "continue_next_lesson": {
+    "en": "Continue to Next Lesson ➡️",
+    "pcm": "Go to Next Lesson ➡️",
+    "ha": "Ci gaba zuwa Darasi na Gaba ➡️",
+    "yo": "Tẹsiwaju si Ẹkọ Ti o Kàn ➡️",
+    "ig": "Gaba n'Ihe Ọmụmụ Ọzọ ➡️"
   }
 }

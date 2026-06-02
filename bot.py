@@ -1774,11 +1774,43 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         from db_manager import save_reflection
         save_reflection(user_id, module_id, user_message)
         
-        saved_msg = TRANSLATIONS.get("reflections", {}).get("saved", {}).get(lang, "Reflection saved privately in your journal.")
-        await update.message.reply_text(saved_msg)
+        # Build interactive social sharing prompt for this specific reflection
+        module = get_module_by_id(module_id)
+        module_title = module["title"] if module else module_id
         
-        # Move forward automatically
-        await next_lesson_handler(update, context)
+        # Truncate user reflection to keep it safe for X and WhatsApp url lengths
+        takeaway_val = user_message.strip()
+        if len(takeaway_val) > 150:
+            takeaway_val = takeaway_val[:147] + "..."
+            
+        import urllib.parse
+        share_msg_template = get_text("reflection_share_message", lang)
+        share_text = share_msg_template.replace("{module_title}", module_title).replace("{takeaway}", takeaway_val)
+        encoded_share = urllib.parse.quote(share_text)
+        
+        whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_share}"
+        twitter_url = f"https://twitter.com/intent/tweet?text={encoded_share}"
+        telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_share}"
+        
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(get_text("share_whatsapp", lang), url=whatsapp_url),
+                InlineKeyboardButton(get_text("share_x", lang), url=twitter_url)
+            ],
+            [
+                InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
+            ],
+            [
+                InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")
+            ]
+        ])
+        
+        saved_msg = get_text("reflection_share_prompt", lang)
+        await update.message.reply_text(
+            saved_msg,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
         return
 
     # Intercept preferred name for certificate
