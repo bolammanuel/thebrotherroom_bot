@@ -470,5 +470,61 @@
       "yo": "E ku abọ brother! Eyi ni Sunday Check-in rẹ. A rii pe o ti dakẹ diẹ. Ranti pe irin-ajo yii wa lati ṣe atilẹyin fun ọ. Nigbakugba ti o ba ṣetan lati tẹsiwaju, tẹ Atẹle ni isalẹ.",
       "ig": "Kedu nwanne m! Oge Sunday Check-in. Anyị chọpụtara na ị nọ jụụ n'oge na-adịbeghị anya. Cheta na njem a bụ maka nkwado gị. Mgbe ọ bụla ị dị njikere ịga n'ihu, pịa Ọzọ n'okpuru."
     }
+  },
+  "share_whatsapp": {
+    "en": "Share on WhatsApp",
+    "pcm": "Share for WhatsApp",
+    "ha": "Raba a WhatsApp",
+    "yo": "Pin lori WhatsApp",
+    "ig": "Soro na WhatsApp"
+  },
+  "share_x": {
+    "en": "Share on X",
+    "pcm": "Share for X",
+    "ha": "Raba a X",
+    "yo": "Pin lori X",
+    "ig": "Soro na X"
+  },
+  "share_telegram": {
+    "en": "Share on Telegram",
+    "pcm": "Share for Telegram",
+    "ha": "Raba a Telegram",
+    "yo": "Pin lori Telegram",
+    "ig": "Soro na Telegram"
+  },
+  "share_message": {
+    "en": "I just completed the 'Young Men Against Gender Based Violence' (The Brothers' Room) course and earned my Certificate of Completion! 🎓 Join the movement for healthy masculinity here: https://t.me/thebrotherroom_bot",
+    "pcm": "I just finish 'Young Men Against Gender Based Violence' (The Brothers' Room) course and I get my Certificate of Completion! 🎓 Join us brothers make we stand against GBV: https://t.me/thebrotherroom_bot",
+    "ha": "Na kammala karatun 'Young Men Against Gender Based Violence' (The Brothers' Room) kuma na sami Takardar Shaidata! 🎓 Shiga cikin wannan yaki: https://t.me/thebrotherroom_bot",
+    "yo": "Mo ṣẹṣẹ pari ẹkọ 'Young Men Against Gender Based Violence' (The Brothers' Room) ati gba Iwe-ẹri Ipari mi! 🎓 Darapọ mọ wa: https://t.me/thebrotherroom_bot",
+    "ig": "M gachasịrị akwụkwọ 'Young Men Against Gender Based Violence' (The Brothers' Room) wee nweta Asambodo Mmezu m! 🎓 Soro anyị na nke a: https://t.me/thebrotherroom_bot"
+  },
+  "certificate_share_tip": {
+    "en": "\n\n💡 *Tip:* Save this certificate image to your phone's gallery to post it directly to LinkedIn, Facebook, or Instagram!",
+    "pcm": "\n\n💡 *Tip:* Save this certificate image to your phone gallery so you fit post am directly to LinkedIn, Facebook, or Instagram!",
+    "ha": "\n\n💡 *Taimako:* Ajiye wannan hoton takardar shaida a cikin hoton wayarka don tura shi kai tsaye zuwa LinkedIn, Facebook, ko Instagram!",
+    "yo": "\n\n💡 *Ìtọ́nisọ́nà:* Fi iwe-ẹri yii pamọ si ibi aworan foonu rẹ lati firanṣẹ taara si LinkedIn, Facebook, tabi Instagram!",
+    "ig": "\n\n💡 *Ihe Ncheta:* Chekwaa foto asambodo a na gallery ekwentị gị ka i bipụta ya ozugbo na LinkedIn, Facebook, ma ọ bụ Instagram!"
+  },
+  "journal_header": {
+    "en": "📖 *My Reflections Journal - The Brothers' Room*\n\nHere are the personal commitments and reflections you made during this course, brother:\n\n",
+    "pcm": "📖 *My Reflections Journal - The Brothers' Room*\n\nSee the personal commitments and reflections wey you make during this course, brother:\n\n",
+    "ha": "📖 *Littafin Tunanina - The Brothers' Room*\n\nGa alkawuran sirri da tunanin da kuka yi a lokacin wannan darasi, aboki:\n\n",
+    "yo": "📖 *Iwe Akọsilẹ Iṣaro Mi - The Brothers' Room*\n\nEyi ni awọn ipinnu ati iṣaro rẹ ti o ṣe lakoko eko yii, arakunrin:\n\n",
+    "ig": "📖 *Akwụkwọ Ntụgharị Uche m - The Brothers' Room*\n\nNdị a bụ nkwa nke gị na ntụgharị uche gị mgbe ị nọ n'ụzọ a, nwanne m:\n\n"
+  },
+  "journal_empty": {
+    "en": "You haven't saved any reflections in your journal yet. Complete module lessons and write reflections to see them here!",
+    "pcm": "You never save any reflection inside your journal yet. Finish module lessons and write reflection make you see am here!",
+    "ha": "Ba ku ajiye kowane tunani a littafinku ba tukuna. Kammala darussan don ganinsu a nan!",
+    "yo": "O kò ti fi iṣaro kankan pamọ si akọsilẹ rẹ sibẹsibẹ. Pari awọn ẹkọ module lati rii wọn nibi!",
+    "ig": "Ị nwebeghị ntụgharị uche ọ bụla echekwara na akwụkwọ gị. Mezue ihe ọmụmụ modul ka ị hụ ha ebe a!"
+  },
+  "journal_share_prompt": {
+    "en": "\n\n*Share your takeaways or pledge with other brothers to inspire them:*",
+    "pcm": "\n\n*Share wetin you learn or your pledge with other brothers to inspire them:*",
+    "ha": "\n\n*Raba abubuwan da kuka koya tare da sauran 'yan uwa:*",
+    "yo": "\n\n*Pin ohun ti o kọ pẹlu awọn arakunrin miiran lati fun wọn ni iyanju:*",
+    "ig": "\n\n*Kọọrọ ụmụnne gị ndị ọzọ ihe ị mụtara ka ha nwee mmasị ya:*"
   }
 }

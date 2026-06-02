@@ -18,7 +18,7 @@ from db_manager import (
     set_voice_responses, get_voice_responses, update_post_test_score,
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
     get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name,
-    get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent
+    get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent, get_all_learner_reflections
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
 
@@ -125,7 +125,14 @@ def get_main_menu_buttons(lang='en', user_id=None):
         [InlineKeyboardButton(get_command_button("progress", lang), callback_data="cmd_progress"),
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
-         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")]
+         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
+        [InlineKeyboardButton("📖 " + {
+            "en": "My Journal",
+            "pcm": "My Journal",
+            "ha": "Littafin Tunanina",
+            "yo": "Iwe Iṣaro Mi",
+            "ig": "Akwụkwọ M"
+        }.get(lang, "My Journal"), callback_data="cmd_journal")]
         # [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
     ])
     return InlineKeyboardMarkup(buttons)
@@ -198,6 +205,13 @@ def get_help_keyboard_buttons(lang='en', user_id=None):
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
          InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
+        [InlineKeyboardButton("📖 " + {
+            "en": "My Journal",
+            "pcm": "My Journal",
+            "ha": "Littafin Tunanina",
+            "yo": "Iwe Iṣaro Mi",
+            "ig": "Akwụkwọ M"
+        }.get(lang, "My Journal"), callback_data="cmd_journal")],
         # [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")],
         [InlineKeyboardButton(community_label, url="https://chat.whatsapp.com/YOUR_GROUP_LINK")]
     ])
@@ -736,6 +750,87 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
 
+async def journal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Show the learner's private reflections journal with social sharing features."""
+    user_id = update.effective_user.id if update.effective_user else None
+    if not user_id and update.callback_query:
+        user_id = update.callback_query.from_user.id
+        
+    lang = get_language_preference(user_id)
+    reflections = get_all_learner_reflections(user_id)
+    
+    if not reflections:
+        await send_reply(
+            update,
+            get_text("journal_empty", lang),
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+        )
+        return
+        
+    journal_text = get_text("journal_header", lang)
+    for module_id, ref_text in reflections:
+        module = get_module_by_id(module_id)
+        module_title = module["title"] if module else module_id
+        journal_text += f"📙 *{module_title}*\n_{ref_text}_\n\n"
+        
+    # Check for custom exit pledge
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT pledge_text FROM learners WHERE user_id = %s", (user_id,))
+    row = cursor.fetchone()
+    conn.close()
+    
+    pledge_text = row[0] if row else None
+    if pledge_text:
+        pledge_label = {
+            "en": "My Personal Pledge",
+            "pcm": "My Personal Pledge",
+            "ha": "Alkawarina na Sirri",
+            "yo": "Ipinnu Ara Eni Mi",
+            "ig": "Nkwa m"
+        }.get(lang, "My Personal Pledge")
+        journal_text += f"🏆 *{pledge_label}*\n\"{pledge_text}\"\n\n"
+        
+    journal_text += get_text("journal_share_prompt", lang)
+    
+    # URL-encode the share message text
+    import urllib.parse
+    share_base = {
+        "en": "I completed my personal reflections journal on positive masculinity. My pledge: ",
+        "pcm": "I don finish my reflection journal for positive masculinity. My pledge: ",
+        "ha": "Na kammala littafin tunanina a kan zama namiji na gari. Alkawarina: ",
+        "yo": "Mo pari iwe akọsilẹ iṣaro mi lori okunrin rere. Ipinnu mi: ",
+        "ig": "Agachasịrị m akwụkwọ ntụgharị uche m. Nkwa m: "
+    }.get(lang, "My Pledge: ")
+    
+    share_val = pledge_text if pledge_text else "Join the movement to stand against GBV!"
+    share_text = f"{share_base}\"{share_val}\"\nTake the course here: https://t.me/thebrotherroom_bot"
+    encoded_share = urllib.parse.quote(share_text)
+    
+    whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_share}"
+    twitter_url = f"https://twitter.com/intent/tweet?text={encoded_share}"
+    telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_share}"
+    
+    keyboard = InlineKeyboardMarkup([
+        [
+            InlineKeyboardButton(get_text("share_whatsapp", lang), url=whatsapp_url),
+            InlineKeyboardButton(get_text("share_x", lang), url=twitter_url)
+        ],
+        [
+            InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
+        ],
+        [
+            InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")
+        ]
+    ])
+    
+    await send_reply(
+        update,
+        journal_text,
+        reply_markup=keyboard,
+        parse_mode="Markdown"
+    )
+
 async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Change language preference."""
     await send_reply(
@@ -1040,11 +1135,33 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
     congrats_text = get_text("course_complete", lang)
     
     try:
+        import urllib.parse
+        share_msg = get_text("share_message", lang)
+        encoded_msg = urllib.parse.quote(share_msg)
+        
+        whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
+        twitter_url = f"https://twitter.com/intent/tweet?text={encoded_msg}"
+        telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_msg}"
+        
+        share_keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(get_text("share_whatsapp", lang), url=whatsapp_url),
+                InlineKeyboardButton(get_text("share_x", lang), url=twitter_url)
+            ],
+            [
+                InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
+            ],
+            [
+                InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")
+            ]
+        ])
+        
         with open(certificate_file, "rb") as cert:
             await update.message.reply_photo(
                 photo=cert,
-                caption=congrats_text,
-                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                caption=congrats_text + get_text("certificate_share_tip", lang),
+                reply_markup=share_keyboard,
+                parse_mode="Markdown"
             )
     except Exception as e:
         logger.error(f"Error sending certificate photo: {e}")
@@ -1530,6 +1647,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     elif data == "cmd_menu":
         await query.delete_message()
         await menu_command(update, context)
+        
+    elif data == "cmd_journal":
+        await query.delete_message()
+        await journal_command(update, context)
     
     elif data == "cmd_language":
         await query.edit_message_text(
@@ -1719,6 +1840,7 @@ async def post_init(application: Application) -> None:
         BotCommand("progress", "Check your current module and lesson"),
         BotCommand("menu", "View the full course outline"),
         BotCommand("language", "Change your language preference"),
+        BotCommand("journal", "View your Reflections Journal"),
         # BotCommand("accessibility", "Toggle voice replies for visual accessibility"),
         BotCommand("admin", "Admin Dashboard & Peer Facilitator Leaderboard"),
         BotCommand("community", "Join our WhatsApp community"),
@@ -1750,6 +1872,7 @@ def main() -> None:
     application.add_handler(CommandHandler("next", next_lesson_handler))
     application.add_handler(CommandHandler("quiz", quiz_command))
     application.add_handler(CommandHandler("language", language_command))
+    application.add_handler(CommandHandler("journal", journal_command))
     # application.add_handler(CommandHandler("accessibility", accessibility_command))
     application.add_handler(CommandHandler("admin", admin_command))
 

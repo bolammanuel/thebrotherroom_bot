@@ -636,4 +636,19 @@ def update_sunday_check_sent(user_id):
     conn.commit()
     conn.close()
 
+def get_all_learner_reflections(user_id):
+    """Retrieve all reflections for a learner."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT module_id, reflection_text 
+        FROM reflections 
+        WHERE user_id = %s 
+        ORDER BY timestamp ASC
+    """, (user_id,))
+    rows = cursor.fetchall()
+    conn.close()
+    return rows
+
+
 
