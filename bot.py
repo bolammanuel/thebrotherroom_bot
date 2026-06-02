@@ -125,8 +125,8 @@ def get_main_menu_buttons(lang='en', user_id=None):
         [InlineKeyboardButton(get_command_button("progress", lang), callback_data="cmd_progress"),
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
-         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
-        [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
+         InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")]
+        # [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
     ])
     return InlineKeyboardMarkup(buttons)
 
@@ -198,7 +198,7 @@ def get_help_keyboard_buttons(lang='en', user_id=None):
          InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")],
         [InlineKeyboardButton(get_command_button("language", lang), callback_data="cmd_language"),
          InlineKeyboardButton(get_command_button("help", lang), callback_data="cmd_help")],
-        [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")],
+        # [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")],
         [InlineKeyboardButton(community_label, url="https://chat.whatsapp.com/YOUR_GROUP_LINK")]
     ])
     return InlineKeyboardMarkup(buttons)
@@ -301,9 +301,9 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
             parse_mode=parse_mode
         )
         
-    # Check for voice accessibility preference
+    # Check for voice accessibility preference (disabled for now)
     user_id = update.effective_user.id if update.effective_user else None
-    if user_id and get_voice_responses(user_id):
+    if False:  # user_id and get_voice_responses(user_id):
         # Clean text of raw markdown formatting for a natural audio reading experience
         clean_text = text.replace('*', '').replace('_', '').replace('`', '').replace('👉', '').replace('👇', '').replace('✅', '').replace('🎉', '').replace('📊', '').replace('📝', '').replace('📖', '').replace('📚', '').replace('🤛', '').replace('🤜', '')
         
@@ -1750,12 +1750,12 @@ def main() -> None:
     application.add_handler(CommandHandler("next", next_lesson_handler))
     application.add_handler(CommandHandler("quiz", quiz_command))
     application.add_handler(CommandHandler("language", language_command))
-    application.add_handler(CommandHandler("accessibility", accessibility_command))
+    # application.add_handler(CommandHandler("accessibility", accessibility_command))
     application.add_handler(CommandHandler("admin", admin_command))
 
     # Message, voice, and button handlers
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
+    # application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
     application.add_handler(CallbackQueryHandler(button_handler))
 
     # Run the bot
