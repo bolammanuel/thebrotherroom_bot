@@ -322,19 +322,6 @@ def update_full_name(user_id, full_name):
     conn.close()
 
 
-def update_registration_info(user_id, full_name, email, country):
-    """Update learner's registration details (name, email, country) on signup."""
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("""
-        UPDATE learners 
-        SET full_name = %s, email = %s, country = %s, last_activity = CURRENT_TIMESTAMP
-        WHERE user_id = %s
-    """, (full_name, email, country, user_id))
-    conn.commit()
-    conn.close()
-
-
 
 def save_pledge(user_id, pledge_text):
     """Save personal pledge and schedule a 4-week weekly reminder cycle."""
