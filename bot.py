@@ -178,12 +178,12 @@ def get_help_keyboard_buttons(lang='en', user_id=None):
     }.get(lang, "Start / Restart")
 
     community_label = {
-        "en": "Join WhatsApp Community",
-        "pcm": "Join WhatsApp Group",
-        "ha": "Shiga Rukunin WhatsApp",
-        "yo": "Darapọ mọ Agbegbe WhatsApp",
-        "ig": "Soro na Otu WhatsApp"
-    }.get(lang, "Join WhatsApp Community")
+        "en": "Join Telegram Group",
+        "pcm": "Join Telegram Group",
+        "ha": "Shiga Rukunin Telegram",
+        "yo": "Darapọ mọ Agbegbe Telegram",
+        "ig": "Soro na Otu Telegram"
+    }.get(lang, "Join Telegram Group")
 
     buttons = [
         [InlineKeyboardButton(start_label, callback_data="cmd_start")]
@@ -213,7 +213,7 @@ def get_help_keyboard_buttons(lang='en', user_id=None):
             "ig": "Akwụkwọ M"
         }.get(lang, "My Journal"), callback_data="cmd_journal")],
         # [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")],
-        [InlineKeyboardButton(community_label, url="https://chat.whatsapp.com/YOUR_GROUP_LINK")]
+        [InlineKeyboardButton(community_label, url=os.getenv("TELEGRAM_GROUP_URL", "https://t.me/YOUR_TELEGRAM_GROUP_LINK"))]
     ])
     return InlineKeyboardMarkup(buttons)
 
@@ -452,28 +452,29 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     await start(update, context)
  
 async def community_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Prompt user to join the WhatsApp community."""
+    """Prompt user to join the Telegram discussion group."""
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
+    group_url = os.getenv("TELEGRAM_GROUP_URL", "https://t.me/YOUR_TELEGRAM_GROUP_LINK")
     
     prompt = {
-        "en": "🤜🤛 *Join The Brothers' Room WhatsApp Community!*\n\nContinue the conversation with other brothers, challenge harmful norms together, and get access to exclusive events.\n\nJoin here: https://chat.whatsapp.com/YOUR_GROUP_LINK",
-        "pcm": "🤜🤛 *Join The Brothers' Room WhatsApp Group!*\n\nMake we continue this talk with other brothers, work together, and get beta information.\n\nJoin here: https://chat.whatsapp.com/YOUR_GROUP_LINK",
-        "ha": "🤜🤛 *Shiga Rukunin WhatsApp na The Brothers' Room!*\n\nCi gaba da tattaunawa da sauran 'yan uwa, ƙalubalanci al'adun da ba su da kyau tare.\n\nShiga nan: https://chat.whatsapp.com/YOUR_GROUP_LINK",
-        "yo": "🤜🤛 *Darapọ mọ Agbegbe WhatsApp ti The Brothers' Room!*\n\nTẹsiwaju ibaraẹnisọrọ pẹlu awọn arakunrin miiran, ati ifọwọsowọpọ fun rere.\n\nDarapọ mọ nibi: https://chat.whatsapp.com/YOUR_GROUP_LINK",
-        "ig": "🤜🤛 *Soro na Otu WhatsApp nke The Brothers' Room!*\n\nGaa n'ihu na nkata gị na ụmụnne gị ndị ọzọ, ma rụọ ọrụ ọnụ.\n\nSoro na ebe a: https://chat.whatsapp.com/YOUR_GROUP_LINK"
-    }.get(lang, "en")
+        "en": f"🤜🤛 *Join The Brothers' Room Telegram Discussion Group!*\n\nContinue the conversation with other brothers, challenge harmful norms together, and collaborate on your learning journey.\n\nJoin here: {group_url}",
+        "pcm": f"🤜🤛 *Join The Brothers' Room Telegram Group!*\n\nMake we continue this talk with other brothers, share experiences, and work together.\n\nJoin here: {group_url}",
+        "ha": f"🤜🤛 *Shiga Rukunin Tattaunawa na Telegram na The Brothers' Room!*\n\nCi gaba da tattaunawa da sauran 'yan uwa, kalubalanci dabi'un da ba su da kyau tare.\n\nShiga nan: {group_url}",
+        "yo": f"🤜🤛 *Darapọ mọ Egbe Ibaraẹnisọrọ Telegram ti The Brothers' Room!*\n\nTẹsiwaju ibaraẹnisọrọ pẹlu awọn arakunrin miiran, ati ifọwọsowọpọ fun rere.\n\nDarapọ mọ nibi: {group_url}",
+        "ig": f"🤜🤛 *Soro na Otu Nkata Telegram nke The Brothers' Room!*\n\nGaa n'ihu na nkata gị na ụmụnne gị ndị ọzọ, kọọ ahụmịhe gị, ma rụọ ọrụ ọnụ.\n\nSoro na ebe a: {group_url}"
+    }.get(lang, f"🤜🤛 *Join The Brothers' Room Telegram Discussion Group!*\n\nJoin here: {group_url}")
     
     button_label = {
-        "en": "Join WhatsApp Community",
-        "pcm": "Join WhatsApp Group",
-        "ha": "Shiga Rukunin WhatsApp",
-        "yo": "Darapọ mọ Agbegbe WhatsApp",
-        "ig": "Soro na Otu WhatsApp"
-    }.get(lang, "Join WhatsApp Community")
+        "en": "Join Telegram Group",
+        "pcm": "Join Telegram Group",
+        "ha": "Shiga Rukunin Telegram",
+        "yo": "Darapọ mọ Egbe Telegram",
+        "ig": "Soro na Otu Telegram"
+    }.get(lang, "Join Telegram Group")
     
     keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton(button_label, url="https://chat.whatsapp.com/YOUR_GROUP_LINK")]
+        [InlineKeyboardButton(button_label, url=group_url)]
     ])
     
     await send_reply(update, prompt, parse_mode="Markdown", reply_markup=keyboard)
@@ -1168,7 +1169,8 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
     current_date = datetime.datetime.now().strftime("%B %d, %Y")
     certificate_file = generate_certificate_image(learner_name, current_date, user_id)
     
-    congrats_text = get_text("course_complete", lang)
+    group_url = os.getenv("TELEGRAM_GROUP_URL", "https://t.me/YOUR_TELEGRAM_GROUP_LINK")
+    congrats_text = get_text("course_complete", lang).replace("https://t.me/YOUR_TELEGRAM_GROUP_LINK", group_url)
     
     try:
         import urllib.parse
@@ -1212,7 +1214,13 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
     community_chat_id = os.getenv("COMMUNITY_CHAT_ID")
     if community_chat_id:
         try:
-            broadcast_text = f"🤜🤛 *New Brother Pledge Posted!*\n\n*Learner:* {learner_name}\n*Pledge:* \"{pledge}\"\n\nWelcome our new graduate and Peer Champion!"
+            broadcast_text = (
+                f"🎓 *New Champion Certified!* 🌟\n\n"
+                f"Let's celebrate *{learner_name}* who just graduated from *The Brothers' Room*!\n\n"
+                f"📝 *Their Personal Pledge:*\n"
+                f"_{pledge}_\n\n"
+                f"Welcome our new Peer Champion! 🤜🤛"
+            )
             await context.application.bot.send_message(
                 chat_id=community_chat_id,
                 text=broadcast_text,
