@@ -1587,14 +1587,21 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if is_new_user or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
             
-            # Show privacy policy disclaimer first
-            privacy_text = get_text("privacy_disclaimer", lang_code)
-            accept_label = get_text("privacy_accept_btn", lang_code)
+            # Show welcome message encouraging Pre-Test
+            welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
+            pretest_button_label = {
+                "en": "✍️ Take Pre-Test Quiz",
+                "pcm": "✍️ Start Pre-Test Quiz",
+                "ha": "✍️ Fara Jarrabawar Farko",
+                "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
+                "ig": "✍️ Malite Ule Mbụ"
+            }.get(lang_code, "✍️ Take Pre-Test Quiz")
+            
             keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton(accept_label, callback_data=f"accept_privacy_{lang_code}")]
+                [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
             ])
             await query.edit_message_text(
-                privacy_text,
+                welcome_text,
                 reply_markup=keyboard,
                 parse_mode="Markdown"
             )
@@ -1609,33 +1616,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     # Command buttons
     lang = get_language_preference(user_id)
-    
-    # Onboarding callbacks
-    if data.startswith("accept_privacy_"):
-        lang_code = data.split("_")[2]
-        await query.delete_message()
-        
-        # Show welcome message encouraging Pre-Test
-        welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
-        pretest_button_label = {
-            "en": "✍️ Take Pre-Test Quiz",
-            "pcm": "✍️ Start Pre-Test Quiz",
-            "ha": "✍️ Fara Jarrabawar Farko",
-            "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
-            "ig": "✍️ Malite Ule Mbụ"
-        }.get(lang_code, "✍️ Take Pre-Test Quiz")
-        
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
-        ])
-        
-        await context.bot.send_message(
-            chat_id=user_id,
-            text=welcome_text,
-            reply_markup=keyboard,
-            parse_mode="Markdown"
-        )
-        return
 
     # Intercept pre-test callbacks
     if data == "pretest_start":

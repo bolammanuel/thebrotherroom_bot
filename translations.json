@@ -547,19 +547,5 @@
     "ha": "Ci gaba zuwa Darasi na Gaba ➡️",
     "yo": "Tẹsiwaju si Ẹkọ Ti o Kàn ➡️",
     "ig": "Gaba n'Ihe Ọmụmụ Ọzọ ➡️"
-  },
-  "privacy_disclaimer": {
-    "en": "🔒 *Privacy & Data Policy*\n\nWelcome to *The Brothers' Room*. Before we begin our journey together, please review our privacy policy.\n\nWe value your privacy. We do not collect your personal email or location. Your private reflections and quiz answers are stored securely and anonymously. We will never share your personal information. Read our full data privacy policy here: https://youthhubafrica.org/data-privacy-policy/\n\nClick the button below to accept and proceed to the course.",
-    "pcm": "🔒 *Privacy & Data Policy*\n\nWelcome to *The Brothers' Room*. Before we start this journey together, abeg check our privacy policy.\n\nWe value your privacy well well. We no dey collect your personal email or location. Your private reflections and quiz answers dey safe and anonymous. We no go share your personal info with anybody. Read the full data privacy policy here: https://youthhubafrica.org/data-privacy-policy/\n\nClick the button below to accept and start.",
-    "ha": "🔒 *Tsarin Tsare Sirri da Bayanai*\n\nBarka da zuwa *The Brothers' Room*. Kafin mu fara tafiyarmu tare, da fatan za a duba manufofinmu na tsare sirri.\n\nMuna daraja sirrin ku. Ba ma tattara imel ɗinku na sirri ko wurin da kuke. Tunaninku na sirri da amsoshin jarrabawa ana adana su cikin amintacciyar hanya kuma ba a bayyana sunanku ba. Karanta cikakken tsarin sirrinmu a nan: https://youthhubafrica.org/data-privacy-policy/\n\nDanna maballin da ke ƙasa don karɓa da ci gaba zuwa shirin.",
-    "yo": "🔒 *Ilana Aabo ati Data*\n\nKaabo si *The Brothers' Room*. Ṣaaju ki a to bẹrẹ irin-ajo wa papọ, jọwọ ṣayẹwo ilana aabo wa.\n\nA mọ riri aabo rẹ. A ko gba imeeli tabi ipo rẹ. Awọn iṣaro ara ẹni rẹ ati awọn idahun idanwo rẹ wa ni fipamọ ni aabo ati ni ikọkọ. Ka ilana aabo data wa nibi: https://youthhubafrica.org/data-privacy-policy/\n\nTẹ bọtini ti o wa ni isalẹ lati gba ki o si bẹrẹ eto naa.",
-    "ig": "🔒 *Ihe Gbasara Nzuzo & Data*\n\nNnọọ na *The Brothers' Room*. Tupu anyị amalite njem anyị ọnụ, biko gụọ iwu nzuzo anyị.\n\nAnyị na-akwanyere nzuzo gị ugwu. Anyị anaghị anakọta ozi-e gị ma ọ bụ ebe ị nọ. A na-echekwa ntụgharị uche gị na nzuzo. Gụọ iwu nzuzo anyị ebe a: https://youthhubafrica.org/data-privacy-policy/\n\nKpachapụ bọtini dị n'okpuru ebe a ka ị nakwere wee gaa n'ihu na mmemme a."
-  },
-  "privacy_accept_btn": {
-    "en": "✅ I Accept & Continue",
-    "pcm": "✅ I Accept & Continue",
-    "ha": "✅ Na yarda & Ci gaba",
-    "yo": "✅ Mo Gba & Tẹsiwaju",
-    "ig": "✅ M Nakweere & Gaba"
   }
 }
