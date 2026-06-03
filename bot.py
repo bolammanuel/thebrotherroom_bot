@@ -1690,10 +1690,31 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             await query.message.reply_text("You are not authorized to perform this action.")
             return
             
+        participant_list = ""
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT user_id, full_name FROM learners ORDER BY last_activity DESC LIMIT 30")
+            rows = cursor.fetchall()
+            conn.close()
+            
+            if rows:
+                participant_list = "\n\n*Registered Participants (Recent Activity):*\n"
+                for row in rows:
+                    p_id, p_name = row
+                    name_str = p_name if p_name else "Anonymous User"
+                    participant_list += f"• {name_str} — ID: `{p_id}`\n"
+            else:
+                participant_list = "\n\n_(No registered participants found)_"
+        except Exception as e:
+            logger.error(f"Error fetching learners for reset list: {e}")
+            participant_list = "\n\n_(Could not fetch participant list)_"
+
         context.user_data["awaiting_reset_user_id"] = True
         await query.message.reply_text(
             "🔄 *Reset Participant Progress*\n\n"
-            "Please type or paste the Telegram User ID of the participant you want to reset. This will completely delete their progress, reflections, and reminders so they can start over.",
+            "Please type or paste the Telegram User ID of the participant you want to reset. This will completely delete their progress, reflections, and reminders so they can start over."
+            f"{participant_list}",
             parse_mode="Markdown"
         )
         return
