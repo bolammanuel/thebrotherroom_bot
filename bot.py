@@ -1555,6 +1555,8 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle button clicks."""
+    if update.effective_chat and update.effective_chat.type != "private":
+        return
     query = update.callback_query
     await query.answer()
     
@@ -1972,22 +1974,22 @@ def main() -> None:
     application = Application.builder().token(token).post_init(post_init).build()
 
     # Command handlers
-    application.add_handler(CommandHandler("start", start))
-    application.add_handler(CommandHandler("reset", reset_command))
-    application.add_handler(CommandHandler("community", community_command))
-    application.add_handler(CommandHandler("help", help_command))
-    application.add_handler(CommandHandler("menu", menu_command))
-    application.add_handler(CommandHandler("progress", progress_command))
-    application.add_handler(CommandHandler("next", next_lesson_handler))
-    application.add_handler(CommandHandler("quiz", quiz_command))
-    application.add_handler(CommandHandler("language", language_command))
-    application.add_handler(CommandHandler("journal", journal_command))
-    # application.add_handler(CommandHandler("accessibility", accessibility_command))
-    application.add_handler(CommandHandler("admin", admin_command))
+    application.add_handler(CommandHandler("start", start, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("reset", reset_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("community", community_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("help", help_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("menu", menu_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("progress", progress_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("next", next_lesson_handler, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("quiz", quiz_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("language", language_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("journal", journal_command, filters=filters.ChatType.PRIVATE))
+    # application.add_handler(CommandHandler("accessibility", accessibility_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("admin", admin_command, filters=filters.ChatType.PRIVATE))
 
     # Message, voice, and button handlers
-    application.add_handler(MessageHandler(filters.VIDEO | filters.Document.ALL, handle_video_upload))
-    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    application.add_handler(MessageHandler((filters.VIDEO | filters.Document.ALL) & filters.ChatType.PRIVATE, handle_video_upload))
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.ChatType.PRIVATE, handle_message))
     # application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
     application.add_handler(CallbackQueryHandler(button_handler))
 
