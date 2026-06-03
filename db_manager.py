@@ -110,7 +110,9 @@ def init_db():
         "ai_questions_count": "INTEGER DEFAULT 0",
         "first_attempt_quizzes": "INTEGER DEFAULT 0",
         "voice_responses_enabled": "INTEGER DEFAULT 0",
-        "full_name": "TEXT DEFAULT NULL"
+        "full_name": "TEXT DEFAULT NULL",
+        "email": "TEXT DEFAULT NULL",
+        "country": "TEXT DEFAULT NULL"
     }
     
     for col, col_def in new_cols.items():
@@ -316,6 +318,19 @@ def update_full_name(user_id, full_name):
         SET full_name = %s, last_activity = CURRENT_TIMESTAMP
         WHERE user_id = %s
     """, (full_name, user_id))
+    conn.commit()
+    conn.close()
+
+
+def update_registration_info(user_id, full_name, email, country):
+    """Update learner's registration details (name, email, country) on signup."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET full_name = %s, email = %s, country = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (full_name, email, country, user_id))
     conn.commit()
     conn.close()
 

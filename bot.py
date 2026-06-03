@@ -18,7 +18,8 @@ from db_manager import (
     set_voice_responses, get_voice_responses, update_post_test_score,
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
     get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name,
-    get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent, get_all_learner_reflections
+    get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent, get_all_learner_reflections,
+    update_registration_info
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
 
@@ -1431,7 +1432,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT user_id, full_name, current_module_id, current_lesson_id, quiz_completed, 
+        SELECT user_id, full_name, email, country, current_module_id, current_lesson_id, quiz_completed, 
                language_preference, enrollment_date, post_test_score, pledge_text,
                ai_questions_count, first_attempt_quizzes
         FROM learners
@@ -1449,7 +1450,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     with open(csv_file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "User ID", "Full Name", "Current Module", "Current Lesson", "Quiz Status", 
+            "User ID", "Full Name", "Email Address", "Country", "Current Module", "Current Lesson", "Quiz Status", 
             "Language Preference", "Enrollment Date", "Post-Test Score", "Personal Pledge",
             "AI Questions Asked", "First-Attempt Quizzes Passed"
         ])
@@ -1580,26 +1581,21 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         progress = get_learner_progress(user_id)
         is_new_user = progress is None
         
+        # Save temporary lang code to db by enrolling them (lets commands use correct language)
         full_name = query.from_user.full_name if query.from_user else None
         enroll_learner(user_id, lang_code, full_name=full_name)
         
         if is_new_user or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
-            # Show welcome message encouraging Pre-Test
-            welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
-            pretest_button_label = {
-                "en": "✍️ Take Pre-Test Quiz",
-                "pcm": "✍️ Start Pre-Test Quiz",
-                "ha": "✍️ Fara Jarrabawar Farko",
-                "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
-                "ig": "✍️ Malite Ule Mbụ"
-            }.get(lang_code, "✍️ Take Pre-Test Quiz")
             
+            # Show privacy policy disclaimer first
+            privacy_text = get_text("privacy_disclaimer", lang_code)
+            accept_label = get_text("privacy_accept_btn", lang_code)
             keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
+                [InlineKeyboardButton(accept_label, callback_data=f"accept_privacy_{lang_code}")]
             ])
             await query.edit_message_text(
-                welcome_text,
+                privacy_text,
                 reply_markup=keyboard,
                 parse_mode="Markdown"
             )
@@ -1615,6 +1611,81 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # Command buttons
     lang = get_language_preference(user_id)
     
+    # Onboarding callbacks
+    if data.startswith("accept_privacy_"):
+        lang_code = data.split("_")[2]
+        await query.delete_message()
+        
+        prompt_text = get_text("reg_prompt_name", lang_code)
+        tg_name = query.from_user.full_name if query.from_user else ""
+        
+        keyboard = None
+        if tg_name:
+            btn_label = get_text("reg_use_tg_name_btn", lang_code, name=tg_name)
+            keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton(btn_label, callback_data=f"reg_use_tg_{lang_code}")]
+            ])
+            
+        context.user_data["awaiting_reg_name"] = True
+        context.user_data["reg_lang"] = lang_code
+        
+        await context.bot.send_message(
+            chat_id=user_id,
+            text=prompt_text,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+        return
+        
+    elif data.startswith("reg_use_tg_"):
+        lang_code = data.split("_")[3]
+        await query.delete_message()
+        
+        tg_name = query.from_user.full_name if query.from_user else "Learner"
+        context.user_data.pop("awaiting_reg_name", None)
+        context.user_data["reg_full_name"] = tg_name
+        
+        prompt_email = get_text("reg_prompt_email", lang_code, name=tg_name)
+        context.user_data["awaiting_reg_email"] = True
+        
+        await context.bot.send_message(
+            chat_id=user_id,
+            text=prompt_email,
+            parse_mode="Markdown"
+        )
+        return
+        
+    elif data.startswith("reg_country_"):
+        parts = data.split("_")
+        country_name = parts[2]
+        lang_code = parts[3]
+        
+        if country_name == "SouthAfrica":
+            country_name = "South Africa"
+            
+        await query.delete_message()
+        
+        if country_name == "Other":
+            # Clear or skip popping country since they must type it now
+            context.user_data["awaiting_reg_country"] = True
+            prompt_other = {
+                "en": "Please type the name of your Country below:",
+                "pcm": "Abeg type the name of your Country below:",
+                "ha": "Da fatan za a rubuta sunan Ƙasar ku a ƙasa:",
+                "yo": "Jọwọ kọ orukọ Orilẹ-ede rẹ si isalẹ:",
+                "ig": "Biko pịaji aha Obodo gị n'okpuru ebe a:"
+            }.get(lang_code, "Please type the name of your Country below:")
+            await context.bot.send_message(
+                chat_id=user_id,
+                text=f"⌨️ {prompt_other}"
+            )
+            return
+            
+        # Standard country button selected (Nigeria, Ghana, Kenya, South Africa)
+        context.user_data.pop("awaiting_reg_country", None)
+        await finalize_registration(user_id, country_name, lang_code, context)
+        return
+
     # Intercept pre-test callbacks
     if data == "pretest_start":
         await query.delete_message()
@@ -1854,11 +1925,112 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 get_text("error_generic", lang),
                 reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
+async def finalize_registration(user_id, country, lang_code, context) -> None:
+    """Save participant registration details to db and display the course welcome screen."""
+    full_name = context.user_data.pop("reg_full_name", "Learner")
+    email = context.user_data.pop("reg_email", "N/A")
+    
+    # Update DB
+    update_registration_info(user_id, full_name, email, country)
+    
+    # Enroll/Update in database (sets start state if not already set)
+    enroll_learner(user_id, lang_code, full_name=full_name)
+    
+    # Clean up context data
+    context.user_data.pop("reg_lang", None)
+    context.user_data.pop("awaiting_reg_name", None)
+    context.user_data.pop("awaiting_reg_email", None)
+    context.user_data.pop("awaiting_reg_country", None)
+    
+    # Show welcome message encouraging Pre-Test
+    welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
+    pretest_button_label = {
+        "en": "✍️ Take Pre-Test Quiz",
+        "pcm": "✍️ Start Pre-Test Quiz",
+        "ha": "✍️ Fara Jarrabawar Farko",
+        "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
+        "ig": "✍️ Malite Ule Mbụ"
+    }.get(lang_code, "✍️ Take Pre-Test Quiz")
+    
+    keyboard = InlineKeyboardMarkup([
+        [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
+    ])
+    
+    await context.bot.send_message(
+        chat_id=user_id,
+        text=welcome_text,
+        reply_markup=keyboard,
+        parse_mode="Markdown"
+    )
+
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
     user_message = update.message.text
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
+
+    # Onboarding Flow - Intercept Name input
+    if context.user_data.get("awaiting_reg_name"):
+        context.user_data.pop("awaiting_reg_name", None)
+        lang_code = context.user_data.get("reg_lang", "en")
+        
+        name_val = user_message.strip()
+        context.user_data["reg_full_name"] = name_val
+        
+        # Step 2: Prompt for email
+        prompt_email = get_text("reg_prompt_email", lang_code, name=name_val)
+        context.user_data["awaiting_reg_email"] = True
+        
+        await update.message.reply_text(prompt_email, parse_mode="Markdown")
+        return
+
+    # Onboarding Flow - Intercept Email input
+    if context.user_data.get("awaiting_reg_email"):
+        lang_code = context.user_data.get("reg_lang", "en")
+        email_val = user_message.strip()
+        
+        # Validate email
+        import re
+        email_regex = r"^[^@]+@[^@]+\.[^@]+$"
+        if not re.match(email_regex, email_val):
+            invalid_msg = get_text("reg_invalid_email", lang_code)
+            await update.message.reply_text(invalid_msg, parse_mode="Markdown")
+            return
+            
+        context.user_data.pop("awaiting_reg_email", None)
+        context.user_data["reg_email"] = email_val
+        
+        # Step 3: Prompt for country (prioritizing African countries)
+        prompt_country = get_text("reg_prompt_country", lang_code)
+        
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(get_text("reg_country_btn_nigeria", lang_code), callback_data=f"reg_country_Nigeria_{lang_code}"),
+                InlineKeyboardButton(get_text("reg_country_btn_ghana", lang_code), callback_data=f"reg_country_Ghana_{lang_code}")
+            ],
+            [
+                InlineKeyboardButton(get_text("reg_country_btn_kenya", lang_code), callback_data=f"reg_country_Kenya_{lang_code}"),
+                InlineKeyboardButton(get_text("reg_country_btn_south_africa", lang_code), callback_data=f"reg_country_SouthAfrica_{lang_code}")
+            ],
+            [
+                InlineKeyboardButton(get_text("reg_country_btn_other", lang_code), callback_data=f"reg_country_Other_{lang_code}")
+            ]
+        ])
+        
+        # Also set awaiting_reg_country = True in case they choose to type it directly instead of using buttons
+        context.user_data["awaiting_reg_country"] = True
+        
+        await update.message.reply_text(prompt_country, reply_markup=keyboard, parse_mode="Markdown")
+        return
+
+    # Onboarding Flow - Intercept Country typed input
+    if context.user_data.get("awaiting_reg_country"):
+        lang_code = context.user_data.get("reg_lang", "en")
+        country_val = user_message.strip()
+        
+        context.user_data.pop("awaiting_reg_country", None)
+        await finalize_registration(user_id, country_val, lang_code, context)
+        return
 
     # Intercept private reflections
     if context.user_data.get("awaiting_reflection"):
