@@ -1354,7 +1354,8 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     keyboard = InlineKeyboardMarkup([
         [InlineKeyboardButton("Peer Facilitator Leaderboard", callback_data="admin_leaderboard")],
         [InlineKeyboardButton("Program Impact Analytics", callback_data="admin_analytics")],
-        [InlineKeyboardButton("Export Progress Report (CSV)", callback_data="admin_export_csv")]
+        [InlineKeyboardButton("Export Progress Report (CSV)", callback_data="admin_export_csv")],
+        [InlineKeyboardButton("Reset Participant Progress", callback_data="admin_reset_prompt")]
     ])
     
     await send_reply(update, dashboard_text, reply_markup=keyboard, parse_mode="Markdown")
@@ -1680,6 +1681,22 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         await export_admin_csv(update, context)
         return
+        
+    elif data == "admin_reset_prompt":
+        await query.delete_message()
+        admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+        admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+        if admin_ids and user_id not in admin_ids:
+            await query.message.reply_text("You are not authorized to perform this action.")
+            return
+            
+        context.user_data["awaiting_reset_user_id"] = True
+        await query.message.reply_text(
+            "🔄 *Reset Participant Progress*\n\n"
+            "Please type or paste the Telegram User ID of the participant you want to reset. This will completely delete their progress, reflections, and reminders so they can start over.",
+            parse_mode="Markdown"
+        )
+        return
     
     if data == "cmd_next":
         await query.delete_message()
@@ -1886,6 +1903,59 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         save_pledge(user_id, user_message)
         cert_name = context.user_data.pop("cert_name", update.effective_user.full_name)
         await handle_graduation_and_certificate(update, context, pledge=user_message, cert_name=cert_name)
+        return
+
+    # Intercept admin request to reset a user's progress
+    if context.user_data.get("awaiting_reset_user_id"):
+        context.user_data.pop("awaiting_reset_user_id", None)
+        
+        # Double check sender is admin
+        admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+        admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+        if admin_ids and user_id not in admin_ids:
+            await update.message.reply_text("You are not authorized to perform this action.")
+            return
+            
+        target_id_str = user_message.strip()
+        if not target_id_str.isdigit():
+            await update.message.reply_text(
+                "❌ Invalid User ID. Please make sure you enter a purely numeric Telegram User ID.\n\n"
+                "Use /admin to open the dashboard again."
+            )
+            return
+            
+        target_id = int(target_id_str)
+        
+        # Perform DB reset
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM learners WHERE user_id = %s", (target_id,))
+            cursor.execute("DELETE FROM reflections WHERE user_id = %s", (target_id,))
+            cursor.execute("DELETE FROM reminders WHERE user_id = %s", (target_id,))
+            conn.commit()
+            conn.close()
+            
+            # Send confirmation to admin
+            await update.message.reply_text(
+                f"✅ *Success!* Progress for user `{target_id}` has been completely reset.\n\n"
+                f"They have been removed from progress tracking, and their reflections and reminders have been deleted."
+            )
+            
+            # Try to notify the participant
+            try:
+                await context.bot.send_message(
+                    chat_id=target_id,
+                    text="🔄 *Your progress has been reset by an administrator.*\n\n"
+                         "You can start the course again from the beginning by sending /start!"
+                )
+            except Exception as e:
+                logger.info(f"Could not send reset notification to user {target_id}: {e}")
+                
+        except Exception as e:
+            logger.error(f"Error resetting user progress: {e}")
+            await update.message.reply_text("❌ An error occurred while resetting progress in the database.")
+            
         return
 
     # Check for navigation keywords
