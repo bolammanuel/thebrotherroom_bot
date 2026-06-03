@@ -1944,6 +1944,8 @@ async def handle_video_upload(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def post_init(application: Application) -> None:
     """Set bot commands in Telegram's menu."""
+    from telegram import BotCommandScopeAllPrivateChats, BotCommandScopeDefault
+    
     commands = [
         BotCommand("start", "Begin or restart the course"),
         BotCommand("next", "Go to the next lesson"),
@@ -1954,11 +1956,20 @@ async def post_init(application: Application) -> None:
         BotCommand("journal", "View your Reflections Journal"),
         # BotCommand("accessibility", "Toggle voice replies for visual accessibility"),
         BotCommand("admin", "Admin Dashboard & Peer Facilitator Leaderboard"),
-        BotCommand("community", "Join our WhatsApp community"),
+        BotCommand("community", "Join our Telegram Group"),
         BotCommand("reset", "Reset progress completely and restart"),
         BotCommand("help", "Get help and list commands")
     ]
-    await application.bot.set_my_commands(commands)
+    
+    # Set commands only for private 1-on-1 chats
+    await application.bot.set_my_commands(commands, scope=BotCommandScopeAllPrivateChats())
+    
+    # Delete default commands so they don't show up in group chats
+    try:
+        await application.bot.delete_my_commands(scope=BotCommandScopeDefault())
+    except Exception as e:
+        logger.error(f"Error clearing default command scope: {e}")
+        
     # Start background reminder and nudge scheduler clock
     asyncio.create_task(reminder_scheduler(application))
 
