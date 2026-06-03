@@ -145,7 +145,7 @@ def enroll_learner(user_id, language='en', full_name=None):
         cursor.execute("""
             INSERT INTO learners (user_id, current_module_id, current_lesson_id, language_preference, full_name)
             VALUES (%s, %s, %s, %s, %s)
-        """, (user_id, "module_1", "lesson_1_1", language, full_name))
+        """, (user_id, "module_1", "start", language, full_name))
     
     conn.commit()
     conn.close()

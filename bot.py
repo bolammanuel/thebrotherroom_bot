@@ -647,15 +647,22 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             )
             return
 
-    # Get next lesson
-    next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
+    # Check if they have not started the first lesson yet
+    if current_lesson_id == "start":
+        next_module_id = "module_1"
+        next_lesson_id = "lesson_1_1"
+        update_learner_progress(user_id, next_module_id, next_lesson_id)
+    else:
+        # Get next lesson
+        next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
 
     if next_module_id and next_lesson_id:
-        # If moving to new module, reset quiz status
-        if next_module_id != current_module_id:
-            update_learner_progress(user_id, next_module_id, next_lesson_id, quiz_completed=0)
-        else:
-            update_learner_progress(user_id, next_module_id, next_lesson_id)
+        if current_lesson_id != "start":
+            # If moving to new module, reset quiz status
+            if next_module_id != current_module_id:
+                update_learner_progress(user_id, next_module_id, next_lesson_id, quiz_completed=0)
+            else:
+                update_learner_progress(user_id, next_module_id, next_lesson_id)
 
         module, lesson = get_module_lesson(next_module_id, next_lesson_id)
         
@@ -663,12 +670,41 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             # Show lesson
             lesson_header = get_text("lesson_header", lang, module_title=module['title'], lesson_title=lesson['title'])
             
-            await send_reply(
-                update,
-                f"{lesson_header}\n\n{lesson['content']}",
-                parse_mode="Markdown",
-                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
-            )
+            # Check if this lesson has a video configured
+            video_file_id = lesson.get("video")
+            if video_file_id:
+                try:
+                    chat_msg = update.callback_query.message if update.callback_query else update.message
+                    # Send native video with header as caption
+                    await chat_msg.reply_video(
+                        video=video_file_id,
+                        caption=lesson_header,
+                        parse_mode="Markdown"
+                    )
+                    # Send text contents as a follow-up with keyboard buttons
+                    await send_reply(
+                        update,
+                        lesson['content'],
+                        parse_mode="Markdown",
+                        reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                    )
+                except Exception as e:
+                    logger.error(f"Error sending lesson video: {e}")
+                    # Fallback to standard text layout on error
+                    await send_reply(
+                        update,
+                        f"{lesson_header}\n\n{lesson['content']}",
+                        parse_mode="Markdown",
+                        reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                    )
+            else:
+                # Standard text lesson
+                await send_reply(
+                    update,
+                    f"{lesson_header}\n\n{lesson['content']}",
+                    parse_mode="Markdown",
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                )
 
             # If this is last lesson, prompt for quiz
             if is_last_lesson_of_module(next_module_id, next_lesson_id):
@@ -1863,6 +1899,39 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         reply_markup=get_main_menu_buttons(lang, user_id=user_id)
     )
 
+async def handle_video_upload(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle incoming video/file from admin and reply with the file_id."""
+    user_id = update.effective_user.id
+    admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+    admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+    
+    if admin_ids and user_id not in admin_ids:
+        return
+
+    file_id = None
+    file_type = "File"
+    
+    if update.message.video:
+        file_id = update.message.video.file_id
+        file_type = "Video"
+    elif update.message.document:
+        doc = update.message.document
+        if doc.mime_type and doc.mime_type.startswith("video/"):
+            file_id = doc.file_id
+            file_type = "Video Document"
+        elif doc.file_name and doc.file_name.lower().endswith(('.mp4', '.mkv', '.avi', '.mov', '.3gp')):
+            file_id = doc.file_id
+            file_type = "Video File"
+            
+    if file_id:
+        await update.message.reply_text(
+            f"📹 *{file_type} Detected!*\n\n"
+            f"Here is the Telegram `file_id`:\n"
+            f"`{file_id}`\n\n"
+            f"Save this string into the video field of the corresponding lesson in `course_content.json`.",
+            parse_mode="Markdown"
+        )
+
 async def post_init(application: Application) -> None:
     """Set bot commands in Telegram's menu."""
     commands = [
@@ -1909,6 +1978,7 @@ def main() -> None:
     application.add_handler(CommandHandler("admin", admin_command))
 
     # Message, voice, and button handlers
+    application.add_handler(MessageHandler(filters.VIDEO | filters.Document.ALL, handle_video_upload))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     # application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
     application.add_handler(CallbackQueryHandler(button_handler))
