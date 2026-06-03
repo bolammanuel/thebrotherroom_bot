@@ -1960,7 +1960,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             # Send confirmation to admin
             await update.message.reply_text(
                 f"✅ *Success!* Progress for user `{target_id}` has been completely reset.\n\n"
-                f"They have been removed from progress tracking, and their reflections and reminders have been deleted."
+                f"They have been removed from progress tracking, and their reflections and reminders have been deleted.",
+                parse_mode="Markdown"
             )
             
             # Try to notify the participant
@@ -1968,7 +1969,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 await context.bot.send_message(
                     chat_id=target_id,
                     text="🔄 *Your progress has been reset by an administrator.*\n\n"
-                         "You can start the course again from the beginning by sending /start!"
+                         "You can start the course again from the beginning by sending /start!",
+                    parse_mode="Markdown"
                 )
             except Exception as e:
                 logger.info(f"Could not send reset notification to user {target_id}: {e}")
