@@ -1211,8 +1211,16 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
             except Exception:
                 pass
                 
-    community_chat_id = os.getenv("COMMUNITY_CHAT_ID")
-    if community_chat_id:
+    community_chat_id_raw = os.getenv("COMMUNITY_CHAT_ID")
+    if community_chat_id_raw:
+        try:
+            val = community_chat_id_raw.strip()
+            if (val.startswith("-") and val[1:].isdigit()) or val.isdigit():
+                community_chat_id = int(val)
+            else:
+                community_chat_id = val
+        except Exception:
+            community_chat_id = community_chat_id_raw
         try:
             broadcast_text = (
                 f"🎓 *New Champion Certified!* 🌟\n\n"
