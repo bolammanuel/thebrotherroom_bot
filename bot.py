@@ -18,7 +18,8 @@ from db_manager import (
     set_voice_responses, get_voice_responses, update_post_test_score,
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
     get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name,
-    get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent, get_all_learner_reflections
+    get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent, get_all_learner_reflections,
+    reset_learner_data
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
 
@@ -114,8 +115,23 @@ def get_main_menu_buttons(lang='en', user_id=None):
 
     buttons = []
     
-    # Only show Next button if we aren't displaying the Quiz as the primary next action
-    buttons.append([InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next")])
+    # Check if we should show the Back button
+    has_back = False
+    if user_id:
+        try:
+            progress = get_learner_progress(user_id)
+            if progress and progress[0]:
+                current_module_id, current_lesson_id, quiz_completed, _ = progress
+                if not (current_module_id == "module_1" and current_lesson_id == "start"):
+                    has_back = True
+        except Exception:
+            pass
+            
+    nav_row = []
+    if has_back:
+        nav_row.append(InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev"))
+    nav_row.append(InlineKeyboardButton(get_command_button("next", lang), callback_data="cmd_next"))
+    buttons.append(nav_row)
     
     # Dynamic Quiz button visibility
     if show_quiz:
@@ -297,6 +313,49 @@ def get_next_lesson(current_module_id, current_lesson_id):
 
     return None, None
 
+def get_previous_lesson(current_module_id, current_lesson_id):
+    """Get previous lesson or module."""
+    if current_lesson_id == "start":
+        return None, None
+        
+    current_module_index = -1
+    current_lesson_index = -1
+
+    for i, module in enumerate(MODULES):
+        if module["module_id"] == current_module_id:
+            current_module_index = i
+            for j, lesson in enumerate(module["lessons"]):
+                if lesson["lesson_id"] == current_lesson_id:
+                    current_lesson_index = j
+                    break
+
+    if current_module_index == -1 or current_lesson_index == -1:
+        return None, None
+
+    # Try to get previous lesson in current module
+    if current_lesson_index - 1 >= 0:
+        prev_lesson = MODULES[current_module_index]["lessons"][current_lesson_index - 1]
+        return current_module_id, prev_lesson["lesson_id"]
+
+    # Try to get last lesson in previous module
+    elif current_module_index - 1 >= 0:
+        prev_module = MODULES[current_module_index - 1]
+        if prev_module["lessons"]:
+            return prev_module["module_id"], prev_module["lessons"][-1]["lesson_id"]
+
+    # If it's Module 1 Lesson 1, going back takes them to "start"
+    return "module_1", "start"
+
+def get_quiz_correct_answer(module_id):
+    """Helper to get correct answer letter for current module first question."""
+    module = get_module_by_id(module_id)
+    if module and "quiz" in module:
+        if isinstance(module["quiz"], list) and len(module["quiz"]) > 0:
+            return module["quiz"][0]["answer"]
+        elif isinstance(module["quiz"], dict):
+            return module["quiz"]["answer"]
+    return "A"
+
 # ============== REPLY HELPER ==============
 
 async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
@@ -404,11 +463,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         if next_module_id is None and next_lesson_id is None and quiz_completed in [1, 2]:
             # They want to retake the course (as stated in the course_complete message)!
             # Reset progress in database
-            conn = get_connection()
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM learners WHERE user_id = %s", (user_id,))
-            conn.commit()
-            conn.close()
+            reset_learner_data(user_id)
             # Clear user_data and continue to onboarding selection
             context.user_data.clear()
         else:
@@ -436,11 +491,7 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     """Reset learner progress completely."""
     user_id = update.effective_user.id
     
-    conn = get_connection()
-    cursor = conn.cursor()
-    cursor.execute("DELETE FROM learners WHERE user_id = %s", (user_id,))
-    conn.commit()
-    conn.close()
+    reset_learner_data(user_id)
     
     context.user_data.clear()
     
@@ -593,10 +644,307 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
 
+async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, module_id: str, lang: str, user_id: int) -> None:
+    module = get_module_by_id(module_id)
+    if not module:
+        return
+    quote_cards_trans = TRANSLATIONS.get("quote_cards", {}).get(module_id, {})
+    quote_text = quote_cards_trans.get(lang, quote_cards_trans.get("en", ""))
+    
+    quote_card_file = None
+    if quote_text:
+        try:
+            quote_card_file = generate_quote_card_image(module_id, module['title'], quote_text, lang, user_id)
+            
+            import urllib.parse
+            module_num = module_id.replace("module_", "")
+            raw_share_msg = get_text("quote_card_share_message", lang, module_num=module_num, quote=quote_text)
+            encoded_msg = urllib.parse.quote(raw_share_msg)
+            
+            whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
+            twitter_url = f"https://twitter.com/intent/tweet?text={encoded_msg}"
+            telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_msg}"
+            
+            share_keyboard = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton(get_text("share_whatsapp", lang), url=whatsapp_url),
+                    InlineKeyboardButton(get_text("share_x", lang), url=twitter_url)
+                ],
+                [
+                    InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
+                ],
+                [
+                    InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev"),
+                    InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")
+                ]
+            ])
+            
+            caption_text = {
+                "en": "🖼 *Here is your Shareable Quote Card for Module {num}!* Save this to your gallery and share it to your WhatsApp Status, Facebook, or Instagram to inspire other young men.",
+                "pcm": "🖼 *See your Shareable Quote Card for Module {num}!* Save am to your phone and share am on WhatsApp Status, Facebook, or Instagram make you inspire other men.",
+                "ha": "🖼 *Ga Katin Tunaninku na Raba don Modul {num}!* Adana shi a cikin gallery dinku kuma ku raba shi a WhatsApp Status, Facebook, ko Instagram don zaburar da sauran maza.",
+                "yo": "🖼 *Eyi ni Kaadi Iṣaro rẹ fun Modulu {num}!* Fi pamọ si ibi aworan rẹ ki o pin lori WhatsApp Status, Facebook, tabi Instagram lati fun awọn ọkunrin miiran ni iyanju.",
+                "ig": "🖼 *Nke a bụ Kaadị Ntụgharị uche gị maka Modul {num}!* Chekwaa ya na gallery gị ma kọrọ ya na WhatsApp Status, Facebook, ma ọ bụ Instagram ka ị kpalie ndị ikom ọzọ."
+            }.get(lang, "Here is your shareable quote card!").format(num=module_num)
+            
+            chat_msg = update.callback_query.message if update.callback_query else update.message
+            with open(quote_card_file, "rb") as q_photo:
+                await chat_msg.reply_photo(
+                    photo=q_photo,
+                    caption=caption_text,
+                    reply_markup=share_keyboard,
+                    parse_mode="Markdown"
+                )
+            context.user_data["awaiting_lessons_complete"] = module_id
+        except Exception as e:
+            logger.error(f"Error generating or sending quote card: {e}")
+            await send_reply(
+                update,
+                get_text("lessons_complete", lang, module_title=module['title']),
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+            )
+        finally:
+            if quote_card_file and os.path.exists(quote_card_file):
+                try:
+                    os.remove(quote_card_file)
+                except Exception:
+                    pass
+    else:
+        await send_reply(
+            update,
+            get_text("lessons_complete", lang, module_title=module['title']),
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+        )
+
+async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Handle /prev command, /back command, and Back button."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    result = get_learner_progress(user_id)
+    if not result or not result[0]:
+        await start(update, context)
+        return
+        
+    current_module_id, current_lesson_id, quiz_completed, lang = result
+    
+    # 1. State: Awaiting reflection response
+    if "awaiting_reflection" in context.user_data:
+        module_id = context.user_data.pop("awaiting_reflection")
+        # Return to Quiz Correct screen (or Quiz screen depending on status)
+        if quiz_completed == 1:
+            await send_reply(
+                update,
+                get_text("quiz_correct", lang),
+                reply_markup=get_quiz_continue_button(lang)
+            )
+        else:
+            await send_reply(
+                update,
+                get_text("quiz_incorrect", lang, correct_answer=get_quiz_correct_answer(module_id)),
+                reply_markup=get_quiz_retry_buttons(lang)
+            )
+        return
+        
+    # 2. State: Viewing Reflection Share Prompt (saved reflection screen)
+    from db_manager import get_learner_reflection
+    existing_ref = get_learner_reflection(user_id, current_module_id)
+    if quiz_completed in [1, 2] and existing_ref is not None and "story_read" not in context.user_data:
+        # Clear reflection from database to allow re-entering
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM reflections WHERE user_id = %s AND module_id = %s", (user_id, current_module_id))
+        conn.commit()
+        conn.close()
+        
+        # Show Mirror Moment reflection prompt again
+        ref_questions = TRANSLATIONS.get("reflections", {}).get("questions", {}).get(current_module_id, {})
+        ref_question = ref_questions.get(lang, ref_questions.get("en", "Reflect on this module."))
+        prompt_template = TRANSLATIONS.get("reflections", {}).get("prompt", {}).get(lang, "Mirror Moment:\n\n{question}")
+        prompt_text = prompt_template.replace("{question}", ref_question)
+        
+        context.user_data["awaiting_reflection"] = current_module_id
+        await send_reply(
+            update,
+            prompt_text,
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+        )
+        return
+
+    # 2.5 State: Inside Quiz
+    if quiz_completed == 0 and is_last_lesson_of_module(current_module_id, current_lesson_id) and "quiz_question_idx" in context.user_data:
+        q_idx = context.user_data.get("quiz_question_idx", 0)
+        if q_idx > 0:
+            context.user_data["quiz_question_idx"] = q_idx - 1
+            await quiz_command(update, context)
+            return
+        else:
+            context.user_data.pop("quiz_question_idx", None)
+            context.user_data.pop("quiz_errors", None)
+            module = get_module_by_id(current_module_id)
+            if module:
+                await send_reply(
+                    update,
+                    get_text("lessons_complete", lang, module_title=module['title']),
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                )
+            return
+
+    # 3. State: Ready to take Quiz or viewing Quiz instructions
+    if quiz_completed == 0 and is_last_lesson_of_module(current_module_id, current_lesson_id) and "awaiting_lessons_complete" not in context.user_data and "awaiting_quote_card" not in context.user_data:
+        # Go back to Quote Card
+        context.user_data["awaiting_lessons_complete"] = current_module_id
+        await send_quote_card(update, context, current_module_id, lang, user_id)
+        return
+
+    # 4. State: Viewing Lessons Complete prompt (awaiting quiz prompt)
+    if "awaiting_lessons_complete" in context.user_data:
+        context.user_data.pop("awaiting_lessons_complete", None)
+        await send_quote_card(update, context, current_module_id, lang, user_id)
+        return
+
+    # 5. State: Viewing Quote Card
+    if "awaiting_quote_card" in context.user_data:
+        context.user_data.pop("awaiting_quote_card", None)
+        module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+        if module and lesson:
+            module_num = current_module_id.replace("module_", "")
+            lesson_num = current_lesson_id.split("_")[-1]
+            lesson_header = get_text("lesson_header", lang, module_num=module_num, module_title=module['title'], lesson_num=lesson_num, lesson_title=lesson['title'])
+            await send_reply(
+                update,
+                f"{lesson_header}\n\n{lesson['content']}",
+                parse_mode="Markdown",
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+            )
+            context.user_data["awaiting_quote_card"] = current_module_id
+        return
+
+    # 6. State: Welcome screen / onboarding start
+    if current_lesson_id == "start":
+        if context.user_data.get("story_read") == "module_1":
+            context.user_data.pop("story_read", None)
+            await start(update, context)
+        else:
+            await start(update, context)
+        return
+
+    # 7. State: Viewing the Opening Story of Module X (X > 1)
+    if "story_read" in context.user_data:
+        story_mod_id = context.user_data.pop("story_read", None)
+        prev_module = get_module_by_id(current_module_id)
+        if prev_module:
+            existing_ref = get_learner_reflection(user_id, current_module_id)
+            if existing_ref:
+                module_title = prev_module["title"]
+                takeaway_val = existing_ref.strip()
+                if len(takeaway_val) > 150:
+                    takeaway_val = takeaway_val[:147] + "..."
+                import urllib.parse
+                share_msg_template = get_text("reflection_share_message", lang)
+                share_text = share_msg_template.replace("{module_title}", module_title).replace("{takeaway}", takeaway_val)
+                encoded_share = urllib.parse.quote(share_text)
+                
+                whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_share}"
+                twitter_url = f"https://twitter.com/intent/tweet?text={encoded_share}"
+                telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_share}"
+                
+                keyboard = InlineKeyboardMarkup([
+                    [
+                        InlineKeyboardButton(get_text("share_whatsapp", lang), url=whatsapp_url),
+                        InlineKeyboardButton(get_text("share_x", lang), url=twitter_url)
+                    ],
+                    [
+                        InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
+                    ],
+                    [
+                        InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev"),
+                        InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")
+                    ]
+                ])
+                await send_reply(
+                    update,
+                    get_text("reflection_share_prompt", lang),
+                    reply_markup=keyboard,
+                    parse_mode="Markdown"
+                )
+                return
+
+    # 8. State: standard lesson pagination back
+    prev_module_id, prev_lesson_id = get_previous_lesson(current_module_id, current_lesson_id)
+    if prev_module_id and prev_lesson_id:
+        if prev_lesson_id == "start":
+            # Stepping back to the Opening Story of current_module_id
+            context.user_data["story_read"] = current_module_id
+            update_learner_progress(user_id, current_module_id, "start")
+            
+            module = get_module_by_id(current_module_id)
+            story_header = {
+                "en": "📖 *Opening Story*",
+                "pcm": "📖 *Opening Story*",
+                "ha": "📖 *Labarin Budewa*",
+                "yo": "📖 *Itan Ibẹrẹ*",
+                "ig": "📖 *Akụkọ Mbido*"
+            }.get(lang, "📖 Opening Story")
+            
+            next_button = InlineKeyboardMarkup([[
+                InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev"),
+                InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")
+            ]])
+            await send_reply(
+                update,
+                f"{story_header}\n\n{module['opening_story']}",
+                reply_markup=next_button,
+                parse_mode="Markdown"
+            )
+        else:
+            if prev_module_id != current_module_id:
+                update_learner_progress(user_id, prev_module_id, prev_lesson_id, quiz_completed=1)
+            else:
+                update_learner_progress(user_id, prev_module_id, prev_lesson_id)
+                
+            module, lesson = get_module_lesson(prev_module_id, prev_lesson_id)
+            if module and lesson:
+                module_num = prev_module_id.replace("module_", "")
+                lesson_num = prev_lesson_id.split("_")[-1]
+                lesson_header = get_text("lesson_header", lang, module_num=module_num, module_title=module['title'], lesson_num=lesson_num, lesson_title=lesson['title'])
+                
+                if is_last_lesson_of_module(prev_module_id, prev_lesson_id):
+                    context.user_data["awaiting_quote_card"] = prev_module_id
+                else:
+                    context.user_data.pop("awaiting_quote_card", None)
+                    
+                await send_reply(
+                    update,
+                    f"{lesson_header}\n\n{lesson['content']}",
+                    parse_mode="Markdown",
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                )
+    else:
+        await start(update, context)
+
 async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /next command and next button."""
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
+    
+    # 1. Check if user is awaiting the lessons complete quiz prompt (meaning they just clicked Next on the quote card)
+    if "awaiting_lessons_complete" in context.user_data:
+        module_id = context.user_data.pop("awaiting_lessons_complete")
+        module = get_module_by_id(module_id)
+        if module:
+            await send_reply(
+                update,
+                get_text("lessons_complete", lang, module_title=module['title']),
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+            )
+            return
+
+    # 2. Check if user is awaiting the quote card (meaning they just finished Lesson 3 and clicked Next)
+    if "awaiting_quote_card" in context.user_data:
+        module_id = context.user_data.pop("awaiting_quote_card")
+        await send_quote_card(update, context, module_id, lang, user_id)
+        return
     
     if is_user_graduated(user_id):
         await send_graduation_dashboard(update, context, lang, user_id)
@@ -648,45 +996,57 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             )
             return
 
-    # Check if they have not started the first lesson yet
+    # Determine the next lesson first without updating DB progress yet
     if current_lesson_id == "start":
         next_module_id = "module_1"
         next_lesson_id = "lesson_1_1"
-        update_learner_progress(user_id, next_module_id, next_lesson_id)
     else:
-        # Get next lesson
         next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
 
     if next_module_id and next_lesson_id:
-        if current_lesson_id != "start":
-            # If moving to new module, reset quiz status
-            if next_module_id != current_module_id:
-                update_learner_progress(user_id, next_module_id, next_lesson_id, quiz_completed=0)
-            else:
-                update_learner_progress(user_id, next_module_id, next_lesson_id)
-
         module, lesson = get_module_lesson(next_module_id, next_lesson_id)
-        
         if module and lesson:
-            # Get module and lesson number
             module_num = next_module_id.replace("module_", "")
             lesson_num = next_lesson_id.split("_")[-1]
 
-            # If this is the first lesson of a module, send the opening story as a separate message first
+            # If this is the first lesson of a module, check if they need to read the opening story first
             if lesson_num == "1" and module.get("opening_story"):
-                story_header = {
-                    "en": "📖 *Opening Story*",
-                    "pcm": "📖 *Opening Story*",
-                    "ha": "📖 *Labarin Budewa*",
-                    "yo": "📖 *Itan Ibẹrẹ*",
-                    "ig": "📖 *Akụkọ Mbido*"
-                }.get(lang, "📖 Opening Story")
-                
-                await send_reply(
-                    update,
-                    f"{story_header}\n\n{module['opening_story']}",
-                    parse_mode="Markdown"
-                )
+                if context.user_data.get("story_read") != next_module_id:
+                    context.user_data["story_read"] = next_module_id
+                    
+                    story_header = {
+                        "en": "📖 *Opening Story*",
+                        "pcm": "📖 *Opening Story*",
+                        "ha": "📖 *Labarin Budewa*",
+                        "yo": "📖 *Itan Ibẹrẹ*",
+                        "ig": "📖 *Akụkọ Mbido*"
+                    }.get(lang, "📖 Opening Story")
+                    
+                    # Next/Prev buttons for the story
+                    next_button = InlineKeyboardMarkup([[
+                        InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev"),
+                        InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")
+                    ]])
+                    
+                    await send_reply(
+                        update,
+                        f"{story_header}\n\n{module['opening_story']}",
+                        reply_markup=next_button,
+                        parse_mode="Markdown"
+                    )
+                    return
+                else:
+                    # User clicked Next, story is read, clean up flag and proceed to update progress & deliver lesson
+                    context.user_data.pop("story_read", None)
+
+            # Update DB progress now
+            if current_lesson_id == "start":
+                update_learner_progress(user_id, next_module_id, next_lesson_id)
+            else:
+                if next_module_id != current_module_id:
+                    update_learner_progress(user_id, next_module_id, next_lesson_id, quiz_completed=0)
+                else:
+                    update_learner_progress(user_id, next_module_id, next_lesson_id)
 
             # Show lesson
             lesson_header = get_text(
@@ -733,66 +1093,9 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     reply_markup=get_main_menu_buttons(lang, user_id=user_id)
                 )
 
-            # If this is last lesson, prompt for quiz and send quote card
+            # If this is last lesson, set flag so next button triggers quote card
             if is_last_lesson_of_module(next_module_id, next_lesson_id):
-                # Send quote card image card
-                quote_cards_trans = TRANSLATIONS.get("quote_cards", {}).get(next_module_id, {})
-                quote_text = quote_cards_trans.get(lang, quote_cards_trans.get("en", ""))
-                
-                quote_card_file = None
-                if quote_text:
-                    try:
-                        quote_card_file = generate_quote_card_image(next_module_id, module['title'], quote_text, lang, user_id)
-                        
-                        import urllib.parse
-                        module_num = next_module_id.replace("module_", "")
-                        raw_share_msg = get_text("quote_card_share_message", lang, module_num=module_num, quote=quote_text)
-                        encoded_msg = urllib.parse.quote(raw_share_msg)
-                        
-                        whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
-                        twitter_url = f"https://twitter.com/intent/tweet?text={encoded_msg}"
-                        telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_msg}"
-                        
-                        share_keyboard = InlineKeyboardMarkup([
-                            [
-                                InlineKeyboardButton(get_text("share_whatsapp", lang), url=whatsapp_url),
-                                InlineKeyboardButton(get_text("share_x", lang), url=twitter_url)
-                            ],
-                            [
-                                InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
-                            ]
-                        ])
-                        
-                        caption_text = {
-                            "en": "🖼 *Here is your Shareable Quote Card for Module {num}!* Save this to your gallery and share it to your WhatsApp Status, Facebook, or Instagram to inspire other young men.",
-                            "pcm": "🖼 *See your Shareable Quote Card for Module {num}!* Save am to your phone and share am on WhatsApp Status, Facebook, or Instagram make you inspire other men.",
-                            "ha": "🖼 *Ga Katin Tunaninku na Raba don Modul {num}!* Adana shi a cikin gallery dinku kuma ku raba shi a WhatsApp Status, Facebook, ko Instagram don zaburar da sauran maza.",
-                            "yo": "🖼 *Eyi ni Kaadi Iṣaro rẹ fun Modulu {num}!* Fi pamọ si ibi aworan rẹ ki o pin lori WhatsApp Status, Facebook, tabi Instagram lati fun awọn ọkunrin miiran ni iyanju.",
-                            "ig": "🖼 *Nke a bụ Kaadị Ntụgharị uche gị maka Modul {num}!* Chekwaa ya na gallery gị ma kọrọ ya na WhatsApp Status, Facebook, ma ọ bụ Instagram ka ị kpalie ndị ikom ọzọ."
-                        }.get(lang, "Here is your shareable quote card!").format(num=module_num)
-                        
-                        chat_msg = update.callback_query.message if update.callback_query else update.message
-                        with open(quote_card_file, "rb") as q_photo:
-                            await chat_msg.reply_photo(
-                                photo=q_photo,
-                                caption=caption_text,
-                                reply_markup=share_keyboard,
-                                parse_mode="Markdown"
-                            )
-                    except Exception as e:
-                        logger.error(f"Error generating or sending quote card: {e}")
-                    finally:
-                        if quote_card_file and os.path.exists(quote_card_file):
-                            try:
-                                os.remove(quote_card_file)
-                            except Exception:
-                                pass
-                                
-                await send_reply(
-                    update,
-                    get_text("lessons_complete", lang, module_title=module['title']),
-                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
-                )
+                context.user_data["awaiting_quote_card"] = next_module_id
         else:
             await send_reply(
                 update,
@@ -827,7 +1130,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
-  # ✅ NEW: Check if at last lesson
+        
     if not is_last_lesson_of_module(current_module_id, current_lesson_id):
         module = get_module_by_id(current_module_id)
         await send_reply(
@@ -840,7 +1143,21 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     module = get_module_by_id(current_module_id)
 
     if module and "quiz" in module:
-        quiz_data = module["quiz"]
+        quizzes = module["quiz"]
+        if not isinstance(quizzes, list):
+            quizzes = [quizzes]
+            
+        # Re-start from 0 if accessed via message command (/quiz) or if idx is not set
+        if "quiz_question_idx" not in context.user_data or update.message:
+            context.user_data["quiz_question_idx"] = 0
+            context.user_data["quiz_errors"] = 0
+            
+        q_idx = context.user_data.get("quiz_question_idx", 0)
+        if q_idx >= len(quizzes):
+            q_idx = 0
+            context.user_data["quiz_question_idx"] = 0
+            
+        quiz_data = quizzes[q_idx]
         options = quiz_data["options"]
 
         # Create quiz instructions and buttons
@@ -849,7 +1166,8 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         quiz_header = get_text("quiz_instructions", lang, module_title=module['title'], quiz_question=question_with_options)
         
         # Create answer buttons in a single row using short letters
-        buttons = [[InlineKeyboardButton(f" {option[0]} ", callback_data=f"quiz|{current_module_id}|{option[0]}") for option in options]]
+        buttons = [[InlineKeyboardButton(f" {option[0]} ", callback_data=f"quiz|{current_module_id}|{q_idx}|{option[0]}") for option in options]]
+        buttons.append([InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")])
         reply_markup = InlineKeyboardMarkup(buttons)
 
         await send_reply(
@@ -936,6 +1254,7 @@ async def journal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
         ],
         [
+            InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_progress"),
             InlineKeyboardButton(get_command_button("menu", lang), callback_data="cmd_menu")
         ]
     ])
@@ -1929,6 +2248,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Call next_lesson_handler via update object
         await next_lesson_handler(update, context)
         
+    elif data == "cmd_prev":
+        await query.delete_message()
+        # Call prev_lesson_handler via update object
+        await prev_lesson_handler(update, context)
+        
     elif data == "cmd_start":
         await query.delete_message()
         await start(update, context)
@@ -2011,9 +2335,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                         except Exception:
                             pass
         return
-    
-    # Quiz retry - show quiz again
     elif data == "quiz_retry":
+        context.user_data["quiz_question_idx"] = 0
+        context.user_data["quiz_errors"] = 0
+        await query.delete_message()
+        await quiz_command(update, context)
+        
+    # Quiz next question transition
+    elif data.startswith("quiz_q|"):
+        parts = data.split("|")
+        module_id = parts[1]
+        next_q_idx = int(parts[2])
+        context.user_data["quiz_question_idx"] = next_q_idx
         await query.delete_message()
         await quiz_command(update, context)
     
@@ -2030,35 +2363,101 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             return
         
         module_id = parts[1]
-        selected_answer = parts[2]
+        
         module = get_module_by_id(module_id)
-
-        if module and "quiz" in module:
-            correct_answer = module["quiz"]["answer"]
-            if selected_answer == correct_answer:
-                # CORRECT ANSWER
-                # Check if this is the first attempt (quiz_completed == 0)
-                progress = get_learner_progress(user_id)
+        if not module or "quiz" not in module:
+            await query.edit_message_text(get_text("error_generic", lang))
+            return
+            
+        quizzes = module["quiz"]
+        if not isinstance(quizzes, list):
+            quizzes = [quizzes]
+            
+        if len(parts) == 4:
+            q_idx = int(parts[2])
+            selected_answer = parts[3]
+        else:
+            q_idx = context.user_data.get("quiz_question_idx", 0)
+            selected_answer = parts[2]
+            
+        if q_idx >= len(quizzes):
+            q_idx = 0
+            
+        quiz_data = quizzes[q_idx]
+        correct_answer = quiz_data["answer"]
+        feedback = quiz_data.get("feedback", "")
+        
+        is_correct = (selected_answer == correct_answer)
+        
+        if "quiz_errors" not in context.user_data:
+            context.user_data["quiz_errors"] = 0
+            
+        if not is_correct:
+            context.user_data["quiz_errors"] += 1
+            
+        fb_title = {
+            "en": "📢 *Feedback:*",
+            "pcm": "📢 *Feedback:*",
+            "ha": "📢 *Maganar Gaskiya:*",
+            "yo": "📢 *Esi Iṣaju:*",
+            "ig": "📢 *Azịza na Nkowasi:*"
+        }.get(lang, "Feedback:")
+        
+        ans_status = "✅ Correct!" if is_correct else f"❌ Incorrect (Correct was {correct_answer})"
+        
+        feedback_text = (
+            f"❓ *{quiz_data['question']}*\n\n"
+            f"Your Answer: *{selected_answer}* — {ans_status}\n\n"
+            f"{fb_title} {feedback}"
+        )
+        
+        if q_idx + 1 < len(quizzes):
+            next_q_idx = q_idx + 1
+            buttons = [
+                [InlineKeyboardButton("Next Question ➡️", callback_data=f"quiz_q|{module_id}|{next_q_idx}")],
+                [InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")]
+            ]
+            reply_markup = InlineKeyboardMarkup(buttons)
+            await query.edit_message_text(feedback_text, reply_markup=reply_markup, parse_mode="Markdown")
+        else:
+            errors = context.user_data.get("quiz_errors", 0)
+            progress = get_learner_progress(user_id)
+            
+            if errors == 0:
                 if progress and progress[2] == 0:
                     increment_first_attempt_quizzes(user_id)
-                
                 update_quiz_status(user_id, 1)
-                await query.edit_message_text(
-                    get_text("quiz_correct", lang),
-                    reply_markup=get_quiz_continue_button(lang)
+                
+                completion_text = (
+                    f"{feedback_text}\n\n"
+                    f"🎉 *Quiz Complete!* You scored 3/3 correct!\n\n"
+                    f"{get_text('quiz_correct', lang)}"
                 )
+                buttons = [
+                    [InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")],
+                    [InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")]
+                ]
+                reply_markup = InlineKeyboardMarkup(buttons)
+                await query.edit_message_text(completion_text, reply_markup=reply_markup, parse_mode="Markdown")
             else:
-                # WRONG ANSWER - Mark quiz as attempted so they can proceed
                 update_quiz_status(user_id, 2)
-                await query.edit_message_text(
-                    get_text("quiz_incorrect", lang, correct_answer=correct_answer),
-                    reply_markup=get_quiz_retry_buttons(lang)
+                score = 3 - errors
+                completion_text = (
+                    f"{feedback_text}\n\n"
+                    f"📊 *Quiz Complete!* You scored {score}/3.\n\n"
+                    f"{get_text('quiz_incorrect', lang, correct_answer=correct_answer)}"
                 )
-        else:
-            await query.edit_message_text(
-                get_text("error_generic", lang),
-                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
-            )
+                buttons = [
+                    [
+                        InlineKeyboardButton(get_text("quiz_retry_button", lang), callback_data="quiz_retry"),
+                        InlineKeyboardButton(get_text("quiz_skip_button", lang), callback_data="quiz_skip")
+                    ],
+                    [
+                        InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")
+                    ]
+                ]
+                reply_markup = InlineKeyboardMarkup(buttons)
+                await query.edit_message_text(completion_text, reply_markup=reply_markup, parse_mode="Markdown")
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle text messages."""
     user_message = update.message.text
@@ -2098,6 +2497,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
             ],
             [
+                InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev"),
                 InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")
             ]
         ])
@@ -2154,13 +2554,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
         # Perform DB reset
         try:
-            conn = get_connection()
-            cursor = conn.cursor()
-            cursor.execute("DELETE FROM learners WHERE user_id = %s", (target_id,))
-            cursor.execute("DELETE FROM reflections WHERE user_id = %s", (target_id,))
-            cursor.execute("DELETE FROM reminders WHERE user_id = %s", (target_id,))
-            conn.commit()
-            conn.close()
+            reset_learner_data(target_id)
             
             # Send confirmation to admin
             await update.message.reply_text(
@@ -2255,6 +2649,7 @@ async def post_init(application: Application) -> None:
     commands = [
         BotCommand("start", "Begin or restart the course"),
         BotCommand("next", "Go to the next lesson"),
+        BotCommand("prev", "Go back to the previous lesson"),
         BotCommand("quiz", "Take the quiz for the current module"),
         BotCommand("progress", "Check your current module and lesson"),
         BotCommand("menu", "View the full course outline"),
@@ -2298,6 +2693,8 @@ def main() -> None:
     application.add_handler(CommandHandler("menu", menu_command, filters=filters.ChatType.PRIVATE))
     application.add_handler(CommandHandler("progress", progress_command, filters=filters.ChatType.PRIVATE))
     application.add_handler(CommandHandler("next", next_lesson_handler, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("prev", prev_lesson_handler, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("back", prev_lesson_handler, filters=filters.ChatType.PRIVATE))
     application.add_handler(CommandHandler("quiz", quiz_command, filters=filters.ChatType.PRIVATE))
     application.add_handler(CommandHandler("language", language_command, filters=filters.ChatType.PRIVATE))
     application.add_handler(CommandHandler("journal", journal_command, filters=filters.ChatType.PRIVATE))

@@ -155,11 +155,18 @@
   },
   "command_buttons": {
     "next": {
-      "en": "Next",
-      "pcm": "Next",
-      "ha": "Gida",
-      "yo": "Atẹle",
-      "ig": "Ọzọ"
+      "en": "Next ➡️",
+      "pcm": "Next ➡️",
+      "ha": "Gida ➡️",
+      "yo": "Atẹle ➡️",
+      "ig": "Ọzọ ➡️"
+    },
+    "back": {
+      "en": "⬅️ Back",
+      "pcm": "⬅️ Back",
+      "ha": "⬅️ Baya",
+      "yo": "⬅️ Pada",
+      "ig": "⬅️ Azụ"
     },
     "quiz": {
       "en": "Quiz",

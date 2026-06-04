@@ -23,16 +23,41 @@
                     "content": "Masculinity is the way men express themselves in the world. But there is not just one way to be a man.\n\nHarmful masculinity says: dominate, control, never feel.\n\nPositive masculinity says: lead with respect, feel without shame, protect without controlling, be strong AND kind.\n\nOne traps you. The other sets you free. This course is about choosing freedom."
                 }
             ],
-            "quiz": {
-                "question": "What is the main difference between sex and gender?",
-                "options": [
-                    "A) They mean the same thing",
-                    "B) Sex is biological; gender is built by society",
-                    "C) Gender is biological; sex is built by society",
-                    "D) Both are built by society"
-                ],
-                "answer": "B"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: What is the main difference between sex and gender?",
+                    "options": [
+                        "A) They mean the same thing",
+                        "B) Sex is biological; gender is built by society",
+                        "C) Gender is biological; sex is built by society",
+                        "D) Both are built by society"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct! Sex = what you are born with. Gender = what society teaches you to be. This is the foundation of everything in this course."
+                },
+                {
+                    "question": "Question 2 of 3: Which of these is a harmful gender norm?",
+                    "options": [
+                        "A) Men should be kind to their children",
+                        "B) Men must never show weakness or cry",
+                        "C) Men should listen and respect women",
+                        "D) Men can ask for help when they need it"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct! Telling men never to show emotion cuts them off from their humanity — and harms those around them."
+                },
+                {
+                    "question": "Question 3 of 3: Positive masculinity means a man should be:",
+                    "options": [
+                        "A) Soft, weak, and passive",
+                        "B) Unable to lead or make decisions",
+                        "C) Strong, kind, respectful and emotionally honest",
+                        "D) The same as a woman"
+                    ],
+                    "answer": "C",
+                    "feedback": "Exactly right. Positive masculinity is about being a fuller, freer, better man — one who leads with respect, not fear."
+                }
+            ]
         },
         {
             "module_id": "module_2",
@@ -55,16 +80,41 @@
                     "content": "In Nigeria, men die younger than women. Men are less likely to see a doctor. Men are more likely to take their own lives in silence.\n\nThis is not because men are weaker. It is because they are taught that seeking help is shameful.\n\nThe same norms that harm women are slowly destroying men from the inside.\n\nChanging these norms is not about making men weak. It is about keeping men alive, healthy, and connected to the people they love."
                 }
             ],
-            "quiz": {
-                "question": "Toxic masculinity is best described as:",
-                "options": [
-                    "A) An insult that attacks all men",
-                    "B) A set of harmful beliefs about what manhood requires",
-                    "C) A medical condition affecting some men",
-                    "D) Normal male behaviour"
-                ],
-                "answer": "B"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: Toxic masculinity is best described as:",
+                    "options": [
+                        "A) An insult that attacks all men",
+                        "B) A set of harmful beliefs about what manhood requires",
+                        "C) A medical condition affecting some men",
+                        "D) Normal male behaviour"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. Toxic masculinity is not about all men — it is about specific harmful ideas that hurt men and those around them."
+                },
+                {
+                    "question": "Question 2 of 3: Which of these is a sign of toxic masculinity?",
+                    "options": [
+                        "A) A man cries when his parent dies",
+                        "B) A man asks his friend for advice",
+                        "C) A man uses violence to settle arguments",
+                        "D) A man cooks for his family"
+                    ],
+                    "answer": "C",
+                    "feedback": "Correct. Using violence to resolve conflict is a key expression of toxic masculinity — and it is learned, not natural."
+                },
+                {
+                    "question": "Question 3 of 3: Why do men in Nigeria have shorter life expectancy on average?",
+                    "options": [
+                        "A) Men are biologically weaker",
+                        "B) Men are taught that seeking help is shameful",
+                        "C) Men work harder than women",
+                        "D) Men eat less healthy food"
+                    ],
+                    "answer": "B",
+                    "feedback": "Exactly right. The norms that stop men from seeking help are literally costing them years of their lives."
+                }
+            ]
         },
         {
             "module_id": "module_3",
@@ -87,16 +137,41 @@
                     "content": "SGBV does not just hurt the person it happens to. It damages entire communities.\n\nEffects on survivors: Physical injuries (sometimes permanent). Mental health damage — depression, PTSD, anxiety, suicidal thoughts. Economic loss — inability to work or study. Social isolation — shame, stigma, silence.\n\nEffects on communities: Broken families. Lower school enrollment for girls. Reduced productivity and economic growth. Cycles of violence passing from generation to generation.\n\nSilence protects violence. Knowledge breaks that silence."
                 }
             ],
-            "quiz": {
-                "question": "SGBV includes which of the following?",
-                "options": [
-                    "A) Only physical beating",
-                    "B) Only rape",
-                    "C) Physical, sexual, emotional, economic violence and harmful practices",
-                    "D) Only violence between strangers"
-                ],
-                "answer": "C"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: SGBV includes which of the following?",
+                    "options": [
+                        "A) Only physical beating",
+                        "B) Only rape",
+                        "C) Physical, sexual, emotional, economic violence and harmful practices",
+                        "D) Only violence between strangers"
+                    ],
+                    "answer": "C",
+                    "feedback": "Correct. SGBV is far broader than most people realise — it includes emotional, economic, and traditional forms of harm, not just physical violence."
+                },
+                {
+                    "question": "Question 2 of 3: Who is responsible for SGBV?",
+                    "options": [
+                        "A) The victim, for their behaviour or dress",
+                        "B) The person who commits the violence",
+                        "C) Both equally",
+                        "D) Society, not individuals"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. The responsibility lies entirely with the person who chooses to commit violence. Victims are never to blame — ever."
+                },
+                {
+                    "question": "Question 3 of 3: SGBV affects communities by:",
+                    "options": [
+                        "A) Reducing girls' school enrollment",
+                        "B) Causing cycles of violence across generations",
+                        "C) Breaking families and reducing economic growth",
+                        "D) All of the above"
+                    ],
+                    "answer": "D",
+                    "feedback": "Exactly right. SGBV is not a private matter — its effects ripple through families, schools, economies, and generations."
+                }
+            ]
         },
         {
             "module_id": "module_4",
@@ -119,16 +194,41 @@
                     "content": "Poverty and economic inequality create conditions where SGBV can thrive.\n\nWhen a woman has no income, no savings, and no access to resources, she may feel trapped in an abusive relationship with no way out.\n\nWhen a man faces unemployment and financial failure, and his identity is built entirely on \"being the provider,\" the shame can turn into aggression.\n\nEconomic exclusion of women from education and financial independence is a structural driver of gender-based violence. Ending SGBV means also fighting for economic justice."
                 }
             ],
-            "quiz": {
-                "question": "What is the single biggest root cause of SGBV?",
-                "options": [
-                    "A) Men's natural aggression",
-                    "B) Women's provocative behaviour",
-                    "C) Unequal power between people",
-                    "D) Poverty alone"
-                ],
-                "answer": "C"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: What is the single biggest root cause of SGBV?",
+                    "options": [
+                        "A) Men's natural aggression",
+                        "B) Women's provocative behaviour",
+                        "C) Unequal power between people",
+                        "D) Poverty alone"
+                    ],
+                    "answer": "C",
+                    "feedback": "Correct. SGBV is rooted in power imbalance — the belief that one person has the right to control another. This is learned, not natural."
+                },
+                {
+                    "question": "Question 2 of 3: Socialisation means:",
+                    "options": [
+                        "A) Going out with friends",
+                        "B) How beliefs are passed on through family, religion, media and community",
+                        "C) Learning in school only",
+                        "D) A government programme"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. Socialisation is how norms and beliefs are transmitted across generations — and how harmful gender norms are kept alive."
+                },
+                {
+                    "question": "Question 3 of 3: How does economic inequality contribute to SGBV?",
+                    "options": [
+                        "A) Poor men are naturally more violent",
+                        "B) Women with no income may feel trapped in abusive situations",
+                        "C) Economic issues have nothing to do with SGBV",
+                        "D) Wealth prevents all forms of abuse"
+                    ],
+                    "answer": "B",
+                    "feedback": "Exactly right. Economic dependency can trap survivors in abusive situations — which is why women's financial independence is key to ending SGBV."
+                }
+            ]
         },
         {
             "module_id": "module_5",
@@ -151,16 +251,41 @@
                     "content": "Change starts with you. Not with the government. Not with a campaign. With the choices you make every single day.\n\nYour personal responsibility includes: Examining your own behaviours and attitudes honestly. Recognising how you may have benefited from gender inequality. Making a commitment — not just to avoid harm, but to actively prevent it. Holding yourself accountable when you fall short.\n\nNobody is perfect. But everyone can improve. And every improvement matters."
                 }
             ],
-            "quiz": {
-                "question": "Why is male involvement essential in ending GBV?",
-                "options": [
-                    "A) Women cannot solve this problem alone",
-                    "B) Men hold significant social influence and power, and mostly commit GBV",
-                    "C) Only men can make laws",
-                    "D) Women don't understand the issue"
-                ],
-                "answer": "B"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: Why is male involvement essential in ending GBV?",
+                    "options": [
+                        "A) Women cannot solve this problem alone",
+                        "B) Men hold significant social influence and power, and mostly commit GBV",
+                        "C) Only men can make laws",
+                        "D) Women don't understand the issue"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. Men's social influence — especially over other men — is one of the most powerful tools for changing norms and ending GBV."
+                },
+                {
+                    "question": "Question 2 of 3: Allyship means:",
+                    "options": [
+                        "A) Not committing violence yourself",
+                        "B) Actively using your voice and position to support those being harmed",
+                        "C) Signing a petition",
+                        "D) Agreeing with women on everything"
+                    ],
+                    "answer": "B",
+                    "feedback": "Exactly right. Allyship is active, not passive. It means taking visible action — speaking up, calling out, and modelling respectful behaviour."
+                },
+                {
+                    "question": "Question 3 of 3: Personal responsibility in ending GBV starts with:",
+                    "options": [
+                        "A) Waiting for government to act",
+                        "B) Blaming other men",
+                        "C) Honestly examining your own behaviours and attitudes",
+                        "D) Educating only women"
+                    ],
+                    "answer": "C",
+                    "feedback": "Correct. Change begins with self-examination. Before you can change others, you must be honest about your own choices and their impact."
+                }
+            ]
         },
         {
             "module_id": "module_6",
@@ -183,16 +308,41 @@
                     "content": "Emotional intelligence (EQ) is the ability to understand, express, and manage your own emotions — and to recognise the emotions of others.\n\nMen are often taught to suppress emotions. This creates emotional illiteracy — the inability to name, process, or communicate feelings. And it damages relationships.\n\nBuilding your EQ: Naming your emotions accurately. Pausing before reacting in anger. Recognising when someone you love is struggling. Being able to apologise genuinely. Asking for help when you need it.\n\nEmotional intelligence is not weakness. It is the foundation of every strong relationship and every great leader."
                 }
             ],
-            "quiz": {
-                "question": "Which of the following is TRUE about consent?",
-                "options": [
-                    "A) Once someone says yes, they cannot change their mind",
-                    "B) Silence means yes",
-                    "C) Consent must be freely given, enthusiastic and reversible",
-                    "D) Consent only applies to sex"
-                ],
-                "answer": "C"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: Which of the following is TRUE about consent?",
+                    "options": [
+                        "A) Once someone says yes, they cannot change their mind",
+                        "B) Silence means yes",
+                        "C) Consent must be freely given, enthusiastic and reversible",
+                        "D) Consent only applies to sex"
+                    ],
+                    "answer": "C",
+                    "feedback": "Correct. Consent can be withdrawn at any time. It must be enthusiastic — not just the absence of a 'no'. And it applies to all areas of a relationship."
+                },
+                {
+                    "question": "Question 2 of 3: Emotional intelligence means:",
+                    "options": [
+                        "A) Being overly emotional or sensitive",
+                        "B) Understanding and managing your own emotions and recognising others'",
+                        "C) Hiding your feelings to stay strong",
+                        "D) Only women need emotional skills"
+                    ],
+                    "answer": "B",
+                    "feedback": "Exactly right. EQ is not about being emotional — it's about understanding emotions and using that to communicate and connect well."
+                },
+                {
+                    "question": "Question 3 of 3: Which is a sign of unhealthy communication in a relationship?",
+                    "options": [
+                        "A) Taking a break when a conversation gets too heated",
+                        "B) Saying 'I feel hurt' instead of 'you hurt me'",
+                        "C) Using silence as punishment",
+                        "D) Listening carefully before responding"
+                    ],
+                    "answer": "C",
+                    "feedback": "Correct. Using silence as punishment is emotional control — a manipulation tactic, not a healthy conflict resolution strategy."
+                }
+            ]
         },
         {
             "module_id": "module_7",
@@ -215,16 +365,41 @@
                     "content": "If someone tells you they are being abused, your response in that moment matters enormously.\n\nWhat to do: Believe them. Listen without judgment. Tell them it is not their fault. Ask what they need: \"How can I support you?\" Share resources — helplines, shelters, legal support. Respect their choices — do not force them to leave if they are not ready. Check in with them regularly.\n\nWhat NOT to do: Ask \"What did you do to provoke it?\" Advise them to \"just leave\" without a plan. Tell other people their story without permission. Minimise what happened."
                 }
             ],
-            "quiz": {
-                "question": "Which is a warning sign that someone may be experiencing abuse?",
-                "options": [
-                    "A) They have a busy social life",
-                    "B) They seem afraid of their partner's reactions",
-                    "C) They argue sometimes with their partner",
-                    "D) They earn less than their partner"
-                ],
-                "answer": "B"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: Which is a warning sign that someone may be experiencing abuse?",
+                    "options": [
+                        "A) They have a busy social life",
+                        "B) They seem afraid of their partner's reactions",
+                        "C) They argue sometimes with their partner",
+                        "D) They earn less than their partner"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. Fear of a partner's reactions — walking on eggshells, flinching, excessive appeasement — is one of the clearest warning signs of an abusive relationship."
+                },
+                {
+                    "question": "Question 2 of 3: If you cannot safely intervene directly, you should:",
+                    "options": [
+                        "A) Do nothing — it is not your business",
+                        "B) Shout at the abuser",
+                        "C) Distract or delegate — find a safe way to disrupt the situation",
+                        "D) Record and post on social media immediately"
+                    ],
+                    "answer": "C",
+                    "feedback": "Correct. The 5Ds give you options. Choose the one that is safest in the moment."
+                },
+                {
+                    "question": "Question 3 of 3: When supporting a survivor, you should:",
+                    "options": [
+                        "A) Ask what they did to provoke the situation",
+                        "B) Force them to leave the relationship immediately",
+                        "C) Believe them, listen without judgment, and ask what they need",
+                        "D) Tell their family so others can help decide for them"
+                    ],
+                    "answer": "C",
+                    "feedback": "Exactly right. Believing and listening without judgment are the most powerful things you can offer a survivor. Their choices must remain theirs."
+                }
+            ]
         },
         {
             "module_id": "module_8",
@@ -247,16 +422,41 @@
                     "content": "Advocacy means speaking up for change — in your family, community, school, or workplace.\n\nYou don't need a microphone or a platform to be an advocate. Advocacy starts in small moments: Having honest conversations with your brothers, friends, and sons about GBV. Sharing accurate information on social media. Challenging leaders respectfully when they say harmful things. Mentoring younger men and boys in your community.\n\nEvery advocate was once a bystander who decided to act. This is your moment."
                 }
             ],
-            "quiz": {
-                "question": "Where does a man's influence show up most powerfully?",
-                "options": [
-                    "A) Only in political or religious leadership positions",
-                    "B) In everyday moments — jokes, comments, social media, how he treats women",
-                    "C) Only when he has a large audience",
-                    "D) Only in formal speeches"
-                ],
-                "answer": "B"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: Where does a man's influence show up most powerfully?",
+                    "options": [
+                        "A) Only in political or religious leadership positions",
+                        "B) In everyday moments — jokes, comments, social media, how he treats women",
+                        "C) Only when he has a large audience",
+                        "D) Only in formal speeches"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. Influence is exercised in ordinary moments — what you laugh at, what you share, how you speak. These shape the people around you daily."
+                },
+                {
+                    "question": "Question 2 of 3: Leading by example means:",
+                    "options": [
+                        "A) Telling others what to do",
+                        "B) Consistently behaving in ways that align with the values you claim to hold",
+                        "C) Being perfect at all times",
+                        "D) Only acting when others are watching"
+                    ],
+                    "answer": "B",
+                    "feedback": "Exactly right. Real leadership is consistency between your private behaviour and your public values — not performance."
+                },
+                {
+                    "question": "Question 3 of 3: Advocacy in ending GBV can look like:",
+                    "options": [
+                        "A) Only organised marches and protests",
+                        "B) Sharing honest conversations, calling out harmful speech, mentoring younger men",
+                        "C) Letting organisations handle it",
+                        "D) Only speaking up if you have a large social media following"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. Advocacy is everyday action — conversations, challenges, mentorship. You don't need a platform. You need courage."
+                }
+            ]
         },
         {
             "module_id": "module_9",
@@ -279,16 +479,41 @@
                     "content": "You don't need a budget or an NGO to engage your community. You need intention and consistency.\n\nPractical community engagement: Start a men's conversation group — even three people is enough. Organise a community dialogue on GBV — in a church, mosque, community hall, or under a tree. Use WhatsApp groups to share helpful content. Partner with local organisations, schools, or religious bodies. Identify and work with existing community leaders — chiefs, pastors, imams.\n\nChange is not a project. It is a practice. Start small. Stay consistent. Grow."
                 }
             ],
-            "quiz": {
-                "question": "Why is community action important in ending GBV?",
-                "options": [
-                    "A) Laws and campaigns alone are not enough — norms change community by community",
-                    "B) Communities have no role — it is a government job",
-                    "C) Only urban communities matter",
-                    "D) Community action is too slow to make a difference"
-                ],
-                "answer": "A"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: Why is community action important in ending GBV?",
+                    "options": [
+                        "A) Laws and campaigns alone are not enough — norms change community by community",
+                        "B) Communities have no role — it is a government job",
+                        "C) Only urban communities matter",
+                        "D) Community action is too slow to make a difference"
+                    ],
+                    "answer": "A",
+                    "feedback": "Correct. Norms are lived in communities. Laws protect rights — but communities determine what behaviour is acceptable. Both are needed."
+                },
+                {
+                    "question": "Question 2 of 3: Why is storytelling powerful in advocacy?",
+                    "options": [
+                        "A) Stories are more entertaining than facts",
+                        "B) Stories make people feel, not just think — and behaviour changes through feeling",
+                        "C) Stories are easier to make up",
+                        "D) Stories only work for educated audiences"
+                    ],
+                    "answer": "B",
+                    "feedback": "Exactly right. When people hear a real human story, they connect emotionally — and emotional connection is what changes minds and behaviour."
+                },
+                {
+                    "question": "Question 3 of 3: What is needed to start a community men's group?",
+                    "options": [
+                        "A) A large budget and NGO registration",
+                        "B) A government permit",
+                        "C) Intention, consistency, and even just 2-3 men to start",
+                        "D) At least 50 members"
+                    ],
+                    "answer": "C",
+                    "feedback": "Correct. Segun started with five friends under a mango tree. What matters is beginning — and staying consistent."
+                }
+            ]
         },
         {
             "module_id": "module_10",
@@ -311,16 +536,41 @@
                     "content": "Movements die when people burn out or lose focus. Sustainability requires intention.\n\nHow to sustain your commitment: Keep your \"why\" close — revisit why you started. Celebrate small wins — change is slow; progress is worth celebrating. Rest — you cannot pour from an empty cup. Build systems, not just events — regular meetings, shared responsibilities. Bring in new voices — especially younger men. Document your impact.\n\nThe work is long. But it is worth it."
                 }
             ],
-            "quiz": {
-                "question": "Why do networks matter in social change work?",
-                "options": [
-                    "A) They make individuals look more important",
-                    "B) They multiply impact, provide accountability and reduce isolation",
-                    "C) They are mainly useful for fundraising",
-                    "D) Only large networks matter"
-                ],
-                "answer": "B"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: Why do networks matter in social change work?",
+                    "options": [
+                        "A) They make individuals look more important",
+                        "B) They multiply impact, provide accountability and reduce isolation",
+                        "C) They are mainly useful for fundraising",
+                        "D) Only large networks matter"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. Networks amplify what individuals cannot do alone — they share resources, build resilience, and carry the message further."
+                },
+                {
+                    "question": "Question 2 of 3: Collaboration over competition means:",
+                    "options": [
+                        "A) Allowing only one organisation to lead all GBV work",
+                        "B) Supporting other men's and organisations' work rather than competing with it",
+                        "C) Only working with people from your own tribe or religion",
+                        "D) Taking credit for all progress"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. The problem is too large for competition. Collaboration multiplies impact and builds a stronger, broader movement."
+                },
+                {
+                    "question": "Question 3 of 3: To sustain a movement long-term, you should:",
+                    "options": [
+                        "A) Work as hard as possible without stopping",
+                        "B) Focus only on big events and campaigns",
+                        "C) Build systems, celebrate wins, rest, and bring in new voices",
+                        "D) Keep the core group small and exclusive"
+                    ],
+                    "answer": "C",
+                    "feedback": "Exactly right. Sustainability requires systems, rest, and renewal — not just passion. Burn-out is the enemy of long-term change."
+                }
+            ]
         },
         {
             "module_id": "module_11",
@@ -343,16 +593,41 @@
                     "content": "If someone is experiencing abuse, knowing where to report can save a life. In Nigeria, key referral channels include:\n\n1. NAPTIP (National Agency for the Prohibition of Trafficking in Persons) - handles violence against persons.\n2. Family Support Units (FSUs) at designated police stations.\n3. Human Rights Commissions and local NGOs providing legal aid and shelters.\n\nAs an ally, your role is to share these resources, support the survivor's choices, and help them contact authorities safely."
                 }
             ],
-            "quiz": {
-                "question": "Which of the following is TRUE under the VAPP Act in Nigeria?",
-                "options": [
-                    "A) Domestic violence is a private family matter",
-                    "B) Spousal violence is a criminal offense and marriage is not an excuse",
-                    "C) The police cannot interfere in marital disputes",
-                    "D) Only physical violence is criminalized"
-                ],
-                "answer": "B"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: Which of the following is TRUE under the VAPP Act in Nigeria?",
+                    "options": [
+                        "A) Domestic violence is a private family matter",
+                        "B) Spousal violence is a criminal offense and marriage is not an excuse",
+                        "C) The police cannot interfere in marital disputes",
+                        "D) Only physical violence is criminalized"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct! The VAPP Act criminalizes spousal violence, and marriage is never a shield for abuse under Nigerian law."
+                },
+                {
+                    "question": "Question 2 of 3: What right do SGBV survivors have under the VAPP Act?",
+                    "options": [
+                        "A) The right to be blamed for provoking the abuse",
+                        "B) The right to seek protection orders and get medical support",
+                        "C) No rights until the court finishes the case",
+                        "D) Only the right to pay the police to investigate"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct! Survivors have the legal right to seek protection orders, obtain medical/psychological support, and have their privacy protected."
+                },
+                {
+                    "question": "Question 3 of 3: Which agency in Nigeria is specifically tasked with handling violence against persons (such as SGBV)?",
+                    "options": [
+                        "A) EFCC",
+                        "B) NAPTIP",
+                        "C) NIS",
+                        "D) Federal Road Safety Corps (FRSC)"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct! NAPTIP (National Agency for the Prohibition of Trafficking in Persons) handles the enforcement of the VAPP Act."
+                }
+            ]
         },
         {
             "module_id": "module_12",
@@ -375,16 +650,41 @@
                     "content": "Commitment without accountability fades. Accountability keeps commitment alive.\n\nYour accountability tools: Your accountability buddy (check in weekly). The Brothers' Room community group (share your progress). Your personal action plan (review every Sunday). The bot (it will remind you of your pledge weekly for the next month).\n\nYour public pledge: \"I, [your name], commit to [specific action]. I will do this because I believe [your reason]. I will be held accountable by [name of person or group].\"\n\nThis pledge is yours. But it belongs to your community too. Post it in the group. Say it out loud. Mean it.\n\nWelcome to the Brotherhood of Change Agents."
                 }
             ],
-            "quiz": {
-                "question": "A personal action plan should include:",
-                "options": [
-                    "A) Only one big goal",
-                    "B) Daily, weekly, and long-term commitments",
-                    "C) A list of other people who need to change",
-                    "D) Only things you are already doing"
-                ],
-                "answer": "B"
-            }
+            "quiz": [
+                {
+                    "question": "Question 1 of 3: A personal action plan should include:",
+                    "options": [
+                        "A) Only one big goal",
+                        "B) Daily, weekly, and long-term commitments",
+                        "C) A list of other people who need to change",
+                        "D) Only things you are already doing"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. A strong action plan works at all levels — small daily habits, consistent weekly practices, and ambitious long-term commitments. All three are needed."
+                },
+                {
+                    "question": "Question 2 of 3: Why is public accountability important?",
+                    "options": [
+                        "A) To show off to others",
+                        "B) To keep commitment alive and create social support for your goals",
+                        "C) Because private commitments never work",
+                        "D) It is not important — private commitments are enough"
+                    ],
+                    "answer": "B",
+                    "feedback": "Correct. Public pledges create social accountability — the knowledge that others are watching motivates consistency, and community support sustains long-term change."
+                },
+                {
+                    "question": "Question 3 of 3: Completing this course means:",
+                    "options": [
+                        "A) You are now perfect and done with learning",
+                        "B) You have the information — now the work of applying it begins",
+                        "C) You can teach others without continuing to learn yourself",
+                        "D) Your responsibility ended with Module 12"
+                    ],
+                    "answer": "B",
+                    "feedback": "Exactly right. The course is the beginning, not the destination. The real work happens in your daily choices, your relationships, and your community — starting now."
+                }
+            ]
         }
     ]
 }

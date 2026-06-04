@@ -652,5 +652,16 @@ def get_all_learner_reflections(user_id):
     conn.close()
     return rows
 
+def reset_learner_data(user_id):
+    """Completely wipe a learner's progress, reflections, and reminders/pledges."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("DELETE FROM learners WHERE user_id = %s", (user_id,))
+    cursor.execute("DELETE FROM reflections WHERE user_id = %s", (user_id,))
+    cursor.execute("DELETE FROM reminders WHERE user_id = %s", (user_id,))
+    conn.commit()
+    conn.close()
+
+
 
 
