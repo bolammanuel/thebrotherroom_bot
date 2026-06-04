@@ -784,5 +784,98 @@
     "ha": "Ci gaba zuwa Darasi na Gaba ➡️",
     "yo": "Tẹsiwaju si Ẹkọ Ti o Kàn ➡️",
     "ig": "Gaba n'Ihe Ọmụmụ Ọzọ ➡️"
+  },
+  "quote_cards": {
+    "module_1": {
+      "en": "You were born male. Being a man was taught to you. And anything that was taught can be learned differently.",
+      "pcm": "Na male dem born you. But how to be man na wetin dem teach you. And anything wey dem teach person, he fit learn am another way.",
+      "ha": "An haife ka a matsayin namiji. Amma an koya maka yadda ake zama namiji. Kuma duk abin da aka koya za a iya sake koyonsa ta wata hanyar.",
+      "yo": "A bi ọ ni ọkunrin. Wọn kọ ọ bi o ṣe le jẹ ọkunrin. Ati ohunkohun ti a ba kọ ni a le kọ ni ọna miiran.",
+      "ig": "A mụrụ gị dị ka nwoke. Mana a kụziiri gị otu esi abụ nwoke. Kandi ihe ọ bụla a kụziiri gị, a pụrụ ịmụta ya n'ụzọ ọzọ."
+    },
+    "module_2": {
+      "en": "Toxic masculinity does not make you more of a man. It makes you less of a human.",
+      "pcm": "Toxic masculinity no dey make you more of a man. E dey make you less of a human being.",
+      "ha": "Halayen mazantaka na cutarwa ba sa sa ka zama cikakken namiji. Suna rage maka mutuntaka ne kawai.",
+      "yo": "Iwa ọkunrin ti ko daa ko sọ ọ di ọkunrin gidi. O n dinku rẹ bi eniyan.",
+      "ig": "Omume nwoke na-adịghị mma anaghị eme ka ị bụrụ nwoke karị. Ọ na-eme ka ị ghara ịbụ ezigbo mmadụ."
+    },
+    "module_3": {
+      "en": "SGBV is not a woman's problem. It is a human problem. And it will take human beings — especially men — to end it.",
+      "pcm": "SGBV no be only women problem. Na human problem. Kuma e go need human beings—especially men—to stop am.",
+      "ha": "Rikicin jinsi ba matsalar mata ce kadai ba. Matsalar bil'adama ce. Kuma yana bukatar mutane—musamman maza—don kawo karshenta.",
+      "yo": "Iwa-ipa jọmọ ẹya kii ṣe iṣoro obinrin nikan. Iṣoro eniyan ni. Yio si gba eniyan—paapaa awọn ọkunrin—lati fi opin si i.",
+      "ig": "Mmegbu nwoke na nwanyị abụghị naanị nsogbu ụmụ nwanyị. Ọ bụ nsogbu mmadụ nile. Ọ ga-ewe kwa mmadụ—karịsịa ndị ikom—iji kwụsị ya."
+    },
+    "module_4": {
+      "en": "Violence is not caused by anger. It is caused by the belief that one person has power over another.",
+      "pcm": "No be vex dey cause violence. Na when person believe say he get power pass another person.",
+      "ha": "Ba fushi ne ke kawo rikici ba. Yardar da mutum yake da ita cewa yana da iko a kan wani ne ke kawowa.",
+      "yo": "Kii ṣe ibinu lo n fa iwa-ipa. O n waye nitori igbagbo pe eniyan kan ni agbara lori ẹlomiiran.",
+      "ig": "Ọ bụghị iwe na-ebute ime ihe ike. Ọ bụ n'ihi nkwenye na otu onye nwere ikike n'elu onye ọzọ."
+    },
+    "module_5": {
+      "en": "Being a good man is not enough. We need men who are actively good — who speak, act, and stand up even when it's uncomfortable.",
+      "pcm": "To just be good man no do. We need men wey dey do good things—wey dey speak out, dey act, and dey stand up even when e hard.",
+      "ha": "Zama mutumin kirki kadai bai wadatar ba. Muna bukatar maza masu fafutukar alheri—wadanda ke magana, aiki, da tsayawa ko da a lokatim wahala.",
+      "yo": "Lati jẹ ọkunrin rere kọ to. A nilo awọn ọkunrin ti nṣe rere ni gbangba—ti wọn n sọrọ, n ṣe nkan, ti wọn si n dide duro paapaa nigbati ko rọrun.",
+      "ig": "Ịbụ ezigbo nwoke ezughị. Anyị chọrọ ndị ikom na-eme ezigbo ihe—ndị na-ekwu okwu, na-eme ihe, ma na-eguzo ọtọ ọbụlagodi mgbe ọ na-adịghị mfe."
+    },
+    "module_6": {
+      "en": "Respect is not weakness. It is the foundation of every strong relationship.",
+      "pcm": "Respect no be weakness. Na the foundation wey strong relationship stand on.",
+      "ha": "Girmamawa ba rauni ba ne. Shi ne harsashin kowace kyakkyawar dangantaka.",
+      "yo": "Ọwọ kii ṣe ailera. O jẹ ipilẹ ti gbogbo ibatan to lagbara.",
+      "ig": "Nkwanye ùgwù abụghị adịghị ike. Ọ bụ ntọala nke mmekọrịta ọ bụla siri ike."
+    },
+    "module_7": {
+      "en": "Silence is not safety. Your voice, your action — however small — can save a life.",
+      "pcm": "To keep quiet no mean say you dey safe. Your voice and your action—no matter how e small—fit save life.",
+      "ha": "Yin shiru ba aminci ba ne. Muryarka, aikinka—ko da kankane ne—na iya ceton rai.",
+      "yo": "Idakẹjẹ kii ṣe aabo. Ohun rẹ, iṣe rẹ—bi o ti wu ki o kere to—le gba ẹmi là.",
+      "ig": "Ịgbachi nkịtị abụghị nchekwa. Olu gị, omume gị—ọ bụrụgodị na ọ dị obere—nwere ike ịzọpụta ndụ."
+    },
+    "module_8": {
+      "en": "Your friends follow your lead more than you know. Lead well.",
+      "pcm": "Your friends dey follow your hand pass wetin you think. Lead them well.",
+      "ha": "Abokanka suna bin jagorancinka fiye da yadda kake tsammani. Jagoranci da kyau.",
+      "yo": "Awọn ọrẹ rẹ n tẹle igbesẹ rẹ ju bi o ti mọ lọ. Rìn ọna rere.",
+      "ig": "Ndị enyi gị na-agbaso ụzọ gị karịa ka ị maara. Duga ha nke ọma."
+    },
+    "module_9": {
+      "en": "Change does not start in government. It starts in your compound, your mosque, your church, your friend group.",
+      "pcm": "Change no dey start from government. E dey start from your compound, your mosque, your church, and among your friends.",
+      "ha": "Canji ba ya farawa daga gwamnati. Yana farawa ne daga cikin gidanku, masallacinku, cocinku, da rukunin abokanku.",
+      "yo": "Iyipada kii bẹrẹ lati ọdọ ijọba. O n bẹrẹ lati agbala rẹ, mọṣalasi rẹ, ṣọọṣi rẹ, ati ẹgbẹ ọrẹ rẹ.",
+      "ig": "Mgbanwe anaghị amalite n'aka gọọmentị. Ọ na-amalite n'ogige gị, n'ụlọ alakuba gị, n'ụlọ ụka gị, na n'etiti ndị enyi gị."
+    },
+    "module_10": {
+      "en": "Alone you walk fast. Together you walk far.",
+      "pcm": "If you waka alone, you go run fast. But if we waka together, we go waka go far.",
+      "ha": "Kai kadai za ka iya tafiya da sauri. Amma tare za mu iya tafiya mai nisa.",
+      "yo": "Nikan o le rin yara. Ṣugbọn papọ a le rin jinna.",
+      "ig": "Naanị gị, ị ga-aga ọsọ ọsọ. Mana anyị nọ n'otu, anyị ga-aga ebe dị anya."
+    },
+    "module_11": {
+      "en": "Justice is not a favor. It is a right. Protect the vulnerable, know the law, and speak up for justice.",
+      "pcm": "Justice no be favor. Na right. Protect those wey no get power, know the law, and speak up for justice.",
+      "ha": "Shari'a ba alfarma ba ce. Hakki ne. Kare marasa karfi, san doka, kuma yi magana don tabbatar da adalci.",
+      "yo": "Idajọ kii ṣe oore-ọfẹ. Ẹtọ ni. Dabobo awọn alailagbara, mọ ofin, ki o si sọrọ fun idajọ.",
+      "ig": "Ikpe nkwụmọtọ abụghị amara. Ọ bụ ikike. Chebe ndị na-enweghị enyemaka, mara iwu, ma kwuo okwu maka ikpe nkwụmọtọ."
+    },
+    "module_12": {
+      "en": "The course ends today. The work begins tomorrow. And it begins with you.",
+      "pcm": "The course don end today. But the work dey start tomorrow. And e dey start with you.",
+      "ha": "Darasin ya kare yau. Aikin yana farawa gobe. Kuma yana farawa ne da kai.",
+      "yo": "Eko yii pari loni. Iṣẹ n bẹrẹ lọla. Ati pe o bẹrẹ pẹlu rẹ.",
+      "ig": "Akwụkwọ a agwụla taa. Ọrụ a na-amalite echi. Ọ na-amalitekwa n'ahụ gị."
+    }
+  },
+  "quote_card_share_message": {
+    "en": "I just completed Module {module_num} of The Brothers' Room course! Here is a key lesson: \"{quote}\"\n\nJoin the movement for healthy masculinity here: https://t.me/thebrotherroom_bot",
+    "pcm": "I just finish Module {module_num} for The Brothers' Room course! See this correct lesson: \"{quote}\"\n\nJoin the movement for healthy masculinity here: https://t.me/thebrotherroom_bot",
+    "ha": "Na kammala Modul {module_num} na darasin The Brothers' Room! Ga wani muhimmin darasi: \"{quote}\"\n\nShiga cikin wannan shiri domin inganta rayuwar maza a nan: https://t.me/thebrotherroom_bot",
+    "yo": "Mo ṣẹṣẹ pari Modulu {module_num} ti ẹkọ The Brothers' Room! Eyi ni ẹkọ pataki kan: \"{quote}\"\n\nDarapọ mọ ẹgbẹ fun idagbasoke awọn ọkunrin nibi: https://t.me/thebrotherroom_bot",
+    "ig": "Agụchala m Modul {module_num} na The Brothers' Room! Nke a bụ ihe ọmụmụ dị mkpa: \"{quote}\"\n\nSoro anyị n'ije maka ịkwado ụmụ nwoke ebe a: https://t.me/thebrotherroom_bot"
   }
 }

@@ -707,8 +707,61 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     reply_markup=get_main_menu_buttons(lang, user_id=user_id)
                 )
 
-            # If this is last lesson, prompt for quiz
+            # If this is last lesson, prompt for quiz and send quote card
             if is_last_lesson_of_module(next_module_id, next_lesson_id):
+                # Send quote card image card
+                quote_cards_trans = TRANSLATIONS.get("quote_cards", {}).get(next_module_id, {})
+                quote_text = quote_cards_trans.get(lang, quote_cards_trans.get("en", ""))
+                
+                quote_card_file = None
+                if quote_text:
+                    try:
+                        quote_card_file = generate_quote_card_image(next_module_id, module['title'], quote_text, lang, user_id)
+                        
+                        import urllib.parse
+                        module_num = next_module_id.replace("module_", "")
+                        raw_share_msg = get_text("quote_card_share_message", lang, module_num=module_num, quote=quote_text)
+                        encoded_msg = urllib.parse.quote(raw_share_msg)
+                        
+                        whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
+                        twitter_url = f"https://twitter.com/intent/tweet?text={encoded_msg}"
+                        telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_msg}"
+                        
+                        share_keyboard = InlineKeyboardMarkup([
+                            [
+                                InlineKeyboardButton(get_text("share_whatsapp", lang), url=whatsapp_url),
+                                InlineKeyboardButton(get_text("share_x", lang), url=twitter_url)
+                            ],
+                            [
+                                InlineKeyboardButton(get_text("share_telegram", lang), url=telegram_url)
+                            ]
+                        ])
+                        
+                        caption_text = {
+                            "en": "🖼 *Here is your Shareable Quote Card for Module {num}!* Save this to your gallery and share it to your WhatsApp Status, Facebook, or Instagram to inspire other young men.",
+                            "pcm": "🖼 *See your Shareable Quote Card for Module {num}!* Save am to your phone and share am on WhatsApp Status, Facebook, or Instagram make you inspire other men.",
+                            "ha": "🖼 *Ga Katin Tunaninku na Raba don Modul {num}!* Adana shi a cikin gallery dinku kuma ku raba shi a WhatsApp Status, Facebook, ko Instagram don zaburar da sauran maza.",
+                            "yo": "🖼 *Eyi ni Kaadi Iṣaro rẹ fun Modulu {num}!* Fi pamọ si ibi aworan rẹ ki o pin lori WhatsApp Status, Facebook, tabi Instagram lati fun awọn ọkunrin miiran ni iyanju.",
+                            "ig": "🖼 *Nke a bụ Kaadị Ntụgharị uche gị maka Modul {num}!* Chekwaa ya na gallery gị ma kọrọ ya na WhatsApp Status, Facebook, ma ọ bụ Instagram ka ị kpalie ndị ikom ọzọ."
+                        }.get(lang, "Here is your shareable quote card!").format(num=module_num)
+                        
+                        chat_msg = update.callback_query.message if update.callback_query else update.message
+                        with open(quote_card_file, "rb") as q_photo:
+                            await chat_msg.reply_photo(
+                                photo=q_photo,
+                                caption=caption_text,
+                                reply_markup=share_keyboard,
+                                parse_mode="Markdown"
+                            )
+                    except Exception as e:
+                        logger.error(f"Error generating or sending quote card: {e}")
+                    finally:
+                        if quote_card_file and os.path.exists(quote_card_file):
+                            try:
+                                os.remove(quote_card_file)
+                            except Exception:
+                                pass
+                                
                 await send_reply(
                     update,
                     get_text("lessons_complete", lang, module_title=module['title']),
@@ -1026,6 +1079,130 @@ async def grade_post_test(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
             [InlineKeyboardButton(retry_label, callback_data="posttest_start")]
         ])
         await send_reply(update, failed_text, reply_markup=keyboard)
+
+def generate_quote_card_image(module_id, module_title, quote_text, lang, user_id):
+    """Generate a highly aesthetic, premium, 1080x1080 shareable quote card for a module using Pillow."""
+    from PIL import Image, ImageDraw, ImageFont
+    import os
+    
+    width, height = 1080, 1080
+    
+    # 1. Create linear gradient background
+    img = Image.new("RGBA", (width, height))
+    draw = ImageDraw.Draw(img)
+    
+    color1 = (15, 32, 67) # Premium Navy Blue
+    color2 = (25, 25, 25) # Dark Charcoal
+    for y in range(height):
+        r = int(color1[0] + (color2[0] - color1[0]) * y / height)
+        g = int(color1[1] + (color2[1] - color1[1]) * y / height)
+        b = int(color1[2] + (color2[2] - color1[2]) * y / height)
+        draw.line([(0, y), (width, y)], fill=(r, g, b, 255))
+        
+    # 2. Draw elegant gold border line
+    draw.rectangle([45, 45, width - 45, height - 45], outline=(219, 161, 71, 255), width=3)
+    
+    # 3. Load typography
+    assets_dir = "assets"
+    fonts_dir = os.path.join(assets_dir, "fonts")
+    try:
+        font_header = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 26)
+        font_subheader = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 20)
+        font_quote = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 38)
+        font_quote_large = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 140)
+        font_footer = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 20)
+    except Exception as e:
+        logger.error(f"Quote card font loading error: {e}, falling back to defaults")
+        font_header = font_subheader = font_quote = font_footer = ImageFont.load_default()
+        font_quote_large = ImageFont.load_default()
+
+    def get_text_size(text, font):
+        if hasattr(font, "getbbox"):
+            bbox = font.getbbox(text)
+            return bbox[2] - bbox[0], bbox[3] - bbox[1]
+        else:
+            return font.getsize(text)
+
+    # 4. Header & Subheader text
+    header_text = "T H E   B R O T H E R S '   R O O M"
+    draw.text((width // 2, 100), header_text, fill=(219, 161, 71, 255), font=font_header, anchor="mm")
+    
+    module_num = module_id.replace("module_", "")
+    subheader_text = f"MODULE {module_num} : {module_title.upper()}"
+    draw.text((width // 2, 145), subheader_text, fill=(245, 240, 230, 255), font=font_subheader, anchor="mm")
+    
+    # 5. Divider Line
+    draw.line([(width // 2 - 250, 185), (width // 2 + 250, 185)], fill=(219, 161, 71, 255), width=2)
+    
+    # 6. Word-wrapping for quote text
+    max_text_width = 800
+    words = quote_text.split()
+    lines = []
+    current_line = []
+    for word in words:
+        test_line = " ".join(current_line + [word])
+        w, h = get_text_size(test_line, font_quote)
+        if w <= max_text_width:
+            current_line.append(word)
+        else:
+            if current_line:
+                lines.append(" ".join(current_line))
+                current_line = [word]
+            else:
+                lines.append(word)
+                current_line = []
+    if current_line:
+        lines.append(" ".join(current_line))
+        
+    # Calculate text rendering Y coordinates
+    line_heights = [get_text_size(line, font_quote)[1] for line in lines]
+    line_spacing = 20
+    total_text_height = sum(line_heights) + line_spacing * (len(lines) - 1)
+    
+    area_center_y = 540
+    start_y = area_center_y - (total_text_height // 2)
+    
+    # 7. Draw large background quote mark (open quote)
+    draw.text((90, start_y - 80), "“", fill=(219, 161, 71, 35), font=font_quote_large)
+    
+    # 8. Draw each quote line centered horizontally
+    current_y = start_y
+    for i, line in enumerate(lines):
+        line_w, line_h = get_text_size(line, font_quote)
+        draw.text((width // 2, current_y + (line_h // 2)), line, fill=(245, 240, 230, 255), font=font_quote, anchor="mm")
+        current_y += line_h + line_spacing
+        
+    # Draw closing quote mark at the end of the text
+    draw.text((width - 180, current_y - 40), "”", fill=(219, 161, 71, 35), font=font_quote_large)
+    
+    # 9. Footer text
+    footer_text = "Join the conversation: t.me/thebrotherroom_bot"
+    draw.text((width // 2, 975), footer_text, fill=(219, 161, 71, 255), font=font_footer, anchor="mm")
+    
+    # 10. Paste Logos in bottom corners
+    def paste_logo(filename, x, y, target_w, align_right=False):
+        path = os.path.join(assets_dir, filename)
+        if os.path.exists(path):
+            try:
+                logo = Image.open(path).convert("RGBA")
+                aspect = logo.height / logo.width
+                target_h = int(target_w * aspect)
+                logo = logo.resize((target_w, target_h), Image.Resampling.LANCZOS)
+                
+                final_x = x - target_w if align_right else x
+                final_y = y - (target_h // 2)
+                img.paste(logo, (final_x, final_y), logo)
+            except Exception as e:
+                logger.error(f"Error pasting logo {filename}: {e}")
+                
+    paste_logo("youthhub_africa_logo.png", 90, 975, target_w=85)
+    paste_logo("young_mens_foundation_logo.png", 990 - 85, 975, target_w=85)
+    
+    # Save PNG image
+    output_path = f"assets/quote_card_{module_id}_{user_id}.png"
+    final_img = img.convert("RGB")
+    final_img.save(output_path, "PNG")
+    return output_path
 
 def generate_certificate_image(name, date_str, user_id):
     """Generate a highly aesthetic, premium, high-resolution certificate of completion using Pillow."""
