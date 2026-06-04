@@ -259,11 +259,36 @@
           "ig": "Kedu ihe bụ isi njirimara nke ezigbo nwoke?"
         },
         "options": {
-          "en": ["A) Suppressing emotions to appear strong", "B) Empathy, respect, and emotional intelligence", "C) Dominating conversations in relationships", "D) Ignoring gender stereotypes completely"],
-          "pcm": ["A) Force clear emotions down to show power", "B) Empathy, respect, and emotional intelligence", "C) Command talk for inside relationship", "D) Leave gender talk completely"],
-          "ha": ["A) Boye bacin rai don nuna karfi", "B) Jin kai, girmamawa da wayewar kai", "C) Mulki a cikin zamantakewa", "D) Kyalewa batun maza da mata kwata-kwata"],
-          "yo": ["A) Mimu ibinu pam lati farahan bi alagbara", "B) Aanu, owo, ati emotional intelligence", "C) Jije olori ninu ibaraẹnisọrọ ibasepọ", "D) Gbigbagbe awon igbagbo ti ko to"],
-          "ig": ["A) Ichebe iwe onwe anyi ka anyi di ike", "B) Ebere, ugwu, na emotional intelligence", "C) Iburu onye isi n'ihe omume obodo", "D) Ileghara uzo oche nwoke na nwanyị anya"]
+          "en": [
+            "A) Suppressing emotions to appear strong",
+            "B) Empathy, respect, and emotional intelligence",
+            "C) Dominating conversations in relationships",
+            "D) Ignoring gender stereotypes completely"
+          ],
+          "pcm": [
+            "A) Force clear emotions down to show power",
+            "B) Empathy, respect, and emotional intelligence",
+            "C) Command talk for inside relationship",
+            "D) Leave gender talk completely"
+          ],
+          "ha": [
+            "A) Boye bacin rai don nuna karfi",
+            "B) Jin kai, girmamawa da wayewar kai",
+            "C) Mulki a cikin zamantakewa",
+            "D) Kyalewa batun maza da mata kwata-kwata"
+          ],
+          "yo": [
+            "A) Mimu ibinu pam lati farahan bi alagbara",
+            "B) Aanu, owo, ati emotional intelligence",
+            "C) Jije olori ninu ibaraẹnisọrọ ibasepọ",
+            "D) Gbigbagbe awon igbagbo ti ko to"
+          ],
+          "ig": [
+            "A) Ichebe iwe onwe anyi ka anyi di ike",
+            "B) Ebere, ugwu, na emotional intelligence",
+            "C) Iburu onye isi n'ihe omume obodo",
+            "D) Ileghara uzo oche nwoke na nwanyị anya"
+          ]
         },
         "answer": "B"
       },
@@ -276,11 +301,36 @@
           "ig": "Kedu nke na-abụghị ụdị ime ihe ike dabere na nwoke na nwanyị (GBV)?"
         },
         "options": {
-          "en": ["A) Denying a partner financial autonomy", "B) Unwanted comments or sexual advances in public", "C) Disagreeing respectfully with someone's opinion", "D) Forcing a spouse into sexual acts against their will"],
-          "pcm": ["A) Gbanzari partner make e no hold money", "B) Slut-shaming or touch touching for public", "C) Argument wey respect dey inside", "D) Force spouse into sexual acts against their will"],
-          "ha": ["A) Hana abokin zama ikon kudi na kansa", "B) Kalaman cin zarafi ko taba mutum a fili", "C) Sabani cikin girmamawa da ra'ayin wani", "D) Tursasa abokin zama yin jima'i da karfi"],
-          "yo": ["A) Kiko lati fun alabaṣepọ ni ominira owo", "B) Oro tabi ifẹkufẹ ibalopo ni gbangba", "C) Gbigba iyatọ ti o tọ pẹlu ero eniyan", "D) Fi agbara mu alabaṣepọ si ibalopo lai fẹ"],
-          "ig": ["A) Ikwusi onye otu gi inweta ego nke ya", "B) Okwu ruru arụ ma ọ bụ mkpasu iwe n'ihu ọha", "C) Esemokwu nwere ugwu na echiche mmadụ", "D) Iji ike manye di ma ọ bụ nwunye n'omume mmekọahụ"]
+          "en": [
+            "A) Denying a partner financial autonomy",
+            "B) Unwanted comments or sexual advances in public",
+            "C) Disagreeing respectfully with someone's opinion",
+            "D) Forcing a spouse into sexual acts against their will"
+          ],
+          "pcm": [
+            "A) Gbanzari partner make e no hold money",
+            "B) Slut-shaming or touch touching for public",
+            "C) Argument wey respect dey inside",
+            "D) Force spouse into sexual acts against their will"
+          ],
+          "ha": [
+            "A) Hana abokin zama ikon kudi na kansa",
+            "B) Kalaman cin zarafi ko taba mutum a fili",
+            "C) Sabani cikin girmamawa da ra'ayin wani",
+            "D) Tursasa abokin zama yin jima'i da karfi"
+          ],
+          "yo": [
+            "A) Kiko lati fun alabaṣepọ ni ominira owo",
+            "B) Oro tabi ifẹkufẹ ibalopo ni gbangba",
+            "C) Gbigba iyatọ ti o tọ pẹlu ero eniyan",
+            "D) Fi agbara mu alabaṣepọ si ibalopo lai fẹ"
+          ],
+          "ig": [
+            "A) Ikwusi onye otu gi inweta ego nke ya",
+            "B) Okwu ruru arụ ma ọ bụ mkpasu iwe n'ihu ọha",
+            "C) Esemokwu nwere ugwu na echiche mmadụ",
+            "D) Iji ike manye di ma ọ bụ nwunye n'omume mmekọahụ"
+          ]
         },
         "answer": "C"
       },
@@ -293,11 +343,36 @@
           "ig": "Kedu ihe kacha mkpa na nkwenye doro anya?"
         },
         "options": {
-          "en": ["A) The absence of a clear 'No' from the partner", "B) A silent agreement based on standard social rules", "C) An active, ongoing, freely-given, and reversible 'Yes'", "D) Agreeing once at the start of a relationship"],
-          "pcm": ["A) Say partner no say 'No' directly", "B) Keep quiet follow what dey happen", "C) Active, ongoing, freely-given, and reversible 'Yes'", "D) Say 'Yes' only once for beginning of love"],
-          "ha": ["A) Rashin fadin 'A'a' a fili daga abokin zama", "B) Shiru da ke nuna yarda bisa ka'ida", "C) Ee mai aiki, mai dorewa, wadda aka bayar kyauta", "D) Yarda sau daya kawai a farkon soyayya"],
-          "yo": ["A) Aisi 'Bẹ́ẹ̀ kọ́' ti o han gbangba lati ọdọ alabaṣepọ", "B) Adehun lẹnu lai sọrọ", "C) Bẹ́ẹ̀ ni ti o gbona, ti o tẹsiwaju, ti ominira", "D) Gbigba lẹkan ṣoṣo ni ibẹrẹ ibatan"],
-          "ig": ["A) Enweghị 'Mba' doro anya sitere na onye ọzọ", "B) Nkwekọrịta dị jụụ dabere na omenala", "C) Ee dị iru, na-aga n'ihu, n'efu, na nke enwere ike ịgbanwe", "D) Ikwu ee otu ugboro ná mmalite mmekọrịta"]
+          "en": [
+            "A) The absence of a clear 'No' from the partner",
+            "B) A silent agreement based on standard social rules",
+            "C) An active, ongoing, freely-given, and reversible 'Yes'",
+            "D) Agreeing once at the start of a relationship"
+          ],
+          "pcm": [
+            "A) Say partner no say 'No' directly",
+            "B) Keep quiet follow what dey happen",
+            "C) Active, ongoing, freely-given, and reversible 'Yes'",
+            "D) Say 'Yes' only once for beginning of love"
+          ],
+          "ha": [
+            "A) Rashin fadin 'A'a' a fili daga abokin zama",
+            "B) Shiru da ke nuna yarda bisa ka'ida",
+            "C) Ee mai aiki, mai dorewa, wadda aka bayar kyauta",
+            "D) Yarda sau daya kawai a farkon soyayya"
+          ],
+          "yo": [
+            "A) Aisi 'Bẹ́ẹ̀ kọ́' ti o han gbangba lati ọdọ alabaṣepọ",
+            "B) Adehun lẹnu lai sọrọ",
+            "C) Bẹ́ẹ̀ ni ti o gbona, ti o tẹsiwaju, ti ominira",
+            "D) Gbigba lẹkan ṣoṣo ni ibẹrẹ ibatan"
+          ],
+          "ig": [
+            "A) Enweghị 'Mba' doro anya sitere na onye ọzọ",
+            "B) Nkwekọrịta dị jụụ dabere na omenala",
+            "C) Ee dị iru, na-aga n'ihu, n'efu, na nke enwere ike ịgbanwe",
+            "D) Ikwu ee otu ugboro ná mmalite mmekọrịta"
+          ]
         },
         "answer": "C"
       },
@@ -310,11 +385,36 @@
           "ig": "Ọ bụrụ na enyi gị emee egwuregwu mkparị ma ọ bụ nke na-emerụ ahụ na nkata otu, kedu ihe kacha mma ịme?"
         },
         "options": {
-          "en": ["A) Say nothing to avoid starting an argument", "B) Speak out or privately message them to explain why the joke is harmful", "C) Laugh along with the group to maintain peace", "D) Report them to the police immediately without speaking to them"],
-          "pcm": ["A) Keep quiet make argument no start", "B) Speak out or dm them make they know say bad joke be that", "C) Laugh along make peace dey", "D) Call police report am sharply"],
-          "ha": ["A) Yin shiru don guje wa sabani", "B) Yin magana a fili ko aika sako na sirri don bayyana illar hakan", "C) Dariya tare da sauran don kiyaye zaman lafiya", "D) Kai kararsa ga 'yan sanda ba tare da yi masa magana ba"],
-          "yo": ["A) Mase sọ ohunkohun lati yago fun ariyanjiyan", "B) Sọrọ tabi fi ifiranṣẹ ranṣẹ si wọn lati ṣalaye idi ti awada naa fi lewu", "C) Rẹrin pẹlu ẹgbẹ lati ṣetọju alaafia", "D) Jabo wọn si ọlọpa lẹsẹkẹsẹ lai sọrọ pẹlu wọn"],
-          "ig": ["A) Agwala ihe ọ bụla ka ịzenarị esemokwu", "B) Kwuo okwu ma ọ bụ zitere ha ozi na nzuzo iji kọwaa ihe kpatara egwuregwu ahụ ji dị njọ", "C) Soro ndị ọzọ chịa ọchị ka udo dị", "D) Kọọrọ ndị uwe ojii ozugbo na-agwaghị ha okwu"]
+          "en": [
+            "A) Say nothing to avoid starting an argument",
+            "B) Speak out or privately message them to explain why the joke is harmful",
+            "C) Laugh along with the group to maintain peace",
+            "D) Report them to the police immediately without speaking to them"
+          ],
+          "pcm": [
+            "A) Keep quiet make argument no start",
+            "B) Speak out or dm them make they know say bad joke be that",
+            "C) Laugh along make peace dey",
+            "D) Call police report am sharply"
+          ],
+          "ha": [
+            "A) Yin shiru don guje wa sabani",
+            "B) Yin magana a fili ko aika sako na sirri don bayyana illar hakan",
+            "C) Dariya tare da sauran don kiyaye zaman lafiya",
+            "D) Kai kararsa ga 'yan sanda ba tare da yi masa magana ba"
+          ],
+          "yo": [
+            "A) Mase sọ ohunkohun lati yago fun ariyanjiyan",
+            "B) Sọrọ tabi fi ifiranṣẹ ranṣẹ si wọn lati ṣalaye idi ti awada naa fi lewu",
+            "C) Rẹrin pẹlu ẹgbẹ lati ṣetọju alaafia",
+            "D) Jabo wọn si ọlọpa lẹsẹkẹsẹ lai sọrọ pẹlu wọn"
+          ],
+          "ig": [
+            "A) Agwala ihe ọ bụla ka ịzenarị esemokwu",
+            "B) Kwuo okwu ma ọ bụ zitere ha ozi na nzuzo iji kọwaa ihe kpatara egwuregwu ahụ ji dị njọ",
+            "C) Soro ndị ọzọ chịa ọchị ka udo dị",
+            "D) Kọọrọ ndị uwe ojii ozugbo na-agwaghị ha okwu"
+          ]
         },
         "answer": "B"
       },
@@ -327,11 +427,36 @@
           "ig": "Kedu ihe ọ pụtara na nwoke na-eto eto bụ ezigbo onye na-eweta mgbanwe n'obodo ya?"
         },
         "options": {
-          "en": ["A) Telling other men what to do without reflecting on his own behavior", "B) Challenging patriarchal privileges and actively promoting gender equality in everyday actions", "C) Only speaking about GBV during public campaigns or events", "D) Believing that GBV is a private issue that doesn't concern men"],
-          "pcm": ["A) Tell other men wetin to do but no look yourself", "B) Challenge patriarchal powers and support gender equality for everyday action", "C) Talk about GBV only for public show or campaign", "D) Believe say GBV na private talk wey no concern men"],
-          "ha": ["A) Fada wa sauran maza abin da za su yi ba tare da duba halinka ba", "B) Kalubalantar dabi'un mulkin maza da tallata daidaiton jinsi a ayyukan yau da kullum", "C) Magana kan GBV kawai a lokatim kamfe na jama'a", "D) Gaskata cewa GBV wani lamari ne na sirri wanda bai shafi maza ba"],
-          "yo": ["A) Sísọ fún àwọn ọkùnrin yòókù ohun tí wọ́n máa ṣe láì wo àwọn ìṣe ti ara rẹ̀", "B) Kiko fun awọn anfaani patriarchal ati didagbasoke dọgba eya ni gbogbo ọjọ", "C) Sọrọ nipa GBV nikan ni akoko awọn ipolongo", "D) Gbigbagbọ pe GBV jẹ ọrọ ikọkọ ti ko kan awọn ọkunrin"],
-          "ig": ["A) Agwa ndị ikom ndị ọzọ ihe ha ga-eme n'eleghị anya n'omume nke gị", "B) Ịgba mgba megide uru nke di na-achị ma na-akwalite nha nhata nwoke na nwanyị n'omume kwa ụbọchị", "C) Na-ekwu naanị maka GBV n'oge mkpọsa ọha na eze", "D) Ikwere na GBV bụ okwu nzuzo na-adịghị emetụta ndị ikom"]
+          "en": [
+            "A) Telling other men what to do without reflecting on his own behavior",
+            "B) Challenging patriarchal privileges and actively promoting gender equality in everyday actions",
+            "C) Only speaking about GBV during public campaigns or events",
+            "D) Believing that GBV is a private issue that doesn't concern men"
+          ],
+          "pcm": [
+            "A) Tell other men wetin to do but no look yourself",
+            "B) Challenge patriarchal powers and support gender equality for everyday action",
+            "C) Talk about GBV only for public show or campaign",
+            "D) Believe say GBV na private talk wey no concern men"
+          ],
+          "ha": [
+            "A) Fada wa sauran maza abin da za su yi ba tare da duba halinka ba",
+            "B) Kalubalantar dabi'un mulkin maza da tallata daidaiton jinsi a ayyukan yau da kullum",
+            "C) Magana kan GBV kawai a lokatim kamfe na jama'a",
+            "D) Gaskata cewa GBV wani lamari ne na sirri wanda bai shafi maza ba"
+          ],
+          "yo": [
+            "A) Sísọ fún àwọn ọkùnrin yòókù ohun tí wọ́n máa ṣe láì wo àwọn ìṣe ti ara rẹ̀",
+            "B) Kiko fun awọn anfaani patriarchal ati didagbasoke dọgba eya ni gbogbo ọjọ",
+            "C) Sọrọ nipa GBV nikan ni akoko awọn ipolongo",
+            "D) Gbigbagbọ pe GBV jẹ ọrọ ikọkọ ti ko kan awọn ọkunrin"
+          ],
+          "ig": [
+            "A) Agwa ndị ikom ndị ọzọ ihe ha ga-eme n'eleghị anya n'omume nke gị",
+            "B) Ịgba mgba megide uru nke di na-achị ma na-akwalite nha nhata nwoke na nwanyị n'omume kwa ụbọchị",
+            "C) Na-ekwu naanị maka GBV n'oge mkpọsa ọha na eze",
+            "D) Ikwere na GBV bụ okwu nzuzo na-adịghị emetụta ndị ikom"
+          ]
         },
         "answer": "B"
       }
@@ -407,6 +532,62 @@
       "ha": "[Kayan Mai Canji]",
       "yo": "[Ami Asaju Iyasoto]",
       "ig": "[Badge Onye Mgbanwe]"
+    },
+    "module_5": {
+      "en": "[Change Agent Badge]",
+      "pcm": "[Change Agent Badge]",
+      "ha": "[Kayan Mai Canji]",
+      "yo": "[Ami Olori Iyipada]",
+      "ig": "[Badge Onye Mgbanwe]"
+    },
+    "module_6": {
+      "en": "[Connector Badge]",
+      "pcm": "[Connector Badge]",
+      "ha": "[Kayan Mai Hada Kai]",
+      "yo": "[Ami Alasopọ]",
+      "ig": "[Badge Onye Njikọ]"
+    },
+    "module_7": {
+      "en": "[Protector Badge]",
+      "pcm": "[Protector Badge]",
+      "ha": "[Kayan Mai Tsaro]",
+      "yo": "[Ami Olugbeja]",
+      "ig": "[Badge Onye Nche]"
+    },
+    "module_8": {
+      "en": "[Role Model Badge]",
+      "pcm": "[Role Model Badge]",
+      "ha": "[Kayan Abin Koyi]",
+      "yo": "[Ami Apẹẹrẹ Rere]",
+      "ig": "[Badge Onye Nlereanya]"
+    },
+    "module_9": {
+      "en": "[Community Voice Badge]",
+      "pcm": "[Community Voice Badge]",
+      "ha": "[Kayan Muryar Al'umma]",
+      "yo": "[Ami Ohun Agbegbe]",
+      "ig": "[Badge Olu Obodo]"
+    },
+    "module_10": {
+      "en": "[Network Builder Badge]",
+      "pcm": "[Network Builder Badge]",
+      "ha": "[Kayan Ginin Hukumar]",
+      "yo": "[Ami Olukọ Egbe]",
+      "ig": "[Badge Onye Na-ewu Egbe]"
+    },
+    "module_11": {
+      "en": "[Justice Advocate Badge]",
+      "pcm": "[Justice Advocate Badge]",
+      "ha": "[Kayan Mai Fafutukar Shari'a]",
+      "yo": "[Ami Olugbeja Idajọ]",
+      "ig": "[Badge Onye Fafutukar Ikpe Nkwụmọtọ]"
+    },
+    "module_12": {
+      "en": "[Change Agent — Completed Badge]",
+      "pcm": "[Change Agent — Completed Badge]",
+      "ha": "[Kayan Babban Mai Canji]",
+      "yo": "[Ami Olutura Ipari]",
+      "ig": "[Badge Nnukwu Onye Mgbanwe]"
     }
   },
   "reflections": {
@@ -452,6 +633,62 @@
         "ha": "Yi tunani a kan sabani ko rikici na baya-bayan nan. Shin ka fi ba da fifiko ga yin nasara da iko, ko kuwa ka ba da fifiko ga fahimta da yarda? Yaya za ka nuna girmamawa a rikici na gaba?",
         "yo": "Ranti aiyedeegbọn tabi ija ti o kẹhin ti o ni. Ṣe o fun ni pataki lati bori ati ṣakoso, tabi o fun ni pataki lati loye ati gba? Bawo ni o ṣe le fi owo gidi han ni ija atẹle rẹ?",
         "ig": "Chee echiche banyere esemokwu gị kacha nso nso a. Ị nwetara mmeri na njikwa, ka ị nwetara nghọta na nkwenye? Kedu ka ị ga-esi gosi ugwu na esemokwu gị ọzọ?"
+      },
+      "module_5": {
+        "en": "Think of a time you witnessed something unfair — a degrading comment, disrespectful behaviour, or abuse — and you said nothing. What stopped you? What would you do if it happened tomorrow?",
+        "pcm": "Think of one time wey you see something wey no pure—like bad comment, disrespect, or abuse—but you keep quiet. Wetin hold you make you no speak up? If e happen tomorrow, wetin you go do?",
+        "ha": "Ka yi tunani a kan lokacin da ka ga wani abu da ba daidai ba—kamar kalamai na cin zarafi ko rashin girmamawa—kuma ba ka ce komai ba. Menene ya hana ka magana? Me za ka yi idan hakan ya faru gobe?",
+        "yo": "Ranti igba kan ti o ri nkan ti ko tọ—oro ti ko dara, iwa aini-owo, tabi ilokulo—ti o si dakẹ. Kini o da ọ duro lati sọrọ? Kini o le ṣe ti o ba tun farahan lọla?",
+        "ig": "Chee echiche banyere oge ị hụrụ ihe na-adịghị mma—kalamai mkparị, omume nkwutu, ma ọ bụ mmegbu—ma gbachi nkịtị. Gịnị gbochiri gị ikwu okwu? Gịnị ka ị ga-eme ma ọ bụrụ na ọ mee echi?"
+      },
+      "module_6": {
+        "en": "Think about the most important relationship in your life right now. Do you communicate honestly? Do you listen well? Is there something you need to change?",
+        "pcm": "Think about the most important relationship wey you get right now. You dey talk with truth and respect? You dey listen well? Show us wetin you feel say you need to change.",
+        "ha": "Ka yi tunani game da mafi mahimmancin dangantaka a rayuwarka yanzu. Shin kuna magana cikin gaskiya? Kuna sauraro da kyau? Shin akwai abin da kake bukatar canjawa?",
+        "yo": "Ronu nipa ibatan pataki julọ ninu igbesi aye rẹ lọwọlọwọ. Ṣe o n sọrọ pẹlu otitọ? Ṣe o n tẹtisi daradara? Nkan wo ni o nilo lati canjawa?",
+        "ig": "Chee echiche banyere mmekọrịta kachasị mkpa na rayuwarka ugbu a. Ị na-ekwurịta okwu n'eziokwu? Ị na-ege ntị nke ọma? Ọ nwere ihe ị chọrọ ịgbanwe?"
+      },
+      "module_7": {
+        "en": "Think of someone in your life — a friend, a family member, a neighbour — who you suspect may be experiencing abuse. What has stopped you from saying something? What is one thing you could do this week?",
+        "pcm": "Think of one person wey close to you—friend, family member, or neighbour—wey you suspect say person dey treat bad. Wetin hold you make you no talk? Mention one small step you fit take this week.",
+        "ha": "Ka yi tunanin wani a rayuwarka—aboki, dan uwa, ko makwabci—wanda kake zargin ana cin zarafinsa. Menene ya hana ka cewa wani abu? Menene abu daya da zaka iya yi a wannan makon?",
+        "yo": "Ronu nipa ẹnikan ninu igbesi aye rẹ—ọrẹ kan, mọlẹbi kan, tabi aladuugbo kan—ti o fura pe o n doju kọ ilokulo. Kini o da ọ duro lati sọrọ? Ohun kan wo ni o le ṣe ni ọsẹ yii?",
+        "ig": "Chee echiche banyere onye dị gị nso—enyi, onye ezinụlọ, ma ọ bụ onye agbata obi—nke ị na-enyo enyo na ọ na-enweta mmegbu. Gịnị gbochiri gị ikwu okwu? Gịnị bụ otu ihe ị ga-eme n'izu a?"
+      },
+      "module_8": {
+        "en": "Think about the men you spend the most time with. How do they talk about women? How do you respond? What kind of influence are you having on them — and they on you?",
+        "pcm": "Think about the men wey you dey spend time with pass. How they dey talk about women? Wetin you dey do when they dey talk? How you dey copy them, and how they dey copy you?",
+        "ha": "Ka yi tunani game da mazan da kuke yawan zama tare da su. Yaya suke magana game da mata? Yaya kake amsawa? Wane irin tasiri kuke da shi a kansu—kuma su a kanku?",
+        "yo": "Ronu nipa awọn ọkunrin ti o n lo akoko pọ julọ pẹlu wọn. Bawo ni wọn ṣe n sọrọ nipa awọn obinrin? Bawo ni o ṣe n fesi si wọn? Wọn ni ipa wo lori rẹ, iwọ na si ni ipa wo lori wọn?",
+        "ig": "Chee echiche banyere ndị ikom gị na ha na-anọkarị. Kedu ka ha si ekwu maka ụmụ nwanyị? Kedu ka ị si aza? Kedu ụdị mmetụta ị na-enwe n'ahụ ha—na ha n'ahụ gị?"
+      },
+      "module_9": {
+        "en": "Think about your community — your street, your church or mosque, your age group, your market. What is one conversation about GBV or gender norms that needs to happen there? Who could you have it with this week?",
+        "pcm": "Think about your community—your street, church or mosque, age group, or park. Which talk about SGBV or gender rules suppose happen there? Who you fit talk this thing with this week?",
+        "ha": "Ka yi tunani game da al'ummarku—titinku, coci ko masallaci, rukunin shekarunku, ko kasuwarku. Wace tattaunawa ce game da GBV ko dabi'un jinsi da ya kamata a yi a can? Da wa za ku iya tattaunawa a wannan makon?",
+        "yo": "Ronu nipa alagbegbe rẹ—opopona rẹ, ṣọọṣi tabi mọṣalasi rẹ, egbe ọjọ rẹ, tabi ọja rẹ. Ibaraẹnisọrọ wo nipa GBV tabi igbagbo eya ti o yẹ ki o waye ni bẹ? Tani o le ba sọrọ ni ọsẹ yii?",
+        "ig": "Chee echiche banyere obodo gị—okporo ụzọ gị, ụlọ ụka ma ọ bụ alakuba gị, ndị ọgbọ gị, ma ọ bụ ahịa gị. Kedu nkata banyere GBV ma ọ bụ omenala nwoke na nwanyị kwesịrị ime ebe ahụ? Ònye ka ị ga-aba na nkata n'izu a?"
+      },
+      "module_10": {
+        "en": "Who are three men in your life who you could invite into this work? Not perfect men. Men who are ready to grow. What would you say to them?",
+        "pcm": "Who be the three men for your life wey you fit invite make they join this work? No be perfect men, but men wey ready to grow. Wetin you go tell them?",
+        "ha": "Su wane ne maza uku a rayuwarka da za ka iya gayyata don shiga wannan aikin? Ba maza marasa aibu ba. Maza da suke a shirye su girma. Me za ka ce musu?",
+        "yo": "Awọn ọkunrin mẹta wo ninu igbesi aye rẹ ni o le pe lati darapọ mọ iṣẹ yii? Kii ṣe eniyan ti ko ni abawọn, ṣugbọn awọn ti o ṣetan lati dagba. Kini iwọ yoo sọ fun wọn?",
+        "ig": "Ònye bụ ndị ikom atọ n'obodo gị ị ga-akpọ ka ha sonye n'ọrụ a? Ọ bụghị ndị ikom na-enweghị ntụpọ, kama ndị dị njikere itolite. Gịnị ka ị ga-agwa ha?"
+      },
+      "module_11": {
+        "en": "Did you know that domestic violence and SGBV are criminal offenses in Nigeria, not private family matters? How does this change the way you view intervention?",
+        "pcm": "You know say domestic violence and SGBV na serious crime under Nigeria law, and no be private family talk? How this one take change how you go take help?",
+        "ha": "Shin kun san cewa cin zarafin gida da SGBV laifuka ne na manyan laifuka a Najeriya, ba batutuwan sirri na iyali ba? Yaya wannan ya canza yadda kuke kallon shiga tsakani?",
+        "yo": "Ṣe o mọ pe iwa-ipa ile ati SGBV jẹ ẹṣẹ ọdaràn labẹ ofin orilẹ-ede Naijiria, kii ṣe ọrọ ikọkọ ti ẹbi? Bawo ni eyi ṣe yi ọna ti o fi n wo idasi si?",
+        "ig": "Ị maara na ime ihe ike n'ezinụlọ na SGBV bụ mpụ dị njọ n'okpuru iwu Naịjirịa, ọ bụghị ihe nzuzo ezinụlọ? Kedu ka nke a si gbanwee otú ị si ele itinye ọnụ anya?"
+      },
+      "module_12": {
+        "en": "Six weeks ago, you started this course. Think about who you were then. What has changed in how you think? What has changed in how you act? What do you still want to work on?",
+        "pcm": "Six weeks ago, you start this course. Think about who you be that time. Wetin don change for how you dey think? Wetin don change for how you dey act? Wetin you still want work on?",
+        "ha": "Makonni shida da suka gabata, kun fara wannan karatun. Ka yi tunani a kan wanda kake a lokacin. Menene ya canza a yadda kake tunani? Menene ya canza a yadda kake aiki? Me kake so ka gyara?",
+        "yo": "Oṣe mẹfa sẹhin, o bẹrẹ eko yii. Ronu nipa ẹni ti o jẹ ni igba yẹn. Kini o ti yipada ninu bi o ṣe n ronu? Kini o ti yipada ninu bi o ṣe n ṣe? Kini o tun fẹ lati ṣiṣẹ lori rẹ?",
+        "ig": "Izu isii gara aga, ị malitere akwụkwọ a. Chee echiche banyere onye ị bụ mgbe ahụ. Gịnị gbanwere n'otú ị si eche echiche? Gịnị gbanwere n'otú ị si emeso ihe? Gịnị ka ị ka na-achọ ịrụ ọrụ na ya?"
       }
     }
   },

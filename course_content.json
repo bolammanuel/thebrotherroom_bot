@@ -4,111 +4,374 @@
     "modules": [
         {
             "module_id": "module_1",
-            "title": "Understanding Gender-Based Violence",
+            "title": "Understanding Gender & Masculinity",
             "lessons": [
                 {
                     "lesson_id": "lesson_1_1",
-                    "title": "What is GBV?",
-                    "content": "Emeka is sitting at a local motor park when he hears his friends joking about beating their wives to 'keep them in line.' Emeka feels uncomfortable but stays silent.\n\nGender-based violence (GBV) refers to harmful acts directed at an individual based on their gender. It is rooted in gender inequality, the abuse of power, and harmful norms. GBV can be physical, sexual, emotional, or economic. Like Emeka's friends, many normalize it, but change starts when we recognize it."
+                    "title": "Sex vs Gender",
+                    "content": "Meet Emeka.\n\nEmeka is 24, from Onitsha. He grew up hearing the same things every Nigerian boy hears:\n\n\"Real men don't cry.\" \"You are the man — you must provide.\" \"Control your woman or she will disrespect you.\"\n\nHis father said it. His uncles said it. His church said it. His friends still say it.\n\nBut lately, Emeka has been thinking. His younger sister was beaten by her boyfriend. When Emeka told his uncle, the uncle said — \"Maybe she provoked him. A man has to show authority.\"\n\nEmeka felt something wrong with that answer. But he didn't have the words to explain why.\n\nToday, we give him — and you — those words.\n\nThese two words are often used as if they mean the same thing. They do not.\n\nSEX is biological — the body you were born with. Male or female. Determined by chromosomes, hormones, and anatomy.\n\nGENDER is social — the rules, roles, and expectations that society places on people because of their sex.\n\nOne comes from nature. The other was built by people."
                 },
                 {
                     "lesson_id": "lesson_1_2",
-                    "title": "Types and Forms of GBV",
-                    "content": "GBV manifests in various forms, including domestic violence, sexual harassment, rape, child marriage, female genital mutilation, and emotional abuse. It affects individuals across all social strata."
+                    "title": "The Key Insight",
+                    "content": "Here is the most important thing we will say in this entire course:\n\nYou were born male. But everything you learned about \"how to be a man\" — that was taught to you.\n\nBy your father. Your uncles. Your school. Your religion. Your community. Your peers.\n\nSome of those lessons were good and worth keeping. Some were harmful — and can be changed."
+                },
+                {
+                    "lesson_id": "lesson_1_3",
+                    "title": "What is Positive Masculinity?",
+                    "content": "Masculinity is the way men express themselves in the world. But there is not just one way to be a man.\n\nHarmful masculinity says: dominate, control, never feel.\n\nPositive masculinity says: lead with respect, feel without shame, protect without controlling, be strong AND kind.\n\nOne traps you. The other sets you free. This course is about choosing freedom."
                 }
             ],
             "quiz": {
-                "question": "Which of the following is NOT a form of Gender-Based Violence?",
+                "question": "What is the main difference between sex and gender?",
                 "options": [
-                    "A) Domestic Violence",
-                    "B) Sexual Harassment",
-                    "C) Child Marriage",
-                    "D) Financial Literacy"
-                ],
-                "answer": "D"
-            }
-        },
-        {
-            "module_id": "module_2",
-            "title": "Exploring Positive Masculinity",
-            "lessons": [
-                {
-                    "lesson_id": "lesson_2_1",
-                    "title": "Defining Masculinity",
-                    "content": "Tunde lost his job last week. He feels overwhelmed, but his father tells him, 'Real men don't cry, just endure in silence.' Tunde suppresses his grief, feeling increasingly isolated.\n\nMasculinity is a set of attributes, behaviors, and roles associated with boys and men. Positive masculinity challenges the pressure to suppress emotions. It encourages healthy expressions of manhood that reject dominance and aggression, promoting emotional honesty and respect."
-                },
-                {
-                    "lesson_id": "lesson_2_2",
-                    "title": "Traits of Positive Masculinity",
-                    "content": "Positive masculinity includes traits like empathy, respect, responsibility, emotional intelligence, and non-violence. It promotes equality and partnership in relationships."
-                },
-                {
-                    "lesson_id": "lesson_2_3",
-                    "title": "Challenging Harmful Stereotypes",
-                    "content": "Harmful stereotypes often pressure men to be tough, suppress emotions, and exert control. Positive masculinity challenges these norms, advocating for authenticity and respect for all genders."
-                }
-            ],
-            "quiz": {
-                "question": "What is a key characteristic of positive masculinity?",
-                "options": [
-                    "A) Dominance over women",
-                    "B) Suppression of emotions",
-                    "C) Empathy and respect",
-                    "D) Aggression and control"
-                ],
-                "answer": "C"
-            }
-        },
-        {
-            "module_id": "module_3",
-            "title": "The Role of Young Men in Prevention",
-            "lessons": [
-                {
-                    "lesson_id": "lesson_3_1",
-                    "title": "Being an Ally",
-                    "content": "Chukwudi is in a WhatsApp group with his classmates. A friend shares a degrading, non-consensual photo of a female classmate, and everyone is laughing. Chukwudi realizes that staying silent makes him complicit. He types a private message to his friend explaining why it is wrong and asks him to delete it.\n\nYoung men can be powerful allies in preventing GBV by speaking out against violence, supporting survivors, and promoting respectful relationships among their peers. Chukwudi chose to act as an ally rather than a bystander."
-                },
-                {
-                    "lesson_id": "lesson_3_2",
-                    "title": "Promoting Equality",
-                    "content": "Promoting gender equality means advocating for equal rights, opportunities, and treatment for all genders. This is fundamental to preventing GBV."
-                }
-            ],
-            "quiz": {
-                "question": "How can young men be allies in GBV prevention?",
-                "options": [
-                    "A) By ignoring harmful jokes",
-                    "B) By speaking out against violence",
-                    "C) By maintaining traditional gender roles",
-                    "D) By avoiding discussions about gender"
+                    "A) They mean the same thing",
+                    "B) Sex is biological; gender is built by society",
+                    "C) Gender is biological; sex is built by society",
+                    "D) Both are built by society"
                 ],
                 "answer": "B"
             }
         },
         {
-            "module_id": "module_4",
-            "title": "Building Healthy Relationships",
+            "module_id": "module_2",
+            "title": "Harmful Norms & Toxic Masculinity",
             "lessons": [
                 {
-                    "lesson_id": "lesson_4_1",
-                    "title": "Communication and Consent",
-                    "content": "Bello has a heated argument with his partner about her decision to take a new job. His first instinct is to raise his voice and assert authority. Instead, he takes a deep breath, listens to her perspective, and respects her choice.\n\nHealthy relationships are built on open communication, mutual respect, and enthusiastic consent. Bello's decision to communicate rather than dominate is a form of active respect. Understanding and practicing consent is crucial in all interactions."
+                    "lesson_id": "lesson_2_1",
+                    "title": "What Are Harmful Gender Norms?",
+                    "content": "Meet Chidi.\n\nChidi is 19. When his best friend Tolu started crying after losing his job, Chidi felt deeply uncomfortable. He told Tolu: \"Oga, men don't cry. Pull yourself together.\"\n\nThree weeks later, Tolu stopped answering his phone. His family found him in his room. He had taken his own life.\n\nChidi has not forgiven himself since. He keeps asking: \"What if I had let him cry? What if I had just listened?\"\n\nToday, we explore the norms that told Chidi — and all of us — that men cannot feel. And what those norms cost us.\n\nHarmful gender norms are beliefs about men that sound like truth but are actually damaging.\n\nThey include: \"A man must never show weakness.\" \"Men are naturally aggressive — it's in their nature.\" \"A real man controls his household.\" \"If a woman disrespects you, you have the right to correct her.\"\n\nThese are not facts. They are teachings. And they cause real damage — to women, children, and men themselves."
                 },
                 {
-                    "lesson_id": "lesson_4_2",
-                    "title": "Conflict Resolution without Violence",
-                    "content": "Disagreements are normal, but resolving conflicts without resorting to violence or aggression is a hallmark of healthy relationships. This involves active listening and compromise."
+                    "lesson_id": "lesson_2_2",
+                    "title": "What is Toxic Masculinity?",
+                    "content": "Toxic masculinity is not an insult to men. It is the name for a specific set of harmful ideas about manhood.\n\nIt describes behaviours and beliefs like: using violence to show strength, suppressing all emotion except anger, believing women must be controlled, seeing asking for help as weakness, and using sexual conquest to prove manhood.\n\nToxic masculinity hurts the men who practice it — with mental illness, isolation, and broken relationships — and it hurts everyone around them."
+                },
+                {
+                    "lesson_id": "lesson_2_3",
+                    "title": "The Cost of Toxic Norms",
+                    "content": "In Nigeria, men die younger than women. Men are less likely to see a doctor. Men are more likely to take their own lives in silence.\n\nThis is not because men are weaker. It is because they are taught that seeking help is shameful.\n\nThe same norms that harm women are slowly destroying men from the inside.\n\nChanging these norms is not about making men weak. It is about keeping men alive, healthy, and connected to the people they love."
                 }
             ],
             "quiz": {
-                "question": "What is essential for building healthy relationships?",
+                "question": "Toxic masculinity is best described as:",
                 "options": [
-                    "A) Dominance and control",
-                    "B) Lack of communication",
-                    "C) Mutual respect and consent",
-                    "D) Suppressing disagreements"
+                    "A) An insult that attacks all men",
+                    "B) A set of harmful beliefs about what manhood requires",
+                    "C) A medical condition affecting some men",
+                    "D) Normal male behaviour"
+                ],
+                "answer": "B"
+            }
+        },
+        {
+            "module_id": "module_3",
+            "title": "Introduction to SGBV",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_3_1",
+                    "title": "What is SGBV?",
+                    "content": "Meet Musa.\n\nMusa is 26, from Kaduna. One evening, his neighbour Fatima knocked on his door with a swollen face and trembling hands. She said her husband had beaten her again.\n\nMusa felt something rise in his chest. But then he heard his father's voice: \"Don't enter another man's marriage. It's not your business.\"\n\nSo Musa said: \"Sorry, aunty. Go and settle it between yourselves.\"\n\nFatima went home. Two months later, she was admitted to hospital.\n\nToday, Musa is a man who wishes he had known better. This module gives you the knowledge Musa needed.\n\nSGBV stands for Sexual and Gender-Based Violence. It refers to any harmful act committed against a person's will, based on their gender or sex.\n\nSGBV is not just physical beating. It includes: Physical violence (hitting, kicking, pushing). Sexual violence (rape, assault, harassment, unwanted touching). Emotional/psychological violence (threats, humiliation, control, isolation). Economic violence (controlling money, stopping someone from working). Harmful traditional practices (child marriage, FGM).\n\nSGBV happens in homes, schools, workplaces, churches, mosques, and communities. It crosses every religion, tribe, and class."
+                },
+                {
+                    "lesson_id": "lesson_3_2",
+                    "title": "Who Are the Victims?",
+                    "content": "SGBV affects mostly women and girls — but not exclusively.\n\nIn Nigeria: 1 in 3 women have experienced physical violence. 1 in 4 girls are married before age 18. Boys and men can also be victims — especially of sexual violence and emotional abuse.\n\nSGBV is not caused by what someone wears, where they go, or how they behave. It is caused by the person who chooses to commit violence. Victims are never to blame."
+                },
+                {
+                    "lesson_id": "lesson_3_3",
+                    "title": "The Impact of SGBV",
+                    "content": "SGBV does not just hurt the person it happens to. It damages entire communities.\n\nEffects on survivors: Physical injuries (sometimes permanent). Mental health damage — depression, PTSD, anxiety, suicidal thoughts. Economic loss — inability to work or study. Social isolation — shame, stigma, silence.\n\nEffects on communities: Broken families. Lower school enrollment for girls. Reduced productivity and economic growth. Cycles of violence passing from generation to generation.\n\nSilence protects violence. Knowledge breaks that silence."
+                }
+            ],
+            "quiz": {
+                "question": "SGBV includes which of the following?",
+                "options": [
+                    "A) Only physical beating",
+                    "B) Only rape",
+                    "C) Physical, sexual, emotional, economic violence and harmful practices",
+                    "D) Only violence between strangers"
                 ],
                 "answer": "C"
+            }
+        },
+        {
+            "module_id": "module_4",
+            "title": "Root Causes of SGBV",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_4_1",
+                    "title": "Power Imbalance",
+                    "content": "Meet the Okafor household.\n\nMr. Okafor earns all the money. Mrs. Okafor stays home with the children. When she asks for money to buy food, he says: \"Whose money is it? You will use it as I say.\"\n\nTheir son, Junior, watches everything. He is 8 years old.\n\nBy the time Junior is 25, he believes that a man's money gives him the right to control a woman's body, movement, and voice.\n\nJunior never hit anyone. But he controls his girlfriend's phone. He decides where she can go. He monitors her friends.\n\nJunior learned this. Not from evil — but from what he watched every day growing up.\n\nToday we trace the roots.\n\nThe single biggest root cause of SGBV is unequal power — when one person believes they have the right to control, own, or dominate another.\n\nPower imbalances show up as: Economic power (\"I earn the money, so I decide everything\"). Physical power (using size or strength to intimidate). Social power (using status or title to silence others). Institutional power (when laws and systems protect abusers, not survivors).\n\nWhere there is unchecked power, abuse follows. Not always. But far too often."
+                },
+                {
+                    "lesson_id": "lesson_4_2",
+                    "title": "Culture and Socialisation",
+                    "content": "Culture shapes what we believe is normal. Socialisation is how those beliefs are passed on — through family, religion, media, peers, and community.\n\nIn many Nigerian communities, culture teaches: that men are naturally dominant; that women must be submissive and silent; that family matters must stay private; that a man's authority is sacred.\n\nThese teachings are not facts. They are traditions. And traditions can be examined, challenged, and changed.\n\nCulture is powerful. But it is also made by people — and can be remade by people."
+                },
+                {
+                    "lesson_id": "lesson_4_3",
+                    "title": "Economic Factors",
+                    "content": "Poverty and economic inequality create conditions where SGBV can thrive.\n\nWhen a woman has no income, no savings, and no access to resources, she may feel trapped in an abusive relationship with no way out.\n\nWhen a man faces unemployment and financial failure, and his identity is built entirely on \"being the provider,\" the shame can turn into aggression.\n\nEconomic exclusion of women from education and financial independence is a structural driver of gender-based violence. Ending SGBV means also fighting for economic justice."
+                }
+            ],
+            "quiz": {
+                "question": "What is the single biggest root cause of SGBV?",
+                "options": [
+                    "A) Men's natural aggression",
+                    "B) Women's provocative behaviour",
+                    "C) Unequal power between people",
+                    "D) Poverty alone"
+                ],
+                "answer": "C"
+            }
+        },
+        {
+            "module_id": "module_5",
+            "title": "Role of Men as Change Agents",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_5_1",
+                    "title": "Why Men Must Be Part of the Solution",
+                    "content": "Meet Tunde.\n\nTunde is 30. He works in a Lagos office. One afternoon, a colleague makes a degrading joke about a female colleague — the whole room laughs.\n\nTunde wants to speak. His heart is beating fast. But a voice in his head says: \"Don't make it awkward. It's just a joke. Nobody will thank you.\"\n\nHe stays silent. But the woman he defended in his mind goes home that day feeling invisible.\n\nLater that week, Tunde's younger sister tells him she is experiencing harassment at her job. She says no one speaks up for her.\n\nTunde sits quietly. And he realises: he was the type of person his sister was hoping for — and he chose silence.\n\nThis module is about choosing differently.\n\nFor too long, gender-based violence has been framed as \"a women's issue.\" This is wrong — and dangerous.\n\nMen commit the vast majority of GBV. Men hold most social, economic, and political power. And men have enormous influence over other men.\n\nThis means men are not just part of the problem. Men are essential to the solution.\n\nWhen a man speaks up, other men listen in ways they don't when women speak. That influence is powerful — and carries responsibility."
+                },
+                {
+                    "lesson_id": "lesson_5_2",
+                    "title": "What Allyship Looks Like",
+                    "content": "Being an ally means actively using your position and voice to support those who are being harmed. Allyship is not just \"not being abusive.\" It is taking action.\n\nPractical allyship: Speaking up when you hear a sexist joke. Refusing to laugh at content that mocks women. Supporting a friend you think is being abused. Calling out a friend when his behaviour is controlling. Modelling respectful relationships in your own life.\n\nAllyship is not a performance. It is a daily practice."
+                },
+                {
+                    "lesson_id": "lesson_5_3",
+                    "title": "Personal Responsibility",
+                    "content": "Change starts with you. Not with the government. Not with a campaign. With the choices you make every single day.\n\nYour personal responsibility includes: Examining your own behaviours and attitudes honestly. Recognising how you may have benefited from gender inequality. Making a commitment — not just to avoid harm, but to actively prevent it. Holding yourself accountable when you fall short.\n\nNobody is perfect. But everyone can improve. And every improvement matters."
+                }
+            ],
+            "quiz": {
+                "question": "Why is male involvement essential in ending GBV?",
+                "options": [
+                    "A) Women cannot solve this problem alone",
+                    "B) Men hold significant social influence and power, and mostly commit GBV",
+                    "C) Only men can make laws",
+                    "D) Women don't understand the issue"
+                ],
+                "answer": "B"
+            }
+        },
+        {
+            "module_id": "module_6",
+            "title": "Healthy Masculinity & Relationships",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_6_1",
+                    "title": "Consent — The Foundation of Everything",
+                    "content": "Meet Emeka again.\n\nEmeka has been learning. He is now in a relationship with Adaeze, a woman he deeply respects.\n\nBut he is confused about some things. When he is stressed, he shuts down and goes silent. Adaeze says he makes her feel invisible.\n\nOne evening, they have a disagreement. Emeka raises his voice. Adaeze flinches.\n\nHe sees her flinch. And for the first time, he really sees it.\n\nHe sits down. He breathes. And he says: \"I'm sorry. Can we start again?\"\n\nThat moment changes everything. Today, we talk about what healthy relationships actually look like — and the skills that build them.\n\nConsent means freely, enthusiastically, and clearly agreeing to something.\n\nConsent must be: Freely given (not under pressure or fear). Reversible (a person can change their mind at any time). Informed (both people understand what they're agreeing to). Enthusiastic (an uncertain \"yes\" is not a full yes). Specific (saying yes to one thing does not mean yes to everything).\n\nConsent applies to sex. But also to everyday decisions in relationships — where you go, who you see, what you share.\n\nA relationship without consent is not a relationship. It is control."
+                },
+                {
+                    "lesson_id": "lesson_6_2",
+                    "title": "Communication and Conflict",
+                    "content": "Healthy relationships require honest, respectful communication — especially during conflict.\n\nSigns of healthy communication: Listening to understand, not just to respond. Expressing feelings without blame (\"I feel...\" not \"You always...\"). Taking responsibility for your own emotions. Being willing to take a break when conversations get too heated. Returning to difficult conversations when both people are calm.\n\nSigns of unhealthy communication: Shouting, threatening, or using silence as punishment. Bringing up old arguments to win the current one. Refusing to listen or dismissing your partner's feelings."
+                },
+                {
+                    "lesson_id": "lesson_6_3",
+                    "title": "Emotional Intelligence",
+                    "content": "Emotional intelligence (EQ) is the ability to understand, express, and manage your own emotions — and to recognise the emotions of others.\n\nMen are often taught to suppress emotions. This creates emotional illiteracy — the inability to name, process, or communicate feelings. And it damages relationships.\n\nBuilding your EQ: Naming your emotions accurately. Pausing before reacting in anger. Recognising when someone you love is struggling. Being able to apologise genuinely. Asking for help when you need it.\n\nEmotional intelligence is not weakness. It is the foundation of every strong relationship and every great leader."
+                }
+            ],
+            "quiz": {
+                "question": "Which of the following is TRUE about consent?",
+                "options": [
+                    "A) Once someone says yes, they cannot change their mind",
+                    "B) Silence means yes",
+                    "C) Consent must be freely given, enthusiastic and reversible",
+                    "D) Consent only applies to sex"
+                ],
+                "answer": "C"
+            }
+        },
+        {
+            "module_id": "module_7",
+            "title": "Bystander Intervention",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_7_1",
+                    "title": "Recognising Abuse",
+                    "content": "Meet Bello.\n\nBello is 22, from Kano. He is walking home with his friend Danladi when Danladi grabs his girlfriend's wrist — hard — and says: \"You will not embarrass me in front of my friend.\"\n\nThe girlfriend winces. She goes silent. She looks at the ground.\n\nBello sees everything. His heart pounds. He thinks: \"This is not my business. They will settle it.\"\n\nBut then he looks at her face. He has seen that face before — on his mother, years ago.\n\nBello stops walking. He clears his throat. And he says: \"Danladi, bros — let's go get some water. Leave her small.\"\n\nIt was a small moment. But it changed everything for that woman — and for Bello.\n\nToday, we learn how to be Bello.\n\nAbuse is not always obvious. It does not always look like a black eye or a hospital visit.\n\nWarning signs of abuse in relationships: A partner is controlled — their phone, money, movements, friendships. They are frequently belittled or humiliated in public. They seem afraid of their partner's reactions. They make excuses for their partner's behaviour. They are isolated from family and friends.\n\nYou do not need to be certain to be concerned. If something feels wrong, it usually is."
+                },
+                {
+                    "lesson_id": "lesson_7_2",
+                    "title": "How to Intervene Safely — The 5Ds",
+                    "content": "Intervening does not mean becoming a hero or risking violence. It means doing something — however small — that disrupts the abuse.\n\nThe 5Ds of Bystander Intervention: Direct — speak up calmly: \"Hey, that's not okay.\" Distract — interrupt the situation: \"Bello! Come, let's go.\" Delegate — get someone else involved if you can't act safely. Delay — check in with the person after: \"Are you okay?\" Document — record safely if it is safe to do so.\n\nSafety first — always. If direct intervention feels dangerous, use distraction or delegation instead."
+                },
+                {
+                    "lesson_id": "lesson_7_3",
+                    "title": "Supporting Survivors",
+                    "content": "If someone tells you they are being abused, your response in that moment matters enormously.\n\nWhat to do: Believe them. Listen without judgment. Tell them it is not their fault. Ask what they need: \"How can I support you?\" Share resources — helplines, shelters, legal support. Respect their choices — do not force them to leave if they are not ready. Check in with them regularly.\n\nWhat NOT to do: Ask \"What did you do to provoke it?\" Advise them to \"just leave\" without a plan. Tell other people their story without permission. Minimise what happened."
+                }
+            ],
+            "quiz": {
+                "question": "Which is a warning sign that someone may be experiencing abuse?",
+                "options": [
+                    "A) They have a busy social life",
+                    "B) They seem afraid of their partner's reactions",
+                    "C) They argue sometimes with their partner",
+                    "D) They earn less than their partner"
+                ],
+                "answer": "B"
+            }
+        },
+        {
+            "module_id": "module_8",
+            "title": "Peer Influence & Leadership",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_8_1",
+                    "title": "Understanding Your Influence",
+                    "content": "Meet Chukwudi.\n\nChukwudi is 21. He is the most respected person in his friend group. When he speaks, everyone listens.\n\nOne night, the boys are drinking and one of them starts talking about a girl in degrading terms. Everyone laughs. The conversation escalates.\n\nChukwudi laughs too — at first.\n\nBut then he thinks of his 16-year-old sister. And he imagines someone talking about her this way.\n\nHe stops laughing. He says: \"Abeg, that's somebody's sister. Let's change the topic.\"\n\nThere is a moment of silence. And then someone else says: \"You're right. My bad.\" The conversation shifts.\n\nChukwudi didn't give a speech. He didn't shout. He just used the influence he already had — and it worked.\n\nEvery man has influence — over his friends, his siblings, his colleagues, his community.\n\nInfluence is not reserved for pastors, politicians, or people with large followings. Influence is in everyday moments: The joke you laugh at or refuse to laugh at. The comment you make or stay silent about. The story you share on social media. The way you treat women in front of other men.\n\nYou are already shaping the men around you. The question is: what are you shaping them into?"
+                },
+                {
+                    "lesson_id": "lesson_8_2",
+                    "title": "Leading by Example",
+                    "content": "The most powerful form of leadership is not what you say — it is what you do consistently.\n\nYou become a role model when: You speak respectfully about and to women — always. You call out harmful jokes, even at the cost of short-term comfort. You show emotional honesty among your peers. You ask for help when you need it. You take responsibility when you are wrong, without excuse.\n\nPeople are watching. Your example gives others permission to be better."
+                },
+                {
+                    "lesson_id": "lesson_8_3",
+                    "title": "Becoming an Advocate",
+                    "content": "Advocacy means speaking up for change — in your family, community, school, or workplace.\n\nYou don't need a microphone or a platform to be an advocate. Advocacy starts in small moments: Having honest conversations with your brothers, friends, and sons about GBV. Sharing accurate information on social media. Challenging leaders respectfully when they say harmful things. Mentoring younger men and boys in your community.\n\nEvery advocate was once a bystander who decided to act. This is your moment."
+                }
+            ],
+            "quiz": {
+                "question": "Where does a man's influence show up most powerfully?",
+                "options": [
+                    "A) Only in political or religious leadership positions",
+                    "B) In everyday moments — jokes, comments, social media, how he treats women",
+                    "C) Only when he has a large audience",
+                    "D) Only in formal speeches"
+                ],
+                "answer": "B"
+            }
+        },
+        {
+            "module_id": "module_9",
+            "title": "Community Action & Advocacy",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_9_1",
+                    "title": "Why Community Action Matters",
+                    "content": "Meet Segun.\n\nSegun is 27. He lives in Ibadan. After completing a GBV training, he went back to his community and started a conversation — just him and five friends under a mango tree.\n\nHe shared what he had learned. He asked questions. He listened.\n\nWithin a month, the group grew to 30 men. They called themselves the \"Ibadan Brothers' Circle.\"\n\nThey started holding weekly meetings. They began sharing information in WhatsApp groups. They organised a community dialogue.\n\nOne of their members stopped his friend from beating his wife. Another reported a case of child marriage to the authorities.\n\nSegun didn't have money. He didn't have a title. He had knowledge, commitment, and community. That was enough.\n\nLaws can be passed. Campaigns can be launched. But lasting change happens community by community, relationship by relationship.\n\nCommunities are where norms live. They are where children learn what is normal. They are where survivors are believed — or silenced.\n\nWhen communities change, everything changes: Survivors are more likely to speak out. Abusers are less protected by silence. Young people grow up with healthier models. Women's rights become community values, not just legal ones.\n\nYou are a part of a community. And communities are changed by their members."
+                },
+                {
+                    "lesson_id": "lesson_9_2",
+                    "title": "The Power of Storytelling",
+                    "content": "Stories change minds faster than statistics. When people hear facts, they think. When they hear stories, they feel. And behaviour changes through feeling.\n\nSharing your own story — your journey of learning, questioning, and changing — gives other men permission to do the same.\n\nWays to use storytelling: Share your journey on social media. Speak at community meetings, youth groups, or religious gatherings. Write a short message and share it in your family or friend WhatsApp group. Talk one-on-one with a friend who needs to hear it."
+                },
+                {
+                    "lesson_id": "lesson_9_3",
+                    "title": "How to Engage Your Community",
+                    "content": "You don't need a budget or an NGO to engage your community. You need intention and consistency.\n\nPractical community engagement: Start a men's conversation group — even three people is enough. Organise a community dialogue on GBV — in a church, mosque, community hall, or under a tree. Use WhatsApp groups to share helpful content. Partner with local organisations, schools, or religious bodies. Identify and work with existing community leaders — chiefs, pastors, imams.\n\nChange is not a project. It is a practice. Start small. Stay consistent. Grow."
+                }
+            ],
+            "quiz": {
+                "question": "Why is community action important in ending GBV?",
+                "options": [
+                    "A) Laws and campaigns alone are not enough — norms change community by community",
+                    "B) Communities have no role — it is a government job",
+                    "C) Only urban communities matter",
+                    "D) Community action is too slow to make a difference"
+                ],
+                "answer": "A"
+            }
+        },
+        {
+            "module_id": "module_10",
+            "title": "Networks & Movement Building",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_10_1",
+                    "title": "Why Networks Matter",
+                    "content": "Meet Ibrahim, Emeka, Tunde, and Bello.\n\nThey all took different journeys. They come from different states, different tribes, different religions.\n\nBut they are now connected — through a WhatsApp group, through shared values, and through a commitment they made to themselves and each other.\n\nTogether, they have reached over 300 men in their communities. They share resources. They support each other when the work gets hard. They hold each other accountable.\n\nNone of them could have reached 300 men alone. But together, they are a movement.\n\nWhen good men connect, the ripple goes further than anyone can see.\n\nIndividual effort is valuable. But networks multiply impact.\n\nA network connects you with: Other men who share your values (reducing isolation). Resources, ideas, and strategies you might not have alone. Accountability — people who challenge and encourage you. Amplification — your message reaches further when others carry it too.\n\nThe Brothers' Room community group is your first network. Use it."
+                },
+                {
+                    "lesson_id": "lesson_10_2",
+                    "title": "Collaboration Over Competition",
+                    "content": "Many men in Nigeria are doing good work on GBV prevention. The work is too big for anyone to do alone — and too important to make it about themselves.\n\nCollaboration means: Sharing information and resources across groups. Supporting other men's work, not competing with it. Reaching out to local organisations and offering your skills. Finding common ground across religious and ethnic differences.\n\nTogether we grow. Divided we go in circles."
+                },
+                {
+                    "lesson_id": "lesson_10_3",
+                    "title": "Sustaining the Movement",
+                    "content": "Movements die when people burn out or lose focus. Sustainability requires intention.\n\nHow to sustain your commitment: Keep your \"why\" close — revisit why you started. Celebrate small wins — change is slow; progress is worth celebrating. Rest — you cannot pour from an empty cup. Build systems, not just events — regular meetings, shared responsibilities. Bring in new voices — especially younger men. Document your impact.\n\nThe work is long. But it is worth it."
+                }
+            ],
+            "quiz": {
+                "question": "Why do networks matter in social change work?",
+                "options": [
+                    "A) They make individuals look more important",
+                    "B) They multiply impact, provide accountability and reduce isolation",
+                    "C) They are mainly useful for fundraising",
+                    "D) Only large networks matter"
+                ],
+                "answer": "B"
+            }
+        },
+        {
+            "module_id": "module_11",
+            "title": "Legal Frameworks & Human Rights",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_11_1",
+                    "title": "The VAPP Act in Nigeria",
+                    "content": "Meet Kelechi.\n\nKelechi is 25, from Abuja. He has a neighbour, Obi, who regularly beats his wife, Chioma. One evening, after a loud fight, Kelechi tries to advise Obi. Obi snaps: 'Keep off! It is my house and my wife. The law has no business here.' Kelechi realizes many men believe the law stops at their front door. Today, we give him and you the truth about legal protections.\n\nIn reality, Nigeria passed the Violence Against Persons (Prohibition) Act (VAPP Act) in 2015. This landmark law criminalizes domestic violence, rape, emotional abuse, and spousal abandonment. It is a federal crime, and marriage is never an excuse for violence. Legal frameworks exist to enter homes and hold abusers accountable."
+                },
+                {
+                    "lesson_id": "lesson_11_2",
+                    "title": "Legal Rights & Protections",
+                    "content": "The VAPP Act and other state laws provide strong protections for SGBV survivors. Under these laws, survivors have the right to seek protection orders (to keep abusers away), obtain medical and psychological support, and have their privacy protected in court.\n\nFiling a report is free, and the state is responsible for prosecuting criminal acts. Understanding these rights is the first step to breaking the cycle of violence."
+                },
+                {
+                    "lesson_id": "lesson_11_3",
+                    "title": "Reporting & Referral Channels",
+                    "content": "If someone is experiencing abuse, knowing where to report can save a life. In Nigeria, key referral channels include:\n\n1. NAPTIP (National Agency for the Prohibition of Trafficking in Persons) - handles violence against persons.\n2. Family Support Units (FSUs) at designated police stations.\n3. Human Rights Commissions and local NGOs providing legal aid and shelters.\n\nAs an ally, your role is to share these resources, support the survivor's choices, and help them contact authorities safely."
+                }
+            ],
+            "quiz": {
+                "question": "Which of the following is TRUE under the VAPP Act in Nigeria?",
+                "options": [
+                    "A) Domestic violence is a private family matter",
+                    "B) Spousal violence is a criminal offense and marriage is not an excuse",
+                    "C) The police cannot interfere in marital disputes",
+                    "D) Only physical violence is criminalized"
+                ],
+                "answer": "B"
+            }
+        },
+        {
+            "module_id": "module_12",
+            "title": "Personal Action Plan",
+            "lessons": [
+                {
+                    "lesson_id": "lesson_12_1",
+                    "title": "What You Now Know",
+                    "content": "Meet Emeka — one last time.\n\nSix weeks ago, Emeka was a man who felt something was wrong but didn't have the words.\n\nToday, he is different.\n\nHe has had a conversation with his younger brother about gender norms. He called out a degrading joke in his friend group. He apologised to Adaeze for the times he shut down instead of communicating. He found out about the VAPP Act and shared it in his family WhatsApp group.\n\nHe is not perfect. He still slips. But he is aware now in ways he was not before.\n\nAnd awareness — honest, committed awareness — is where everything begins.\n\nThis is not the end of the course. This is the beginning of the work.\n\nOver the past six weeks, you have covered:\n\n✅ The difference between sex and gender | ✅ How harmful norms are created and passed on | ✅ What SGBV is, its types, and its impact | ✅ The root causes of GBV — power, culture, economy | ✅ Your role as a man in ending GBV | ✅ What healthy relationships and consent look like | ✅ How to intervene as a bystander | ✅ How to use your influence and become an advocate | ✅ How to engage your community and build networks | ✅ The legal frameworks that protect survivors in Nigeria\n\nThis is not just information. This is responsibility."
+                },
+                {
+                    "lesson_id": "lesson_12_2",
+                    "title": "Building Your Personal Action Plan",
+                    "content": "An action plan turns intention into practice. Your plan has three parts:\n\n1. DAILY ACTIONS — What will you do every day? Examples: Speak respectfully to every woman in your life. Call out one harmful norm when you hear it. Check in on a friend who may be struggling.\n\n2. WEEKLY ACTIONS — What will you commit to each week? Examples: Have one honest conversation about GBV with a man in your life. Share one resource from this course. Attend the Brothers' Room community check-in.\n\n3. LONG-TERM COMMITMENTS — What will you build over time? Examples: Start a men's group in your community. Mentor one younger man. Report any cases of abuse I become aware of through proper channels.\n\nWrite your plan. Share it. Keep it."
+                },
+                {
+                    "lesson_id": "lesson_12_3",
+                    "title": "Accountability and the Pledge",
+                    "content": "Commitment without accountability fades. Accountability keeps commitment alive.\n\nYour accountability tools: Your accountability buddy (check in weekly). The Brothers' Room community group (share your progress). Your personal action plan (review every Sunday). The bot (it will remind you of your pledge weekly for the next month).\n\nYour public pledge: \"I, [your name], commit to [specific action]. I will do this because I believe [your reason]. I will be held accountable by [name of person or group].\"\n\nThis pledge is yours. But it belongs to your community too. Post it in the group. Say it out loud. Mean it.\n\nWelcome to the Brotherhood of Change Agents."
+                }
+            ],
+            "quiz": {
+                "question": "A personal action plan should include:",
+                "options": [
+                    "A) Only one big goal",
+                    "B) Daily, weekly, and long-term commitments",
+                    "C) A list of other people who need to change",
+                    "D) Only things you are already doing"
+                ],
+                "answer": "B"
             }
         }
     ]
