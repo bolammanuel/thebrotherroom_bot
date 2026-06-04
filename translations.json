@@ -42,11 +42,11 @@
     "ig": "Ime Gị:\n\nModul {module_num}/{total_modules}: {module_title}\nAkwukwo Ugbu a: {lesson_title}"
   },
   "lesson_header": {
-    "en": "Module: {module_title}\nLesson: {lesson_title}",
-    "pcm": "Module: {module_title}\nLesson: {lesson_title}",
-    "ha": "Modul: {module_title}\nJerin: {lesson_title}",
-    "yo": "Modul: {module_title}\nEko: {lesson_title}",
-    "ig": "Modul: {module_title}\nAkwukwo: {lesson_title}"
+    "en": "Module {module_num}: {module_title}\nLesson {lesson_num}: {lesson_title}",
+    "pcm": "Module {module_num}: {module_title}\nLesson {lesson_num}: {lesson_title}",
+    "ha": "Modul {module_num}: {module_title}\nDarasi {lesson_num}: {lesson_title}",
+    "yo": "Modulu {module_num}: {module_title}\nẸkọ {lesson_num}: {lesson_title}",
+    "ig": "Modul {module_num}: {module_title}\nIhe Ọmụmụ {lesson_num}: {lesson_title}"
   },
   "lessons_complete": {
     "en": "You have completed all lessons in \"{module_title}\"!\n\nTime for a quick quiz to test your knowledge. Click the Quiz button below to start.",

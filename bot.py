@@ -668,8 +668,34 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         module, lesson = get_module_lesson(next_module_id, next_lesson_id)
         
         if module and lesson:
+            # Get module and lesson number
+            module_num = next_module_id.replace("module_", "")
+            lesson_num = next_lesson_id.split("_")[-1]
+
+            # If this is the first lesson of a module, send the opening story as a separate message first
+            if lesson_num == "1" and module.get("opening_story"):
+                story_header = {
+                    "en": "📖 *Opening Story*",
+                    "pcm": "📖 *Opening Story*",
+                    "ha": "📖 *Labarin Budewa*",
+                    "yo": "📖 *Itan Ibẹrẹ*",
+                    "ig": "📖 *Akụkọ Mbido*"
+                }.get(lang, "📖 Opening Story")
+                
+                await send_reply(
+                    update,
+                    f"{story_header}\n\n{module['opening_story']}",
+                    parse_mode="Markdown"
+                )
+
             # Show lesson
-            lesson_header = get_text("lesson_header", lang, module_title=module['title'], lesson_title=lesson['title'])
+            lesson_header = get_text(
+                "lesson_header", lang, 
+                module_num=module_num, 
+                module_title=module['title'], 
+                lesson_num=lesson_num, 
+                lesson_title=lesson['title']
+            )
             
             # Check if this lesson has a video configured
             video_file_id = lesson.get("video")

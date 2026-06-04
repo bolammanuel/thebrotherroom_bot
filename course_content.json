@@ -5,11 +5,12 @@
         {
             "module_id": "module_1",
             "title": "Understanding Gender & Masculinity",
+            "opening_story": "Meet Emeka.\n\nEmeka is 24, from Onitsha. He grew up hearing the same things every Nigerian boy hears:\n\n\"Real men don't cry.\" \"You are the man — you must provide.\" \"Control your woman or she will disrespect you.\"\n\nHis father said it. His uncles said it. His church said it. His friends still say it.\n\nBut lately, Emeka has been thinking. His younger sister was beaten by her boyfriend. When Emeka told his uncle, the uncle said — \"Maybe she provoked him. A man has to show authority.\"\n\nEmeka felt something wrong with that answer. But he didn't have the words to explain why.\n\nToday, we give him — and you — those words.",
             "lessons": [
                 {
                     "lesson_id": "lesson_1_1",
                     "title": "Sex vs Gender",
-                    "content": "Meet Emeka.\n\nEmeka is 24, from Onitsha. He grew up hearing the same things every Nigerian boy hears:\n\n\"Real men don't cry.\" \"You are the man — you must provide.\" \"Control your woman or she will disrespect you.\"\n\nHis father said it. His uncles said it. His church said it. His friends still say it.\n\nBut lately, Emeka has been thinking. His younger sister was beaten by her boyfriend. When Emeka told his uncle, the uncle said — \"Maybe she provoked him. A man has to show authority.\"\n\nEmeka felt something wrong with that answer. But he didn't have the words to explain why.\n\nToday, we give him — and you — those words.\n\nThese two words are often used as if they mean the same thing. They do not.\n\nSEX is biological — the body you were born with. Male or female. Determined by chromosomes, hormones, and anatomy.\n\nGENDER is social — the rules, roles, and expectations that society places on people because of their sex.\n\nOne comes from nature. The other was built by people."
+                    "content": "These two words are often used as if they mean the same thing. They do not.\n\nSEX is biological — the body you were born with. Male or female. Determined by chromosomes, hormones, and anatomy.\n\nGENDER is social — the rules, roles, and expectations that society places on people because of their sex.\n\nOne comes from nature. The other was built by people."
                 },
                 {
                     "lesson_id": "lesson_1_2",
@@ -36,11 +37,12 @@
         {
             "module_id": "module_2",
             "title": "Harmful Norms & Toxic Masculinity",
+            "opening_story": "Meet Chidi.\n\nChidi is 19. When his best friend Tolu started crying after losing his job, Chidi felt deeply uncomfortable. He told Tolu: \"Oga, men don't cry. Pull yourself together.\"\n\nThree weeks later, Tolu stopped answering his phone. His family found him in his room. He had taken his own life.\n\nChidi has not forgiven himself since. He keeps asking: \"What if I had let him cry? What if I had just listened?\"\n\nToday, we explore the norms that told Chidi — and all of us — that men cannot feel. And what those norms cost us.",
             "lessons": [
                 {
                     "lesson_id": "lesson_2_1",
                     "title": "What Are Harmful Gender Norms?",
-                    "content": "Meet Chidi.\n\nChidi is 19. When his best friend Tolu started crying after losing his job, Chidi felt deeply uncomfortable. He told Tolu: \"Oga, men don't cry. Pull yourself together.\"\n\nThree weeks later, Tolu stopped answering his phone. His family found him in his room. He had taken his own life.\n\nChidi has not forgiven himself since. He keeps asking: \"What if I had let him cry? What if I had just listened?\"\n\nToday, we explore the norms that told Chidi — and all of us — that men cannot feel. And what those norms cost us.\n\nHarmful gender norms are beliefs about men that sound like truth but are actually damaging.\n\nThey include: \"A man must never show weakness.\" \"Men are naturally aggressive — it's in their nature.\" \"A real man controls his household.\" \"If a woman disrespects you, you have the right to correct her.\"\n\nThese are not facts. They are teachings. And they cause real damage — to women, children, and men themselves."
+                    "content": "Harmful gender norms are beliefs about men that sound like truth but are actually damaging.\n\nThey include: \"A man must never show weakness.\" \"Men are naturally aggressive — it's in their nature.\" \"A real man controls his household.\" \"If a woman disrespects you, you have the right to correct her.\"\n\nThese are not facts. They are teachings. And they cause real damage — to women, children, and men themselves."
                 },
                 {
                     "lesson_id": "lesson_2_2",
@@ -67,11 +69,12 @@
         {
             "module_id": "module_3",
             "title": "Introduction to SGBV",
+            "opening_story": "Meet Musa.\n\nMusa is 26, from Kaduna. One evening, his neighbour Fatima knocked on his door with a swollen face and trembling hands. She said her husband had beaten her again.\n\nMusa felt something rise in his chest. But then he heard his father's voice: \"Don't enter another man's marriage. It's not your business.\"\n\nSo Musa said: \"Sorry, aunty. Go and settle it between yourselves.\"\n\nFatima went home. Two months later, she was admitted to hospital.\n\nToday, Musa is a man who wishes he had known better. This module gives you the knowledge Musa needed.",
             "lessons": [
                 {
                     "lesson_id": "lesson_3_1",
                     "title": "What is SGBV?",
-                    "content": "Meet Musa.\n\nMusa is 26, from Kaduna. One evening, his neighbour Fatima knocked on his door with a swollen face and trembling hands. She said her husband had beaten her again.\n\nMusa felt something rise in his chest. But then he heard his father's voice: \"Don't enter another man's marriage. It's not your business.\"\n\nSo Musa said: \"Sorry, aunty. Go and settle it between yourselves.\"\n\nFatima went home. Two months later, she was admitted to hospital.\n\nToday, Musa is a man who wishes he had known better. This module gives you the knowledge Musa needed.\n\nSGBV stands for Sexual and Gender-Based Violence. It refers to any harmful act committed against a person's will, based on their gender or sex.\n\nSGBV is not just physical beating. It includes: Physical violence (hitting, kicking, pushing). Sexual violence (rape, assault, harassment, unwanted touching). Emotional/psychological violence (threats, humiliation, control, isolation). Economic violence (controlling money, stopping someone from working). Harmful traditional practices (child marriage, FGM).\n\nSGBV happens in homes, schools, workplaces, churches, mosques, and communities. It crosses every religion, tribe, and class."
+                    "content": "SGBV stands for Sexual and Gender-Based Violence. It refers to any harmful act committed against a person's will, based on their gender or sex.\n\nSGBV is not just physical beating. It includes: Physical violence (hitting, kicking, pushing). Sexual violence (rape, assault, harassment, unwanted touching). Emotional/psychological violence (threats, humiliation, control, isolation). Economic violence (controlling money, stopping someone from working). Harmful traditional practices (child marriage, FGM).\n\nSGBV happens in homes, schools, workplaces, churches, mosques, and communities. It crosses every religion, tribe, and class."
                 },
                 {
                     "lesson_id": "lesson_3_2",
@@ -98,11 +101,12 @@
         {
             "module_id": "module_4",
             "title": "Root Causes of SGBV",
+            "opening_story": "Meet the Okafor household.\n\nMr. Okafor earns all the money. Mrs. Okafor stays home with the children. When she asks for money to buy food, he says: \"Whose money is it? You will use it as I say.\"\n\nTheir son, Junior, watches everything. He is 8 years old.\n\nBy the time Junior is 25, he believes that a man's money gives him the right to control a woman's body, movement, and voice.\n\nJunior never hit anyone. But he controls his girlfriend's phone. He decides where she can go. He monitors her friends.\n\nJunior learned this. Not from evil — but from what he watched every day growing up.\n\nToday we trace the roots.",
             "lessons": [
                 {
                     "lesson_id": "lesson_4_1",
                     "title": "Power Imbalance",
-                    "content": "Meet the Okafor household.\n\nMr. Okafor earns all the money. Mrs. Okafor stays home with the children. When she asks for money to buy food, he says: \"Whose money is it? You will use it as I say.\"\n\nTheir son, Junior, watches everything. He is 8 years old.\n\nBy the time Junior is 25, he believes that a man's money gives him the right to control a woman's body, movement, and voice.\n\nJunior never hit anyone. But he controls his girlfriend's phone. He decides where she can go. He monitors her friends.\n\nJunior learned this. Not from evil — but from what he watched every day growing up.\n\nToday we trace the roots.\n\nThe single biggest root cause of SGBV is unequal power — when one person believes they have the right to control, own, or dominate another.\n\nPower imbalances show up as: Economic power (\"I earn the money, so I decide everything\"). Physical power (using size or strength to intimidate). Social power (using status or title to silence others). Institutional power (when laws and systems protect abusers, not survivors).\n\nWhere there is unchecked power, abuse follows. Not always. But far too often."
+                    "content": "The single biggest root cause of SGBV is unequal power — when one person believes they have the right to control, own, or dominate another.\n\nPower imbalances show up as: Economic power (\"I earn the money, so I decide everything\"). Physical power (using size or strength to intimidate). Social power (using status or title to silence others). Institutional power (when laws and systems protect abusers, not survivors).\n\nWhere there is unchecked power, abuse follows. Not always. But far too often."
                 },
                 {
                     "lesson_id": "lesson_4_2",
@@ -129,11 +133,12 @@
         {
             "module_id": "module_5",
             "title": "Role of Men as Change Agents",
+            "opening_story": "Meet Tunde.\n\nTunde is 30. He works in a Lagos office. One afternoon, a colleague makes a degrading joke about a female colleague — the whole room laughs.\n\nTunde wants to speak. His heart is beating fast. But a voice in his head says: \"Don't make it awkward. It's just a joke. Nobody will thank you.\"\n\nHe stays silent. But the woman he defended in his mind goes home that day feeling invisible.\n\nLater that week, Tunde's younger sister tells him she is experiencing harassment at her job. She says no one speaks up for her.\n\nTunde sits quietly. And he realises: he was the type of person his sister was hoping for — and he chose silence.\n\nThis module is about choosing differently.",
             "lessons": [
                 {
                     "lesson_id": "lesson_5_1",
                     "title": "Why Men Must Be Part of the Solution",
-                    "content": "Meet Tunde.\n\nTunde is 30. He works in a Lagos office. One afternoon, a colleague makes a degrading joke about a female colleague — the whole room laughs.\n\nTunde wants to speak. His heart is beating fast. But a voice in his head says: \"Don't make it awkward. It's just a joke. Nobody will thank you.\"\n\nHe stays silent. But the woman he defended in his mind goes home that day feeling invisible.\n\nLater that week, Tunde's younger sister tells him she is experiencing harassment at her job. She says no one speaks up for her.\n\nTunde sits quietly. And he realises: he was the type of person his sister was hoping for — and he chose silence.\n\nThis module is about choosing differently.\n\nFor too long, gender-based violence has been framed as \"a women's issue.\" This is wrong — and dangerous.\n\nMen commit the vast majority of GBV. Men hold most social, economic, and political power. And men have enormous influence over other men.\n\nThis means men are not just part of the problem. Men are essential to the solution.\n\nWhen a man speaks up, other men listen in ways they don't when women speak. That influence is powerful — and carries responsibility."
+                    "content": "For too long, gender-based violence has been framed as \"a women's issue.\" This is wrong — and dangerous.\n\nMen commit the vast majority of GBV. Men hold most social, economic, and political power. And men have enormous influence over other men.\n\nThis means men are not just part of the problem. Men are essential to the solution.\n\nWhen a man speaks up, other men listen in ways they don't when women speak. That influence is powerful — and carries responsibility."
                 },
                 {
                     "lesson_id": "lesson_5_2",
@@ -160,11 +165,12 @@
         {
             "module_id": "module_6",
             "title": "Healthy Masculinity & Relationships",
+            "opening_story": "Meet Emeka again.\n\nEmeka has been learning. He is now in a relationship with Adaeze, a woman he deeply respects.\n\nBut he is confused about some things. When he is stressed, he shuts down and goes silent. Adaeze says he makes her feel invisible.\n\nOne evening, they have a disagreement. Emeka raises his voice. Adaeze flinches.\n\nHe sees her flinch. And for the first time, he really sees it.\n\nHe sits down. He breathes. And he says: \"I'm sorry. Can we start again?\"\n\nThat moment changes everything. Today, we talk about what healthy relationships actually look like — and the skills that build them.",
             "lessons": [
                 {
                     "lesson_id": "lesson_6_1",
                     "title": "Consent — The Foundation of Everything",
-                    "content": "Meet Emeka again.\n\nEmeka has been learning. He is now in a relationship with Adaeze, a woman he deeply respects.\n\nBut he is confused about some things. When he is stressed, he shuts down and goes silent. Adaeze says he makes her feel invisible.\n\nOne evening, they have a disagreement. Emeka raises his voice. Adaeze flinches.\n\nHe sees her flinch. And for the first time, he really sees it.\n\nHe sits down. He breathes. And he says: \"I'm sorry. Can we start again?\"\n\nThat moment changes everything. Today, we talk about what healthy relationships actually look like — and the skills that build them.\n\nConsent means freely, enthusiastically, and clearly agreeing to something.\n\nConsent must be: Freely given (not under pressure or fear). Reversible (a person can change their mind at any time). Informed (both people understand what they're agreeing to). Enthusiastic (an uncertain \"yes\" is not a full yes). Specific (saying yes to one thing does not mean yes to everything).\n\nConsent applies to sex. But also to everyday decisions in relationships — where you go, who you see, what you share.\n\nA relationship without consent is not a relationship. It is control."
+                    "content": "Consent means freely, enthusiastically, and clearly agreeing to something.\n\nConsent must be: Freely given (not under pressure or fear). Reversible (a person can change their mind at any time). Informed (both people understand what they're agreeing to). Enthusiastic (an uncertain \"yes\" is not a full yes). Specific (saying yes to one thing does not mean yes to everything).\n\nConsent applies to sex. But also to everyday decisions in relationships — where you go, who you see, what you share.\n\nA relationship without consent is not a relationship. It is control."
                 },
                 {
                     "lesson_id": "lesson_6_2",
@@ -191,11 +197,12 @@
         {
             "module_id": "module_7",
             "title": "Bystander Intervention",
+            "opening_story": "Meet Bello.\n\nBello is 22, from Kano. He is walking home with his friend Danladi when Danladi grabs his girlfriend's wrist — hard — and says: \"You will not embarrass me in front of my friend.\"\n\nThe girlfriend winces. She goes silent. She looks at the ground.\n\nBello sees everything. His heart pounds. He thinks: \"This is not my business. They will settle it.\"\n\nBut then he looks at her face. He has seen that face before — on his mother, years ago.\n\nBello stops walking. He clears his throat. And he says: \"Danladi, bros — let's go get some water. Leave her small.\"\n\nIt was a small moment. But it changed everything for that woman — and for Bello.\n\nToday, we learn how to be Bello.",
             "lessons": [
                 {
                     "lesson_id": "lesson_7_1",
                     "title": "Recognising Abuse",
-                    "content": "Meet Bello.\n\nBello is 22, from Kano. He is walking home with his friend Danladi when Danladi grabs his girlfriend's wrist — hard — and says: \"You will not embarrass me in front of my friend.\"\n\nThe girlfriend winces. She goes silent. She looks at the ground.\n\nBello sees everything. His heart pounds. He thinks: \"This is not my business. They will settle it.\"\n\nBut then he looks at her face. He has seen that face before — on his mother, years ago.\n\nBello stops walking. He clears his throat. And he says: \"Danladi, bros — let's go get some water. Leave her small.\"\n\nIt was a small moment. But it changed everything for that woman — and for Bello.\n\nToday, we learn how to be Bello.\n\nAbuse is not always obvious. It does not always look like a black eye or a hospital visit.\n\nWarning signs of abuse in relationships: A partner is controlled — their phone, money, movements, friendships. They are frequently belittled or humiliated in public. They seem afraid of their partner's reactions. They make excuses for their partner's behaviour. They are isolated from family and friends.\n\nYou do not need to be certain to be concerned. If something feels wrong, it usually is."
+                    "content": "Abuse is not always obvious. It does not always look like a black eye or a hospital visit.\n\nWarning signs of abuse in relationships: A partner is controlled — their phone, money, movements, friendships. They are frequently belittled or humiliated in public. They seem afraid of their partner's reactions. They make excuses for their partner's behaviour. They are isolated from family and friends.\n\nYou do not need to be certain to be concerned. If something feels wrong, it usually is."
                 },
                 {
                     "lesson_id": "lesson_7_2",
@@ -222,11 +229,12 @@
         {
             "module_id": "module_8",
             "title": "Peer Influence & Leadership",
+            "opening_story": "Meet Chukwudi.\n\nChukwudi is 21. He is the most respected person in his friend group. When he speaks, everyone listens.\n\nOne night, the boys are drinking and one of them starts talking about a girl in degrading terms. Everyone laughs. The conversation escalates.\n\nChukwudi laughs too — at first.\n\nBut then he thinks of his 16-year-old sister. And he imagines someone talking about her this way.\n\nHe stops laughing. He says: \"Abeg, that's somebody's sister. Let's change the topic.\"\n\nThere is a moment of silence. And then someone else says: \"You're right. My bad.\" The conversation shifts.\n\nChukwudi didn't give a speech. He didn't shout. He just used the influence he already had — and it worked.",
             "lessons": [
                 {
                     "lesson_id": "lesson_8_1",
                     "title": "Understanding Your Influence",
-                    "content": "Meet Chukwudi.\n\nChukwudi is 21. He is the most respected person in his friend group. When he speaks, everyone listens.\n\nOne night, the boys are drinking and one of them starts talking about a girl in degrading terms. Everyone laughs. The conversation escalates.\n\nChukwudi laughs too — at first.\n\nBut then he thinks of his 16-year-old sister. And he imagines someone talking about her this way.\n\nHe stops laughing. He says: \"Abeg, that's somebody's sister. Let's change the topic.\"\n\nThere is a moment of silence. And then someone else says: \"You're right. My bad.\" The conversation shifts.\n\nChukwudi didn't give a speech. He didn't shout. He just used the influence he already had — and it worked.\n\nEvery man has influence — over his friends, his siblings, his colleagues, his community.\n\nInfluence is not reserved for pastors, politicians, or people with large followings. Influence is in everyday moments: The joke you laugh at or refuse to laugh at. The comment you make or stay silent about. The story you share on social media. The way you treat women in front of other men.\n\nYou are already shaping the men around you. The question is: what are you shaping them into?"
+                    "content": "Every man has influence — over his friends, his siblings, his colleagues, his community.\n\nInfluence is not reserved for pastors, politicians, or people with large followings. Influence is in everyday moments: The joke you laugh at or refuse to laugh at. The comment you make or stay silent about. The story you share on social media. The way you treat women in front of other men.\n\nYou are already shaping the men around you. The question is: what are you shaping them into?"
                 },
                 {
                     "lesson_id": "lesson_8_2",
@@ -253,11 +261,12 @@
         {
             "module_id": "module_9",
             "title": "Community Action & Advocacy",
+            "opening_story": "Meet Segun.\n\nSegun is 27. He lives in Ibadan. After completing a GBV training, he went back to his community and started a conversation — just him and five friends under a mango tree.\n\nHe shared what he had learned. He asked questions. He listened.\n\nWithin a month, the group grew to 30 men. They called themselves the \"Ibadan Brothers' Circle.\"\n\nThey started holding weekly meetings. They began sharing information in WhatsApp groups. They organised a community dialogue.\n\nOne of their members stopped his friend from beating his wife. Another reported a case of child marriage to the authorities.\n\nSegun didn't have money. He didn't have a title. He had knowledge, commitment, and community. That was enough.",
             "lessons": [
                 {
                     "lesson_id": "lesson_9_1",
                     "title": "Why Community Action Matters",
-                    "content": "Meet Segun.\n\nSegun is 27. He lives in Ibadan. After completing a GBV training, he went back to his community and started a conversation — just him and five friends under a mango tree.\n\nHe shared what he had learned. He asked questions. He listened.\n\nWithin a month, the group grew to 30 men. They called themselves the \"Ibadan Brothers' Circle.\"\n\nThey started holding weekly meetings. They began sharing information in WhatsApp groups. They organised a community dialogue.\n\nOne of their members stopped his friend from beating his wife. Another reported a case of child marriage to the authorities.\n\nSegun didn't have money. He didn't have a title. He had knowledge, commitment, and community. That was enough.\n\nLaws can be passed. Campaigns can be launched. But lasting change happens community by community, relationship by relationship.\n\nCommunities are where norms live. They are where children learn what is normal. They are where survivors are believed — or silenced.\n\nWhen communities change, everything changes: Survivors are more likely to speak out. Abusers are less protected by silence. Young people grow up with healthier models. Women's rights become community values, not just legal ones.\n\nYou are a part of a community. And communities are changed by their members."
+                    "content": "Laws can be passed. Campaigns can be launched. But lasting change happens community by community, relationship by relationship.\n\nCommunities are where norms live. They are where children learn what is normal. They are where survivors are believed — or silenced.\n\nWhen communities change, everything changes: Survivors are more likely to speak out. Abusers are less protected by silence. Young people grow up with healthier models. Women's rights become community values, not just legal ones.\n\nYou are a part of a community. And communities are changed by their members."
                 },
                 {
                     "lesson_id": "lesson_9_2",
@@ -284,11 +293,12 @@
         {
             "module_id": "module_10",
             "title": "Networks & Movement Building",
+            "opening_story": "Meet Ibrahim, Emeka, Tunde, and Bello.\n\nThey all took different journeys. They come from different states, different tribes, different religions.\n\nBut they are now connected — through a WhatsApp group, through shared values, and through a commitment they made to themselves and each other.\n\nTogether, they have reached over 300 men in their communities. They share resources. They support each other when the work gets hard. They hold each other accountable.\n\nNone of them could have reached 300 men alone. But together, they are a movement.\n\nWhen good men connect, the ripple goes further than anyone can see.",
             "lessons": [
                 {
                     "lesson_id": "lesson_10_1",
                     "title": "Why Networks Matter",
-                    "content": "Meet Ibrahim, Emeka, Tunde, and Bello.\n\nThey all took different journeys. They come from different states, different tribes, different religions.\n\nBut they are now connected — through a WhatsApp group, through shared values, and through a commitment they made to themselves and each other.\n\nTogether, they have reached over 300 men in their communities. They share resources. They support each other when the work gets hard. They hold each other accountable.\n\nNone of them could have reached 300 men alone. But together, they are a movement.\n\nWhen good men connect, the ripple goes further than anyone can see.\n\nIndividual effort is valuable. But networks multiply impact.\n\nA network connects you with: Other men who share your values (reducing isolation). Resources, ideas, and strategies you might not have alone. Accountability — people who challenge and encourage you. Amplification — your message reaches further when others carry it too.\n\nThe Brothers' Room community group is your first network. Use it."
+                    "content": "Individual effort is valuable. But networks multiply impact.\n\nA network connects you with: Other men who share your values (reducing isolation). Resources, ideas, and strategies you might not have alone. Accountability — people who challenge and encourage you. Amplification — your message reaches further when others carry it too.\n\nThe Brothers' Room community group is your first network. Use it."
                 },
                 {
                     "lesson_id": "lesson_10_2",
@@ -315,11 +325,12 @@
         {
             "module_id": "module_11",
             "title": "Legal Frameworks & Human Rights",
+            "opening_story": "Meet Kelechi.\n\nKelechi is 25, from Abuja. He has a neighbour, Obi, who regularly beats his wife, Chioma. One evening, after a loud fight, Kelechi tries to advise Obi. Obi snaps: 'Keep off! It is my house and my wife. The law has no business here.' Kelechi realizes many men believe the law stops at their front door. Today, we give him and you the truth about legal protections.",
             "lessons": [
                 {
                     "lesson_id": "lesson_11_1",
                     "title": "The VAPP Act in Nigeria",
-                    "content": "Meet Kelechi.\n\nKelechi is 25, from Abuja. He has a neighbour, Obi, who regularly beats his wife, Chioma. One evening, after a loud fight, Kelechi tries to advise Obi. Obi snaps: 'Keep off! It is my house and my wife. The law has no business here.' Kelechi realizes many men believe the law stops at their front door. Today, we give him and you the truth about legal protections.\n\nIn reality, Nigeria passed the Violence Against Persons (Prohibition) Act (VAPP Act) in 2015. This landmark law criminalizes domestic violence, rape, emotional abuse, and spousal abandonment. It is a federal crime, and marriage is never an excuse for violence. Legal frameworks exist to enter homes and hold abusers accountable."
+                    "content": "In reality, Nigeria passed the Violence Against Persons (Prohibition) Act (VAPP Act) in 2015. This landmark law criminalizes domestic violence, rape, emotional abuse, and spousal abandonment. It is a federal crime, and marriage is never an excuse for violence. Legal frameworks exist to enter homes and hold abusers accountable."
                 },
                 {
                     "lesson_id": "lesson_11_2",
@@ -346,11 +357,12 @@
         {
             "module_id": "module_12",
             "title": "Personal Action Plan",
+            "opening_story": "Meet Emeka — one last time.\n\nSix weeks ago, Emeka was a man who felt something was wrong but didn't have the words.\n\nToday, he is different.\n\nHe has had a conversation with his younger brother about gender norms. He called out a degrading joke in his friend group. He apologised to Adaeze for the times he shut down instead of communicating. He found out about the VAPP Act and shared it in his family WhatsApp group.\n\nHe is not perfect. He still slips. But he is aware now in ways he was not before.\n\nAnd awareness — honest, committed awareness — is where everything begins.\n\nThis is not the end of the course. This is the beginning of the work.",
             "lessons": [
                 {
                     "lesson_id": "lesson_12_1",
                     "title": "What You Now Know",
-                    "content": "Meet Emeka — one last time.\n\nSix weeks ago, Emeka was a man who felt something was wrong but didn't have the words.\n\nToday, he is different.\n\nHe has had a conversation with his younger brother about gender norms. He called out a degrading joke in his friend group. He apologised to Adaeze for the times he shut down instead of communicating. He found out about the VAPP Act and shared it in his family WhatsApp group.\n\nHe is not perfect. He still slips. But he is aware now in ways he was not before.\n\nAnd awareness — honest, committed awareness — is where everything begins.\n\nThis is not the end of the course. This is the beginning of the work.\n\nOver the past six weeks, you have covered:\n\n✅ The difference between sex and gender | ✅ How harmful norms are created and passed on | ✅ What SGBV is, its types, and its impact | ✅ The root causes of GBV — power, culture, economy | ✅ Your role as a man in ending GBV | ✅ What healthy relationships and consent look like | ✅ How to intervene as a bystander | ✅ How to use your influence and become an advocate | ✅ How to engage your community and build networks | ✅ The legal frameworks that protect survivors in Nigeria\n\nThis is not just information. This is responsibility."
+                    "content": "Over the past six weeks, you have covered:\n\n✅ The difference between sex and gender | ✅ How harmful norms are created and passed on | ✅ What SGBV is, its types, and its impact | ✅ The root causes of GBV — power, culture, economy | ✅ Your role as a man in ending GBV | ✅ What healthy relationships and consent look like | ✅ How to intervene as a bystander | ✅ How to use your influence and become an advocate | ✅ How to engage your community and build networks | ✅ The legal frameworks that protect survivors in Nigeria\n\nThis is not just information. This is responsibility."
                 },
                 {
                     "lesson_id": "lesson_12_2",
