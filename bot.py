@@ -2204,7 +2204,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT user_id, full_name, address, state, current_module_id, current_lesson_id, quiz_completed, 
+        SELECT user_id, full_name, state, current_module_id, current_lesson_id, quiz_completed, 
                language_preference, enrollment_date, post_test_score, pledge_text,
                ai_questions_count, first_attempt_quizzes
         FROM learners
@@ -2222,7 +2222,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     with open(csv_file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "User ID", "Full Name", "Address", "State", "Current Module", "Current Lesson", "Quiz Status", 
+            "User ID", "Full Name", "State", "Current Module", "Current Lesson", "Quiz Status", 
             "Language Preference", "Enrollment Date", "Post-Test Score", "Personal Pledge",
             "AI Questions Asked", "First-Attempt Quizzes Passed"
         ])
@@ -2788,19 +2788,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         context.user_data.pop("awaiting_full_name", None)
         full_name = user_message.strip()
         update_full_name(user_id, full_name)
-        
-        # Move to address onboarding step
-        context.user_data["awaiting_address"] = True
-        ask_address_text = get_text("ask_address", lang)
-        await update.message.reply_text(ask_address_text)
-        return
-
-    # Intercept address onboarding step
-    if context.user_data.get("awaiting_address"):
-        context.user_data.pop("awaiting_address", None)
-        address = user_message.strip()
-        from db_manager import update_address
-        update_address(user_id, address)
         
         # Move to state onboarding step
         context.user_data["awaiting_state"] = True
