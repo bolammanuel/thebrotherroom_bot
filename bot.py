@@ -2539,7 +2539,14 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
     
     if not admin_ids or user_id not in admin_ids:
-        await send_reply(update, "You are not authorized to view the Admin Dashboard.")
+        logger.warning(f"Unauthorized admin access attempt by user_id: {user_id}")
+        await send_reply(
+            update, 
+            "❌ *Unauthorized Access*\n\n"
+            "You are not authorized to view the Admin Dashboard.\n\n"
+            f"If you are the host/administrator, please add your Telegram User ID (`{user_id}`) to the `ADMIN_USER_IDS` environment variable in your `.env` file or Railway settings, then restart the bot.",
+            parse_mode="Markdown"
+        )
         return
         
     dashboard_text = (
