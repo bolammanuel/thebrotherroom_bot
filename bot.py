@@ -81,21 +81,31 @@ def get_command_button(button_name, lang='en'):
 
 # ============== INLINE BUTTON HELPER ==============
 
-def get_main_menu_buttons(lang='en', user_id=None):
+def get_main_menu_buttons(lang='en', user_id=None, show_quiz=None, context=None):
     """Get context-aware main menu buttons with a dynamic accessibility toggle and dynamically hidden quiz button."""
     voice_enabled = False
-    show_quiz = False
-    if user_id:
-        try:
-            voice_enabled = get_voice_responses(user_id)
-            progress = get_learner_progress(user_id)
-            if progress and progress[0]:
-                current_module_id, current_lesson_id, quiz_completed, _ = progress
-                quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
-                if is_last_lesson_of_module(current_module_id, current_lesson_id) and quiz_completed == 0:
-                    show_quiz = True
-        except Exception:
-            pass
+    
+    if show_quiz is None:
+        show_quiz = False
+        if user_id:
+            try:
+                voice_enabled = get_voice_responses(user_id)
+                progress = get_learner_progress(user_id)
+                if progress and progress[0]:
+                    current_module_id, current_lesson_id, quiz_completed, _ = progress
+                    quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
+                    if is_last_lesson_of_module(current_module_id, current_lesson_id) and quiz_completed == 0:
+                        show_quiz = True
+                        if context and ("awaiting_quote_card" in context.user_data or "awaiting_lessons_complete" in context.user_data):
+                            show_quiz = False
+            except Exception:
+                pass
+    else:
+        if user_id:
+            try:
+                voice_enabled = get_voice_responses(user_id)
+            except Exception:
+                pass
             
     if voice_enabled:
         voice_label = {
@@ -154,7 +164,7 @@ def get_main_menu_buttons(lang='en', user_id=None):
     ])
     return InlineKeyboardMarkup(buttons)
 
-def get_help_keyboard_buttons(lang='en', user_id=None):
+def get_help_keyboard_buttons(lang='en', user_id=None, context=None):
     """Get keyboard buttons specifically for the help menu containing all commands with dynamic quiz visibility."""
     voice_enabled = False
     show_quiz = False
@@ -167,6 +177,8 @@ def get_help_keyboard_buttons(lang='en', user_id=None):
                 quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
                 if is_last_lesson_of_module(current_module_id, current_lesson_id) and quiz_completed == 0:
                     show_quiz = True
+                    if context and ("awaiting_quote_card" in context.user_data or "awaiting_lessons_complete" in context.user_data):
+                        show_quiz = False
         except Exception:
             pass
             
@@ -438,7 +450,7 @@ async def send_graduation_dashboard(update, context, lang, user_id):
     await send_reply(
         update,
         grad_msg,
-        reply_markup=get_main_menu_buttons(lang, user_id=user_id),
+        reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context),
         parse_mode="Markdown"
     )
 
@@ -476,7 +488,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
                 await send_reply(
                     update,
                     welcome_back,
-                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
                 )
                 return
     
@@ -541,7 +553,7 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     await send_reply(
         update,
         get_text("help_menu", lang),
-        reply_markup=get_help_keyboard_buttons(lang, user_id=user_id)
+        reply_markup=get_help_keyboard_buttons(lang, user_id=user_id, context=context)
     )
 
 async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -563,7 +575,7 @@ async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         update,
         menu_text,
         parse_mode="Markdown",
-        reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+        reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
     )
 
 async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -639,13 +651,13 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
         await send_reply(
             update,
             progress_text,
-            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
         )
     else:
         await send_reply(
             update,
             get_text("error_generic", lang),
-            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
         )
 
 async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, module_id: str, lang: str, user_id: int) -> None:
@@ -791,7 +803,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 await send_reply(
                     update,
                     get_text("lessons_complete", lang, module_title=module['title']),
-                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id, show_quiz=True)
                 )
             return
 
@@ -815,7 +827,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 update,
                 f"{lesson_header}\n\n{lesson['content']}",
                 parse_mode="Markdown",
-                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
             )
         return
 
@@ -983,7 +995,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await send_reply(
             update,
             get_text("quiz_not_completed", lang, module_title=module['title']),
-            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id, show_quiz=True)
         )
         return
 
@@ -1060,6 +1072,10 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 else:
                     update_learner_progress(user_id, next_module_id, next_lesson_id)
 
+            # If this is last lesson, set flag so next button triggers quote card (do before rendering so buttons helper knows)
+            if is_last_lesson_of_module(next_module_id, next_lesson_id):
+                context.user_data["awaiting_quote_card"] = next_module_id
+
             # Show lesson
             lesson_header = get_text(
                 "lesson_header", lang, 
@@ -1085,7 +1101,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                         update,
                         lesson['content'],
                         parse_mode="Markdown",
-                        reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                        reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
                     )
                 except Exception as e:
                     logger.error(f"Error sending lesson video: {e}")
@@ -1094,7 +1110,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                         update,
                         f"{lesson_header}\n\n{lesson['content']}",
                         parse_mode="Markdown",
-                        reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                        reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
                     )
             else:
                 # Standard text lesson
@@ -1102,17 +1118,13 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     update,
                     f"{lesson_header}\n\n{lesson['content']}",
                     parse_mode="Markdown",
-                    reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
                 )
-
-            # If this is last lesson, set flag so next button triggers quote card
-            if is_last_lesson_of_module(next_module_id, next_lesson_id):
-                context.user_data["awaiting_quote_card"] = next_module_id
         else:
             await send_reply(
                 update,
                 get_text("error_generic", lang),
-                reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
             )
     else:
         # Course complete — Route to the scored exit post-test exam!
@@ -1210,7 +1222,7 @@ async def journal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await send_reply(
             update,
             get_text("journal_empty", lang),
-            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
         )
         return
         
@@ -2318,9 +2330,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         )
         
         if is_help_menu:
-            reply_markup = get_help_keyboard_buttons(lang, user_id=user_id)
+            reply_markup = get_help_keyboard_buttons(lang, user_id=user_id, context=context)
         else:
-            reply_markup = get_main_menu_buttons(lang, user_id=user_id)
+            reply_markup = get_main_menu_buttons(lang, user_id=user_id, context=context)
             
         await query.edit_message_reply_markup(reply_markup=reply_markup)
         
