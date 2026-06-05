@@ -33,7 +33,7 @@
                         "D) Both are built by society"
                     ],
                     "answer": "B",
-                    "feedback": "Correct! Sex = what you are born with. Gender = what society teaches you to be. This is the foundation of everything in this course."
+                    "feedback": "Correct! Sex = what you are born with. Gender = what society teaches you to be."
                 },
                 {
                     "question": "Question 2 of 3: Which of these is a harmful gender norm?",
@@ -62,7 +62,7 @@
         {
             "module_id": "module_2",
             "title": "Harmful Norms & Toxic Masculinity",
-            "opening_story": "Meet Chidi.\n\nChidi is 19. When his best friend Tolu started crying after losing his job, Chidi felt deeply uncomfortable. He told Tolu: \"Oga, men don't cry. Pull yourself together.\"\n\nThree weeks later, Tolu stopped answering his phone. His family found him in his room. He had taken his own life.\n\nChidi has not forgiven himself since. He keeps asking: \"What if I had let him cry? What if I had just listened?\"\n\nToday, we explore the norms that told Chidi — and all of us — that men cannot feel. And what those norms cost us.",
+            "opening_story": "Meet Aondo.\n\nAondo is 19, from Makurdi. When his best friend Osas started crying after losing his job, Aondo felt deeply uncomfortable.\n\nHe told Osas: \"Oga, men don't cry. Pull yourself together.\"\n\nThree weeks later, Osas stopped answering his phone. His family found him in his room. He had taken his own life.\n\nAondo has not forgiven himself since. He keeps asking: \"What if I had let him cry? What if I had just listened?\"\n\nToday, we explore the norms that told Aondo — and all of us — that men cannot feel. And what those norms cost us.",
             "lessons": [
                 {
                     "lesson_id": "lesson_2_1",
@@ -176,7 +176,7 @@
         {
             "module_id": "module_4",
             "title": "Root Causes of SGBV",
-            "opening_story": "Meet the Okafor household.\n\nMr. Okafor earns all the money. Mrs. Okafor stays home with the children. When she asks for money to buy food, he says: \"Whose money is it? You will use it as I say.\"\n\nTheir son, Junior, watches everything. He is 8 years old.\n\nBy the time Junior is 25, he believes that a man's money gives him the right to control a woman's body, movement, and voice.\n\nJunior never hit anyone. But he controls his girlfriend's phone. He decides where she can go. He monitors her friends.\n\nJunior learned this. Not from evil — but from what he watched every day growing up.\n\nToday we trace the roots.",
+            "opening_story": "Meet the Adeyemi household.\n\nMr. Adeyemi earns all the money. Mrs. Adeyemi stays home with the children. When she asks for money to buy food, he says: \"Whose money is it? You will use it as I say.\"\n\nTheir son, Junior, watches everything. He is 8 years old.\n\nBy the time Junior is 25, he believes that a man's money gives him the right to control a woman's body, movement, and voice.\n\nJunior never hit anyone. But he controls his girlfriend's phone. He decides where she can go. He monitors her friends.\n\nJunior learned this. Not from evil — but from what he watched every day growing up.\n\nToday we trace the roots.",
             "lessons": [
                 {
                     "lesson_id": "lesson_4_1",
@@ -300,7 +300,7 @@
                 {
                     "lesson_id": "lesson_6_2",
                     "title": "Communication and Conflict",
-                    "content": "Healthy relationships require honest, respectful communication — especially during conflict.\n\nSigns of healthy communication: Listening to understand, not just to respond. Expressing feelings without blame (\"I feel...\" not \"You always...\"). Taking responsibility for your own emotions. Being willing to take a break when conversations get too heated. Returning to difficult conversations when both people are calm.\n\nSigns of unhealthy communication: Shouting, threatening, or using silence as punishment. Bringing up old arguments to win the current one. Refusing to listen or dismissing your partner's feelings."
+                    "content": "Healthy relationships require honest, respectful communication — especially during conflict.\n\nSigns of healthy communication: Listening to understand, not just to respond. Expressing feelings without blame (\"I feel...\" not \"You always...\"). Taking responsibility for your own emotions. Being willing to take a break when conversations get too heated.\n\nSigns of unhealthy communication: Shouting, threatening, or using silence as punishment. Bringing up old arguments to win the current one. Refusing to listen or dismissing your partner's feelings."
                 },
                 {
                     "lesson_id": "lesson_6_3",
@@ -318,7 +318,7 @@
                         "D) Consent only applies to sex"
                     ],
                     "answer": "C",
-                    "feedback": "Correct. Consent can be withdrawn at any time. It must be enthusiastic — not just the absence of a 'no'. And it applies to all areas of a relationship."
+                    "feedback": "Correct. Consent can be withdrawn at any time. It must be enthusiastic and applies to all areas of a relationship, not just sex."
                 },
                 {
                     "question": "Question 2 of 3: Emotional intelligence means:",
@@ -357,12 +357,12 @@
                 {
                     "lesson_id": "lesson_7_2",
                     "title": "How to Intervene Safely — The 5Ds",
-                    "content": "Intervening does not mean becoming a hero or risking violence. It means doing something — however small — that disrupts the abuse.\n\nThe 5Ds of Bystander Intervention: Direct — speak up calmly: \"Hey, that's not okay.\" Distract — interrupt the situation: \"Bello! Come, let's go.\" Delegate — get someone else involved if you can't act safely. Delay — check in with the person after: \"Are you okay?\" Document — record safely if it is safe to do so.\n\nSafety first — always. If direct intervention feels dangerous, use distraction or delegation instead."
+                    "content": "Intervening does not mean becoming a hero or risking violence. It means doing something — however small — that disrupts the abuse.\n\nThe 5Ds of Bystander Intervention: Direct — speak up calmly (\"Hey, that's not okay\"). Distract — interrupt the situation (\"Come, let's go\"). Delegate — get someone else involved if you can't act safely. Delay — check in with the person after (\"Are you okay?\"). Document — record safely if it is safe to do so.\n\nSafety first — always. If direct intervention feels dangerous, use distraction or delegation instead."
                 },
                 {
                     "lesson_id": "lesson_7_3",
                     "title": "Supporting Survivors",
-                    "content": "If someone tells you they are being abused, your response in that moment matters enormously.\n\nWhat to do: Believe them. Listen without judgment. Tell them it is not their fault. Ask what they need: \"How can I support you?\" Share resources — helplines, shelters, legal support. Respect their choices — do not force them to leave if they are not ready. Check in with them regularly.\n\nWhat NOT to do: Ask \"What did you do to provoke it?\" Advise them to \"just leave\" without a plan. Tell other people their story without permission. Minimise what happened."
+                    "content": "If someone tells you they are being abused, your response in that moment matters enormously.\n\nWhat to do: Believe them. Listen without judgment. Tell them it is not their fault. Ask what they need (\"How can I support you?\"). Share resources — helplines, shelters, legal support. Respect their choices — do not force them to leave if they are not ready. Check in with them regularly.\n\nWhat NOT to do: Ask \"What did you do to provoke it?\" Advise them to \"just leave\" without a plan. Tell other people their story without permission. Minimise what happened."
                 }
             ],
             "quiz": [
@@ -404,7 +404,7 @@
         {
             "module_id": "module_8",
             "title": "Peer Influence & Leadership",
-            "opening_story": "Meet Chukwudi.\n\nChukwudi is 21. He is the most respected person in his friend group. When he speaks, everyone listens.\n\nOne night, the boys are drinking and one of them starts talking about a girl in degrading terms. Everyone laughs. The conversation escalates.\n\nChukwudi laughs too — at first.\n\nBut then he thinks of his 16-year-old sister. And he imagines someone talking about her this way.\n\nHe stops laughing. He says: \"Abeg, that's somebody's sister. Let's change the topic.\"\n\nThere is a moment of silence. And then someone else says: \"You're right. My bad.\" The conversation shifts.\n\nChukwudi didn't give a speech. He didn't shout. He just used the influence he already had — and it worked.",
+            "opening_story": "Meet Tonye.\n\nTonye is 21, from Yenagoa. He is the most respected person in his friend group. When he speaks, everyone listens.\n\nOne night, the boys are drinking and one of them starts talking about a girl in degrading terms. Everyone laughs. The conversation escalates.\n\nTonye laughs too — at first.\n\nBut then he thinks of his 16-year-old sister. And he imagines someone talking about her this way.\n\nHe stops laughing. He says: \"Abeg, that's somebody's sister. Let's change the topic.\"\n\nThere is a moment of silence. And then someone else says: \"You're right. My bad.\" The conversation shifts.\n\nTonye didn't give a speech. He didn't shout. He just used the influence he already had — and it worked.",
             "lessons": [
                 {
                     "lesson_id": "lesson_8_1",
@@ -476,7 +476,7 @@
                 {
                     "lesson_id": "lesson_9_3",
                     "title": "How to Engage Your Community",
-                    "content": "You don't need a budget or an NGO to engage your community. You need intention and consistency.\n\nPractical community engagement: Start a men's conversation group — even three people is enough. Organise a community dialogue on GBV — in a church, mosque, community hall, or under a tree. Use WhatsApp groups to share helpful content. Partner with local organisations, schools, or religious bodies. Identify and work with existing community leaders — chiefs, pastors, imams.\n\nChange is not a project. It is a practice. Start small. Stay consistent. Grow."
+                    "content": "You don't need a budget or an NGO to engage your community. You need intention and consistency.\n\nPractical community engagement: Start a men's conversation group — even three people is enough. Organise a community dialogue on GBV. Use WhatsApp groups to share helpful content. Partner with local organisations, schools, or religious bodies. Identify and work with community leaders — chiefs, pastors, imams.\n\nChange is not a project. It is a practice. Start small. Stay consistent. Grow."
                 }
             ],
             "quiz": [
@@ -518,7 +518,7 @@
         {
             "module_id": "module_10",
             "title": "Networks & Movement Building",
-            "opening_story": "Meet Ibrahim, Emeka, Tunde, and Bello.\n\nThey all took different journeys. They come from different states, different tribes, different religions.\n\nBut they are now connected — through a WhatsApp group, through shared values, and through a commitment they made to themselves and each other.\n\nTogether, they have reached over 300 men in their communities. They share resources. They support each other when the work gets hard. They hold each other accountable.\n\nNone of them could have reached 300 men alone. But together, they are a movement.\n\nWhen good men connect, the ripple goes further than anyone can see.",
+            "opening_story": "Meet Ibrahim, Emeka, Tunde, and Tonye.\n\nThey all took different journeys. Ibrahim is from Sokoto. Emeka from Onitsha. Tunde from Abeokuta. Tonye from Yenagoa.\n\nDifferent states, different tribes, different religions. But they are now connected — through a WhatsApp group, through shared values, and through a commitment they made to themselves and each other.\n\nTogether, they have reached over 300 men in their communities. They share resources. They support each other when the work gets hard. They hold each other accountable.\n\nNone of them could have reached 300 men alone. But together — they are a movement.\n\nWhen good men connect, the ripple goes further than any one man can see.",
             "lessons": [
                 {
                     "lesson_id": "lesson_10_1",
@@ -533,7 +533,7 @@
                 {
                     "lesson_id": "lesson_10_3",
                     "title": "Sustaining the Movement",
-                    "content": "Movements die when people burn out or lose focus. Sustainability requires intention.\n\nHow to sustain your commitment: Keep your \"why\" close — revisit why you started. Celebrate small wins — change is slow; progress is worth celebrating. Rest — you cannot pour from an empty cup. Build systems, not just events — regular meetings, shared responsibilities. Bring in new voices — especially younger men. Document your impact.\n\nThe work is long. But it is worth it."
+                    "content": "Movements die when people burn out or lose focus. Sustainability requires intention.\n\nHow to sustain your commitment: Keep your \"why\" close — revisit why you started. Celebrate small wins — change is slow; progress is worth celebrating. Rest — you cannot pour from an empty cup. Build systems, not just events. Bring in new voices — especially younger men. Document your impact.\n\nThe work is long. But it is worth it."
                 }
             ],
             "quiz": [
@@ -574,80 +574,23 @@
         },
         {
             "module_id": "module_11",
-            "title": "Legal Frameworks & Human Rights",
-            "opening_story": "Meet Kelechi.\n\nKelechi is 25, from Abuja. He has a neighbour, Obi, who regularly beats his wife, Chioma. One evening, after a loud fight, Kelechi tries to advise Obi. Obi snaps: 'Keep off! It is my house and my wife. The law has no business here.' Kelechi realizes many men believe the law stops at their front door. Today, we give him and you the truth about legal protections.",
+            "title": "Personal Action Plan",
+            "opening_story": "Meet Emeka — one last time.\n\nWhen he started this course, Emeka was a man who felt something was wrong but didn't have the words.\n\nToday, he is different.\n\nHe has had a conversation with his younger brother about gender norms. He called out a degrading joke in his friend group. He apologised to Adaeze for the times he shut down instead of communicating.\n\nHe is not perfect. He still slips. But he is aware now in ways he was not before.\n\nAnd awareness — honest, committed awareness — is where everything begins.\n\nThis is not the end of the course. This is the beginning of the work.",
             "lessons": [
                 {
                     "lesson_id": "lesson_11_1",
-                    "title": "The VAPP Act in Nigeria",
-                    "content": "In reality, Nigeria passed the Violence Against Persons (Prohibition) Act (VAPP Act) in 2015. This landmark law criminalizes domestic violence, rape, emotional abuse, and spousal abandonment. It is a federal crime, and marriage is never an excuse for violence. Legal frameworks exist to enter homes and hold abusers accountable."
+                    "title": "What You Now Know",
+                    "content": "Across this course, you have covered:\n\n✅ The difference between sex and gender  ✅ How harmful norms are created and passed on  ✅ What SGBV is, its types, and its impact  ✅ The root causes of GBV — power, culture, economy  ✅ Your role as a man in ending GBV  ✅ What healthy relationships and consent look like  ✅ How to intervene as a bystander  ✅ How to use your influence and become an advocate  ✅ How to engage your community and build networks\n\nThis is not just information. This is responsibility."
                 },
                 {
                     "lesson_id": "lesson_11_2",
-                    "title": "Legal Rights & Protections",
-                    "content": "The VAPP Act and other state laws provide strong protections for SGBV survivors. Under these laws, survivors have the right to seek protection orders (to keep abusers away), obtain medical and psychological support, and have their privacy protected in court.\n\nFiling a report is free, and the state is responsible for prosecuting criminal acts. Understanding these rights is the first step to breaking the cycle of violence."
+                    "title": "Building Your Personal Action Plan",
+                    "content": "An action plan turns intention into practice. Your plan has three parts:\n\n1. DAILY ACTIONS — What will you do every day? Examples: Speak respectfully to every woman in your life. Call out one harmful norm when you hear it. Check in on a friend who may be struggling.\n\n2. WEEKLY ACTIONS — What will you commit to each week? Examples: Have one honest conversation about GBV with a man in your life. Share one resource from this course. Attend the Brothers' Room community check-in.\n\n3. LONG-TERM COMMITMENTS — What will you build over time? Examples: Start a men's group in your community. Mentor one younger man. Report cases of abuse through proper channels.\n\nWrite your plan. Share it. Keep it."
                 },
                 {
                     "lesson_id": "lesson_11_3",
-                    "title": "Reporting & Referral Channels",
-                    "content": "If someone is experiencing abuse, knowing where to report can save a life. In Nigeria, key referral channels include:\n\n1. NAPTIP (National Agency for the Prohibition of Trafficking in Persons) - handles violence against persons.\n2. Family Support Units (FSUs) at designated police stations.\n3. Human Rights Commissions and local NGOs providing legal aid and shelters.\n\nAs an ally, your role is to share these resources, support the survivor's choices, and help them contact authorities safely."
-                }
-            ],
-            "quiz": [
-                {
-                    "question": "Question 1 of 3: Which of the following is TRUE under the VAPP Act in Nigeria?",
-                    "options": [
-                        "A) Domestic violence is a private family matter",
-                        "B) Spousal violence is a criminal offense and marriage is not an excuse",
-                        "C) The police cannot interfere in marital disputes",
-                        "D) Only physical violence is criminalized"
-                    ],
-                    "answer": "B",
-                    "feedback": "Correct! The VAPP Act criminalizes spousal violence, and marriage is never a shield for abuse under Nigerian law."
-                },
-                {
-                    "question": "Question 2 of 3: What right do SGBV survivors have under the VAPP Act?",
-                    "options": [
-                        "A) The right to be blamed for provoking the abuse",
-                        "B) The right to seek protection orders and get medical support",
-                        "C) No rights until the court finishes the case",
-                        "D) Only the right to pay the police to investigate"
-                    ],
-                    "answer": "B",
-                    "feedback": "Correct! Survivors have the legal right to seek protection orders, obtain medical/psychological support, and have their privacy protected."
-                },
-                {
-                    "question": "Question 3 of 3: Which agency in Nigeria is specifically tasked with handling violence against persons (such as SGBV)?",
-                    "options": [
-                        "A) EFCC",
-                        "B) NAPTIP",
-                        "C) NIS",
-                        "D) Federal Road Safety Corps (FRSC)"
-                    ],
-                    "answer": "B",
-                    "feedback": "Correct! NAPTIP (National Agency for the Prohibition of Trafficking in Persons) handles the enforcement of the VAPP Act."
-                }
-            ]
-        },
-        {
-            "module_id": "module_12",
-            "title": "Personal Action Plan",
-            "opening_story": "Meet Emeka — one last time.\n\nSix weeks ago, Emeka was a man who felt something was wrong but didn't have the words.\n\nToday, he is different.\n\nHe has had a conversation with his younger brother about gender norms. He called out a degrading joke in his friend group. He apologised to Adaeze for the times he shut down instead of communicating. He found out about the VAPP Act and shared it in his family WhatsApp group.\n\nHe is not perfect. He still slips. But he is aware now in ways he was not before.\n\nAnd awareness — honest, committed awareness — is where everything begins.\n\nThis is not the end of the course. This is the beginning of the work.",
-            "lessons": [
-                {
-                    "lesson_id": "lesson_12_1",
-                    "title": "What You Now Know",
-                    "content": "Over the past six weeks, you have covered:\n\n✅ The difference between sex and gender | ✅ How harmful norms are created and passed on | ✅ What SGBV is, its types, and its impact | ✅ The root causes of GBV — power, culture, economy | ✅ Your role as a man in ending GBV | ✅ What healthy relationships and consent look like | ✅ How to intervene as a bystander | ✅ How to use your influence and become an advocate | ✅ How to engage your community and build networks | ✅ The legal frameworks that protect survivors in Nigeria\n\nThis is not just information. This is responsibility."
-                },
-                {
-                    "lesson_id": "lesson_12_2",
-                    "title": "Building Your Personal Action Plan",
-                    "content": "An action plan turns intention into practice. Your plan has three parts:\n\n1. DAILY ACTIONS — What will you do every day? Examples: Speak respectfully to every woman in your life. Call out one harmful norm when you hear it. Check in on a friend who may be struggling.\n\n2. WEEKLY ACTIONS — What will you commit to each week? Examples: Have one honest conversation about GBV with a man in your life. Share one resource from this course. Attend the Brothers' Room community check-in.\n\n3. LONG-TERM COMMITMENTS — What will you build over time? Examples: Start a men's group in your community. Mentor one younger man. Report any cases of abuse I become aware of through proper channels.\n\nWrite your plan. Share it. Keep it."
-                },
-                {
-                    "lesson_id": "lesson_12_3",
                     "title": "Accountability and the Pledge",
-                    "content": "Commitment without accountability fades. Accountability keeps commitment alive.\n\nYour accountability tools: Your accountability buddy (check in weekly). The Brothers' Room community group (share your progress). Your personal action plan (review every Sunday). The bot (it will remind you of your pledge weekly for the next month).\n\nYour public pledge: \"I, [your name], commit to [specific action]. I will do this because I believe [your reason]. I will be held accountable by [name of person or group].\"\n\nThis pledge is yours. But it belongs to your community too. Post it in the group. Say it out loud. Mean it.\n\nWelcome to the Brotherhood of Change Agents."
+                    "content": "Commitment without accountability fades. Accountability keeps commitment alive.\n\nYour accountability tools: Your accountability buddy (check in weekly). The Brothers' Room community group (share your progress). Your personal action plan (review every week). The bot (it will remind you of your pledge weekly for the next month).\n\nYour public pledge: \"I, [your name], commit to [specific action]. I will do this because I believe [your reason]. I will be held accountable by [name of person or group].\"\n\nPost it in the community group. Say it out loud. Mean it.\n\nWelcome to the Brotherhood of Change Agents."
                 }
             ],
             "quiz": [
@@ -671,7 +614,7 @@
                         "D) It is not important — private commitments are enough"
                     ],
                     "answer": "B",
-                    "feedback": "Correct. Public pledges create social accountability — the knowledge that others are watching motivates consistency, and community support sustains long-term change."
+                    "feedback": "Correct. Public pledges create social accountability — the knowledge that others are watching motivates consistency and sustains long-term change."
                 },
                 {
                     "question": "Question 3 of 3: Completing this course means:",
@@ -679,10 +622,10 @@
                         "A) You are now perfect and done with learning",
                         "B) You have the information — now the work of applying it begins",
                         "C) You can teach others without continuing to learn yourself",
-                        "D) Your responsibility ended with Module 12"
+                        "D) Your responsibility ended with Module 11"
                     ],
                     "answer": "B",
-                    "feedback": "Exactly right. The course is the beginning, not the destination. The real work happens in your daily choices, your relationships, and your community — starting now."
+                    "feedback": "Exactly right. The course is the beginning, not the destination. The real work happens in your daily choices, relationships, and community — starting now."
                 }
             ]
         }

@@ -404,7 +404,13 @@ def get_engagement_leaderboard():
             try:
                 num = int(current_module_id.split('_')[1])
                 if post_test_score >= 0:
-                    modules_completed = 12
+                    import json
+                    try:
+                        with open("course_content.json", "r", encoding="utf-8") as f:
+                            total_modules = len(json.load(f)["modules"])
+                    except Exception:
+                        total_modules = 11
+                    modules_completed = total_modules
                 else:
                     modules_completed = max(0, num - 1)
             except Exception:

@@ -44,6 +44,20 @@ COURSE_TITLE = COURSE_CONTENT["course_title"]
 COURSE_DESCRIPTION = COURSE_CONTENT["course_description"]
 MODULES = COURSE_CONTENT["modules"]
 
+HASHTAGS_MAPPING = {
+    "module_1": "#TheBrothersRoom #PositiveMasculinity #GBV",
+    "module_2": "#TheBrothersRoom #BreakTheNorm #MenMatter",
+    "module_3": "#TheBrothersRoom #EndSGBV #NigerianMen",
+    "module_4": "#TheBrothersRoom #RootCauses #EndGBV",
+    "module_5": "#TheBrothersRoom #MenAsAllies #BeTheChange",
+    "module_6": "#TheBrothersRoom #HealthyRelationships #Consent",
+    "module_7": "#TheBrothersRoom #BystanderIntervention #SpeakUp",
+    "module_8": "#TheBrothersRoom #LeadWell #MenLeading",
+    "module_9": "#TheBrothersRoom #CommunityChange #TogetherWeChange",
+    "module_10": "#TheBrothersRoom #MovementBuilding #TogetherWeChange",
+    "module_11": "#TheBrothersRoom #ChangeAgent #TheWorkBegins",
+}
+
 # ============== TRANSLATION HELPER FUNCTIONS ==============
 
 def get_text(key, lang='en', **kwargs):
@@ -674,7 +688,10 @@ async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, mo
             
             import urllib.parse
             module_num = module_id.replace("module_", "")
+            hashtags = HASHTAGS_MAPPING.get(module_id, "")
             raw_share_msg = get_text("quote_card_share_message", lang, module_num=module_num, quote=quote_text)
+            if hashtags:
+                raw_share_msg = f"{raw_share_msg}\n\n{hashtags}"
             encoded_msg = urllib.parse.quote(raw_share_msg)
             
             whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
@@ -702,6 +719,9 @@ async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, mo
                 "yo": "🖼 *Eyi ni Kaadi Iṣaro rẹ fun Modulu {num}!* Fi pamọ si ibi aworan rẹ ki o pin lori WhatsApp Status, Facebook, tabi Instagram lati fun awọn ọkunrin miiran ni iyanju.",
                 "ig": "🖼 *Nke a bụ Kaadị Ntụgharị uche gị maka Modul {num}!* Chekwaa ya na gallery gị ma kọrọ ya na WhatsApp Status, Facebook, ma ọ bụ Instagram ka ị kpalie ndị ikom ọzọ."
             }.get(lang, "Here is your shareable quote card!").format(num=module_num)
+            
+            if hashtags:
+                caption_text = f"{caption_text}\n\n{hashtags}"
             
             chat_msg = update.callback_query.message if update.callback_query else update.message
             with open(quote_card_file, "rb") as q_photo:
@@ -1549,7 +1569,12 @@ def generate_quote_card_image(module_id, module_title, quote_text, lang, user_id
     footer_text = "Join the conversation: t.me/thebrotherroom_bot"
     draw.text((width // 2, 975), footer_text, fill=(219, 161, 71, 255), font=font_footer, anchor="mm")
     
-    # 10. Paste Logos in bottom corners
+    # Draw hashtags
+    hashtags = HASHTAGS_MAPPING.get(module_id, "")
+    if hashtags:
+        draw.text((width // 2, 915), hashtags, fill=(219, 161, 71, 255), font=font_footer, anchor="mm")
+    
+    # 10. Paste Logos in top-right corner horizontally side-by-side (target height = ~45px)
     def paste_logo(filename, x, y, target_w, align_right=False):
         path = os.path.join(assets_dir, filename)
         if os.path.exists(path):
@@ -1562,16 +1587,208 @@ def generate_quote_card_image(module_id, module_title, quote_text, lang, user_id
                 final_x = x - target_w if align_right else x
                 final_y = y - (target_h // 2)
                 img.paste(logo, (final_x, final_y), logo)
+                return target_w, target_h
             except Exception as e:
                 logger.error(f"Error pasting logo {filename}: {e}")
+        return 0, 0
                 
-    paste_logo("youthhub_africa_logo.png", 90, 975, target_w=85)
-    paste_logo("young_mens_foundation_logo.png", 990 - 85, 975, target_w=85)
+    yh_w, yh_h = paste_logo("youthhub_africa_logo.png", width - 75, 110, target_w=41, align_right=True)
+    paste_logo("young_mens_foundation_logo.png", width - 75 - yh_w - 15, 110, target_w=54, align_right=True)
     
     # Save PNG image
     output_path = f"assets/quote_card_{module_id}_{user_id}.png"
     final_img = img.convert("RGB")
     final_img.save(output_path, "PNG")
+    return output_path
+
+def generate_badge_image(module_id, badge_name, lang, user_id):
+    """Generate a highly aesthetic, premium, game-style digital achievement badge using Pillow."""
+    from PIL import Image, ImageDraw, ImageFont
+    import os
+    
+    width, height = 512, 512
+    img = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    
+    # Colors
+    c_gold = (219, 161, 71, 255)
+    c_gold_glow = (219, 161, 71, 40)
+    c_navy = (15, 32, 67, 255)
+    c_navy_light = (28, 54, 105, 255)
+    c_charcoal = (25, 25, 25, 255)
+    c_cream = (245, 240, 230, 255)
+    c_gray = (160, 160, 160, 255)
+    
+    # 1. Draw rounded rectangle card background with subtle gradient
+    for i in range(12):
+        offset = i
+        r = int(c_navy[0] + (c_charcoal[0] - c_navy[0]) * i / 12)
+        g = int(c_navy[1] + (c_charcoal[1] - c_navy[1]) * i / 12)
+        b = int(c_navy[2] + (c_charcoal[2] - c_navy[2]) * i / 12)
+        draw.rounded_rectangle(
+            [15 + offset, 15 + offset, width - 15 - offset, height - 15 - offset],
+            radius=35 - offset,
+            fill=(r, g, b, 255)
+        )
+        
+    # 2. Draw outer gold border
+    draw.rounded_rectangle([15, 15, width - 15, height - 15], radius=35, outline=c_gold, width=4)
+    
+    # 3. Draw inner gold accent line
+    draw.rounded_rectangle([25, 25, width - 25, height - 25], radius=27, outline=(219, 161, 71, 80), width=1)
+    
+    # 4. Load typography
+    assets_dir = "assets"
+    fonts_dir = os.path.join(assets_dir, "fonts")
+    try:
+        font_header = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 14)
+        font_badge = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 28)
+        font_meta = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 16)
+    except Exception:
+        font_header = font_badge = font_meta = ImageFont.load_default()
+        
+    # Header Text
+    draw.text((width // 2, 45), "T H E   B R O T H E R S '   R O O M", fill=c_gold, font=font_header, anchor="mm")
+    
+    # 5. Draw Emblem / Shield
+    shield_pts = [
+        (256, 100), # Top point
+        (376, 140), # Top right
+        (376, 260), # Mid right
+        (256, 340), # Bottom point
+        (136, 260), # Mid left
+        (136, 140)  # Top left
+    ]
+    
+    # Draw glow behind shield
+    draw.polygon(shield_pts, fill=c_gold_glow)
+    # Draw gold border shield
+    draw.polygon(shield_pts, outline=c_gold, width=5)
+    # Inner dark fill shield
+    inner_shield_pts = [
+        (256, 108),
+        (364, 144),
+        (364, 254),
+        (256, 328),
+        (148, 254),
+        (148, 144)
+    ]
+    draw.polygon(inner_shield_pts, fill=c_navy_light)
+    draw.polygon(inner_shield_pts, outline=(219, 161, 71, 120), width=2)
+    
+    # 6. Draw central icon based on module_id
+    cx, cy = 256, 215
+    
+    if module_id == "module_1": # Heart with Star
+        draw.ellipse([cx - 26, cy - 25, cx, cy + 1], fill=c_gold)
+        draw.ellipse([cx, cy - 25, cx + 26, cy + 1], fill=c_gold)
+        draw.polygon([(cx - 25, cy - 6), (cx + 25, cy - 6), (cx, cy + 25)], fill=c_gold)
+        draw.polygon([(cx, cy - 12), (cx + 3, cy - 3), (cx + 12, cy - 3), (cx + 5, cy + 2), (cx + 8, cy + 11), (cx, cy + 5), (cx - 8, cy + 11), (cx - 5, cy + 2), (cx - 12, cy - 3), (cx - 3, cy - 3)], fill=c_navy)
+    elif module_id == "module_2": # Laurel / Diamond
+        diamond_pts = [(cx, cy - 30), (cx + 30, cy), (cx, cy + 30), (cx - 30, cy)]
+        draw.polygon(diamond_pts, fill=c_gold)
+        draw.line([(cx, cy - 30), (cx, cy + 30)], fill=c_navy, width=2)
+        draw.line([(cx - 30, cy), (cx + 30, cy)], fill=c_navy, width=2)
+    elif module_id == "module_3": # Crown
+        crown_pts = [
+            (cx - 30, cy + 25),
+            (cx + 30, cy + 25),
+            (cx + 30, cy - 10),
+            (cx + 15, cy + 5),
+            (cx, cy - 20),
+            (cx - 15, cy + 5),
+            (cx - 30, cy - 10)
+        ]
+        draw.polygon(crown_pts, fill=c_gold)
+        draw.rectangle([cx - 32, cy + 25, cx + 32, cy + 30], fill=c_gold)
+        draw.ellipse([cx - 32, cy - 15, cx - 28, cy - 11], fill=c_cream)
+        draw.ellipse([cx - 2, cy - 25, cx + 2, cy - 21], fill=c_cream)
+        draw.ellipse([cx + 28, cy - 15, cx + 32, cy - 11], fill=c_cream)
+    elif module_id in ["module_4", "module_5"]: # Lightning
+        bolt_pts = [
+            (cx + 5, cy - 35),
+            (cx + 20, cy - 5),
+            (cx + 2, cy - 5),
+            (cx + 12, cy + 30),
+            (cx - 15, cy + 5),
+            (cx + 2, cy + 5)
+        ]
+        draw.polygon(bolt_pts, fill=c_gold)
+    elif module_id == "module_6": # Interlinked Rings
+        draw.ellipse([cx - 30, cy - 18, cx - 2, cy + 10], outline=c_gold, width=6)
+        draw.ellipse([cx + 2, cy - 18, cx + 30, cy + 10], outline=c_gold, width=6)
+    elif module_id == "module_7": # Star inside shield
+        star_pts = []
+        for i in range(10):
+            r_val = 32 if i % 2 == 0 else 14
+            import math
+            angle = i * math.pi / 5 - math.pi / 2
+            star_pts.append((cx + r_val * math.cos(angle), cy + r_val * math.sin(angle)))
+        draw.polygon(star_pts, fill=c_gold)
+    elif module_id == "module_8": # Compass Rose
+        draw.polygon([(cx, cy - 35), (cx + 8, cy - 8), (cx + 35, cy), (cx + 8, cy + 8), (cx, cy + 35), (cx - 8, cy + 8), (cx - 35, cy), (cx - 8, cy - 8)], fill=c_gold)
+        draw.polygon([(cx, cy - 35), (cx, cy), (cx + 8, cy - 8)], fill=c_cream)
+        draw.polygon([(cx + 35, cy), (cx, cy), (cx + 8, cy + 8)], fill=c_cream)
+        draw.polygon([(cx, cy + 35), (cx, cy), (cx - 8, cy + 8)], fill=c_cream)
+        draw.polygon([(cx - 35, cy), (cx, cy), (cx - 8, cy - 8)], fill=c_cream)
+    elif module_id == "module_9": # Megaphone
+        draw.polygon([(cx - 20, cy - 10), (cx + 15, cy - 25), (cx + 15, cy + 15), (cx - 20, cy + 5)], fill=c_gold)
+        draw.polygon([(cx - 15, cy + 2), (cx - 15, cy + 22), (cx - 7, cy + 22), (cx - 7, cy + 2)], fill=c_gold)
+        draw.arc([cx + 5, cy - 35, cx + 35, cy + 25], start=-60, end=60, fill=c_gold, width=4)
+        draw.arc([cx + 15, cy - 45, cx + 45, cy + 35], start=-60, end=60, fill=c_gold, width=4)
+    elif module_id == "module_10": # Network nodes
+        node_positions = [
+            (cx, cy - 25),
+            (cx - 28, cy),
+            (cx + 28, cy),
+            (cx - 15, cy + 28),
+            (cx + 15, cy + 28)
+        ]
+        for i in range(len(node_positions)):
+            for j in range(i + 1, len(node_positions)):
+                draw.line([node_positions[i], node_positions[j]], fill=c_gold, width=2)
+        for pos in node_positions:
+            draw.ellipse([pos[0] - 8, pos[1] - 8, pos[0] + 8, pos[1] + 8], fill=c_gold, outline=c_navy, width=1)
+    elif module_id == "module_11": # Scales of justice
+        draw.line([(cx, cy - 30), (cx, cy + 30)], fill=c_gold, width=4)
+        draw.line([(cx - 20, cy + 30), (cx + 20, cy + 30)], fill=c_gold, width=4)
+        draw.line([(cx - 30, cy - 20), (cx + 30, cy - 20)], fill=c_gold, width=4)
+        draw.line([(cx - 30, cy - 20), (cx - 40, cy + 5)], fill=c_gold, width=2)
+        draw.line([(cx - 30, cy - 20), (cx - 20, cy + 5)], fill=c_gold, width=2)
+        draw.arc([cx - 43, cy + 5, cx - 17, cy + 20], start=0, end=180, fill=c_gold, width=3)
+        draw.line([(cx + 30, cy - 20), (cx + 20, cy + 5)], fill=c_gold, width=2)
+        draw.line([(cx + 30, cy - 20), (cx + 40, cy + 5)], fill=c_gold, width=2)
+        draw.arc([cx + 17, cy + 5, cx + 43, cy + 20], start=0, end=180, fill=c_gold, width=3)
+    else: # Fallback star
+        star_pts = []
+        for i in range(10):
+            r_val = 35 if i % 2 == 0 else 15
+            import math
+            angle = i * math.pi / 5 - math.pi / 2
+            star_pts.append((cx + r_val * math.cos(angle), cy + r_val * math.sin(angle)))
+        draw.polygon(star_pts, fill=c_gold)
+
+    # 7. Draw badge name and completion details
+    badge_name_clean = badge_name.replace("[", "").replace("]", "").upper()
+    draw.text((width // 2, 395), badge_name_clean, fill=c_cream, font=font_badge, anchor="mm")
+    
+    module_num = module_id.replace("module_", "")
+    meta_text = {
+        "en": f"MODULE {module_num} COMPLETION",
+        "pcm": f"MODULE {module_num} COMPLETE",
+        "ha": f"KAMMALA MODUL {module_num}",
+        "yo": f"MODULU {module_num} APARI",
+        "ig": f"NGACHA MODUL {module_num}"
+    }.get(lang, f"MODULE {module_num} COMPLETION")
+    draw.text((width // 2, 440), meta_text, fill=c_gold, font=font_meta, anchor="mm")
+    
+    # Elegant double dots under meta_text
+    draw.ellipse([cx - 20, 465, cx - 16, 469], fill=c_gold)
+    draw.ellipse([cx - 2, 464, cx + 2, 468], fill=c_gold)
+    draw.ellipse([cx + 16, 465, cx + 20, 469], fill=c_gold)
+    
+    output_path = f"assets/badge_{module_id}_{user_id}.png"
+    img.save(output_path, "PNG")
     return output_path
 
 def generate_certificate_image(name, date_str, user_id):
@@ -1927,7 +2144,7 @@ async def show_admin_leaderboard(update: Update, context: ContextTypes.DEFAULT_T
         badge = "🥇" if idx == 0 else "🥈" if idx == 1 else "🥉" if idx == 2 else "👤"
         text += f"{badge} *Rank {idx + 1}:* {item['full_name']} (ID: `{item['user_id']}`)\n"
         text += f"   • Engagement Score: *{item['engagement_score']}*\n"
-        text += f"   • Modules Completed: {item['modules_completed']}/12\n"
+        text += f"   • Modules Completed: {item['modules_completed']}/{len(MODULES)}\n"
         text += f"   • First-Attempt Quizzes: {item['first_attempt_quizzes']}\n"
         text += f"   • AI Assistant Queries: {item['ai_questions_count']}\n"
         if item['post_test_score'] >= 0:
@@ -2378,6 +2595,41 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # Quiz skip/move forward
     elif data == "quiz_skip":
         await query.delete_message()
+        
+        # Deliver badge on skip as they are completing the module
+        progress = get_learner_progress(user_id)
+        if progress and progress[0]:
+            current_module_id = progress[0]
+            badge_path = None
+            try:
+                badge_name = TRANSLATIONS.get("badges", {}).get(current_module_id, {}).get(lang, "Badge")
+                badge_path = generate_badge_image(current_module_id, badge_name, lang, user_id)
+            except Exception as e:
+                logger.error(f"Error generating badge image on skip: {e}")
+                
+            badge_unlocked_text = {
+                "en": "🏆 *Badge Unlocked!* You've earned the digital badge for this module.",
+                "pcm": "🏆 *Badge Unlocked!* You don earn the digital badge for this module.",
+                "ha": "🏆 *An Buɗe Lambar Yabo!* Kun sami lambar yabo ta dijital don wannan modul.",
+                "yo": "🏆 *Ami-ẹri Ti Wa Ni Titi!* O ti gba ami-ẹri oni-nọmba fun modulu yii.",
+                "ig": "🏆 *Emepeela Badge!* Ị nwetawo badge dijitalụ maka modul a."
+            }.get(lang, "🏆 Badge Unlocked!")
+            
+            if badge_path and os.path.exists(badge_path):
+                try:
+                    with open(badge_path, "rb") as bf:
+                        await query.message.reply_photo(
+                            photo=bf,
+                            caption=badge_unlocked_text,
+                            parse_mode="Markdown"
+                        )
+                except Exception as e:
+                    logger.error(f"Error sending skip badge photo: {e}")
+                finally:
+                    try:
+                        os.remove(badge_path)
+                    except Exception:
+                        pass
         await next_lesson_handler(update, context)
     
     # Quiz answer
@@ -2464,7 +2716,42 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                     [InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")]
                 ]
                 reply_markup = InlineKeyboardMarkup(buttons)
-                await query.edit_message_text(completion_text, reply_markup=reply_markup, parse_mode="Markdown")
+                
+                badge_path = None
+                try:
+                    badge_name = TRANSLATIONS.get("badges", {}).get(module_id, {}).get(lang, "Badge")
+                    badge_path = generate_badge_image(module_id, badge_name, lang, user_id)
+                except Exception as e:
+                    logger.error(f"Error generating badge image on perfect score: {e}")
+                
+                await query.delete_message()
+                if badge_path and os.path.exists(badge_path):
+                    try:
+                        with open(badge_path, "rb") as bf:
+                            await query.message.reply_photo(
+                                photo=bf,
+                                caption=completion_text,
+                                reply_markup=reply_markup,
+                                parse_mode="Markdown"
+                            )
+                    except Exception as e:
+                        logger.error(f"Error sending badge photo: {e}")
+                        await query.message.reply_text(
+                            text=completion_text,
+                            reply_markup=reply_markup,
+                            parse_mode="Markdown"
+                        )
+                    finally:
+                        try:
+                            os.remove(badge_path)
+                        except Exception:
+                            pass
+                else:
+                    await query.message.reply_text(
+                        text=completion_text,
+                        reply_markup=reply_markup,
+                        parse_mode="Markdown"
+                    )
             else:
                 update_quiz_status(user_id, 2)
                 score = 3 - errors
