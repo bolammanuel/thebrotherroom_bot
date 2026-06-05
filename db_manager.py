@@ -120,6 +120,16 @@ def init_db():
     for col, col_def in new_cols.items():
         if col not in existing_cols:
             cursor.execute(f"ALTER TABLE learners ADD COLUMN {col} {col_def}")
+            
+    # Create performance indexes to optimize query speed and scheduler loops
+    try:
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_learners_last_activity ON learners (last_activity)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_reminders_next_send_time ON reminders (next_send_time)")
+        cursor.execute("CREATE INDEX IF NOT EXISTS idx_reflections_user_id ON reflections (user_id)")
+    except Exception as e:
+        # Soft logging if index creation encounters table locks
+        import logging
+        logging.getLogger(__name__).warning(f"Performance index creation warning: {e}")
     
     conn.commit()
     conn.close()
@@ -719,6 +729,46 @@ def reset_learner_data(user_id):
     cursor.execute("DELETE FROM reminders WHERE user_id = %s", (user_id,))
     conn.commit()
     conn.close()
+
+def backup_sqlite_db():
+    """Create a backup of the SQLite database if running locally."""
+    conn = get_connection()
+    is_sqlite = conn.is_sqlite
+    conn.close()
+    
+    if not is_sqlite:
+        # PostgreSQL backups are handled natively by hosting providers (e.g. Railway)
+        return True, "PostgreSQL backups are managed natively by the host."
+        
+    try:
+        import shutil
+        import datetime
+        
+        db_file = "learner_progress.db"
+        if not os.path.exists(db_file):
+            return False, f"Database file '{db_file}' not found."
+            
+        backup_dir = "backups"
+        if not os.path.exists(backup_dir):
+            os.makedirs(backup_dir)
+            
+        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+        backup_file = os.path.join(backup_dir, f"learner_progress_backup_{timestamp}.db")
+        shutil.copy2(db_file, backup_file)
+        
+        # Prune old backups (keep only the last 7 backups)
+        backups = [os.path.join(backup_dir, f) for f in os.listdir(backup_dir) if f.startswith("learner_progress_backup_") and f.endswith(".db")]
+        backups.sort(key=os.path.getmtime)
+        while len(backups) > 7:
+            old_backup = backups.pop(0)
+            try:
+                os.remove(old_backup)
+            except Exception as e:
+                pass
+                
+        return True, backup_file
+    except Exception as e:
+        return False, str(e)
 
 
 

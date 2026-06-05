@@ -4,6 +4,7 @@ import logging
 import asyncio
 import csv
 import re
+import time
 from dotenv import load_dotenv
 
 
@@ -20,7 +21,7 @@ from db_manager import (
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
     get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name,
     get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent, get_all_learner_reflections,
-    reset_learner_data
+    reset_learner_data, backup_sqlite_db
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
 
@@ -2420,11 +2421,24 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
         except Exception as e:
             logger.error(f"Error broadcasting pledge to community: {e}")
 
+LAST_BACKUP_TIME = 0
+
 async def reminder_scheduler(application: Application) -> None:
     """Persistent background asynchronous worker for scheduling nudges and weekly reminders."""
     logger.info("Background reminder scheduler started successfully!")
+    global LAST_BACKUP_TIME
     while True:
         try:
+            # 0. Run database backup once every 24 hours
+            current_time = time.time()
+            if current_time - LAST_BACKUP_TIME >= 86400:
+                success, details = backup_sqlite_db()
+                if success:
+                    logger.info(f"Automated database backup created successfully: {details}")
+                else:
+                    logger.error(f"Automated database backup failed: {details}")
+                LAST_BACKUP_TIME = current_time
+                
             # Initialize Sunday checks for any active learners that don't have them scheduled
             init_sunday_checks()
 
@@ -3417,6 +3431,15 @@ async def post_init(application: Application) -> None:
 def main() -> None:
     """Start the bot."""
     init_db()
+
+    # Start the web analytics dashboard in a background daemon thread
+    try:
+        import threading
+        from dashboard import run_dashboard_server
+        threading.Thread(target=run_dashboard_server, daemon=True).start()
+        logger.info("Background facilitator dashboard web server started successfully!")
+    except Exception as e:
+        logger.error(f"Failed to start dashboard web server: {e}")
 
     token = os.getenv("TELEGRAM_BOT_TOKEN")
     if not token:
