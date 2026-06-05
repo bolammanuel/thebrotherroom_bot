@@ -155,18 +155,18 @@ def enroll_learner(user_id, language='en', full_name=None):
     conn.close()
 
 def is_learner_registered(user_id):
-    """Check if learner has completed full profile registration (name, address, state)."""
+    """Check if learner has completed profile registration (name, state)."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT full_name, address, state FROM learners WHERE user_id = %s
+        SELECT full_name, state FROM learners WHERE user_id = %s
     """, (user_id,))
     result = cursor.fetchone()
     conn.close()
     if not result:
         return False
-    full_name, address, state = result
-    return bool(full_name and address and state)
+    full_name, state = result
+    return bool(full_name and state)
 
 def get_learner_progress(user_id):
     """Get learner's current progress (module, lesson, quiz status, language)."""
