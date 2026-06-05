@@ -2204,7 +2204,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT user_id, full_name, current_module_id, current_lesson_id, quiz_completed, 
+        SELECT user_id, full_name, address, state, current_module_id, current_lesson_id, quiz_completed, 
                language_preference, enrollment_date, post_test_score, pledge_text,
                ai_questions_count, first_attempt_quizzes
         FROM learners
@@ -2222,7 +2222,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     with open(csv_file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "User ID", "Full Name", "Current Module", "Current Lesson", "Quiz Status", 
+            "User ID", "Full Name", "Address", "State", "Current Module", "Current Lesson", "Quiz Status", 
             "Language Preference", "Enrollment Date", "Post-Test Score", "Personal Pledge",
             "AI Questions Asked", "First-Attempt Quizzes Passed"
         ])
