@@ -1638,13 +1638,15 @@ def generate_badge_image(module_id, badge_name, lang, user_id):
     draw.rounded_rectangle([25, 25, width - 25, height - 25], radius=27, outline=(219, 161, 71, 80), width=1)
     
     # 4. Load typography
-    assets_dir = "assets"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    assets_dir = os.path.join(base_dir, "assets")
     fonts_dir = os.path.join(assets_dir, "fonts")
     try:
         font_header = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 14)
         font_badge = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 28)
         font_meta = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 16)
-    except Exception:
+    except Exception as e:
+        logger.error(f"Error loading badge fonts: {e}")
         font_header = font_badge = font_meta = ImageFont.load_default()
         
     # Header Text
@@ -1787,7 +1789,7 @@ def generate_badge_image(module_id, badge_name, lang, user_id):
     draw.ellipse([cx - 2, 464, cx + 2, 468], fill=c_gold)
     draw.ellipse([cx + 16, 465, cx + 20, 469], fill=c_gold)
     
-    output_path = f"assets/badge_{module_id}_{user_id}.png"
+    output_path = os.path.join(assets_dir, f"badge_{module_id}_{user_id}.png")
     img.save(output_path, "PNG")
     return output_path
 
@@ -2595,6 +2597,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     # Quiz skip/move forward
     elif data == "quiz_skip":
         await query.delete_message()
+        context.user_data.pop("quiz_question_idx", None)
+        context.user_data.pop("quiz_errors", None)
         
         # Deliver badge on skip as they are completing the module
         progress = get_learner_progress(user_id)
@@ -2701,6 +2705,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             progress = get_learner_progress(user_id)
             
             if errors == 0:
+                context.user_data.pop("quiz_question_idx", None)
+                context.user_data.pop("quiz_errors", None)
                 quiz_comp = int(progress[2]) if (progress and progress[2] is not None) else 0
                 if quiz_comp == 0:
                     increment_first_attempt_quizzes(user_id)
