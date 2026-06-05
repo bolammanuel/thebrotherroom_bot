@@ -91,7 +91,8 @@ def get_main_menu_buttons(lang='en', user_id=None):
             progress = get_learner_progress(user_id)
             if progress and progress[0]:
                 current_module_id, current_lesson_id, quiz_completed, _ = progress
-                if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
+                quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
+                if is_last_lesson_of_module(current_module_id, current_lesson_id) and quiz_completed == 0:
                     show_quiz = True
         except Exception:
             pass
@@ -163,7 +164,8 @@ def get_help_keyboard_buttons(lang='en', user_id=None):
             progress = get_learner_progress(user_id)
             if progress and progress[0]:
                 current_module_id, current_lesson_id, quiz_completed, _ = progress
-                if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
+                quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
+                if is_last_lesson_of_module(current_module_id, current_lesson_id) and quiz_completed == 0:
                     show_quiz = True
         except Exception:
             pass
@@ -457,6 +459,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if result and result[0]:
         # Returning learner — welcome them back
         current_module_id, current_lesson_id, quiz_completed, lang = result
+        quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
         
         # Check if they have completed the entire course (last module, last lesson, quiz completed)
         next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
@@ -579,6 +582,7 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
     # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
     current_module_id, current_lesson_id, quiz_completed, lang = result
+    quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
     module, lesson = get_module_lesson(current_module_id, current_lesson_id)
 
     if module and lesson:
@@ -727,6 +731,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         return
         
     current_module_id, current_lesson_id, quiz_completed, lang = result
+    quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
     
     # 1. State: Awaiting reflection response
     if "awaiting_reflection" in context.user_data:
@@ -797,15 +802,10 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await send_quote_card(update, context, current_module_id, lang, user_id)
         return
 
-    # 4. State: Viewing Lessons Complete prompt (awaiting quiz prompt)
+    # 4. State: Viewing Quote Card (awaiting lessons complete prompt)
     if "awaiting_lessons_complete" in context.user_data:
         context.user_data.pop("awaiting_lessons_complete", None)
-        await send_quote_card(update, context, current_module_id, lang, user_id)
-        return
-
-    # 5. State: Viewing Quote Card
-    if "awaiting_quote_card" in context.user_data:
-        context.user_data.pop("awaiting_quote_card", None)
+        context.user_data["awaiting_quote_card"] = current_module_id
         module, lesson = get_module_lesson(current_module_id, current_lesson_id)
         if module and lesson:
             module_num = current_module_id.replace("module_", "")
@@ -817,16 +817,27 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 parse_mode="Markdown",
                 reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
-            context.user_data["awaiting_quote_card"] = current_module_id
         return
+
+    # 5. State: Clear awaiting_quote_card when navigating back from last lesson
+    if "awaiting_quote_card" in context.user_data:
+        context.user_data.pop("awaiting_quote_card", None)
 
     # 6. State: Welcome screen / onboarding start
     if current_lesson_id == "start":
-        if context.user_data.get("story_read") == "module_1":
-            context.user_data.pop("story_read", None)
-            await start(update, context)
-        else:
-            await start(update, context)
+        context.user_data.pop("story_read", None)
+        if current_module_id == "module_1":
+            pre_score = get_pre_test_score(user_id)
+            if pre_score >= 0:
+                welcome_real = get_text("pre_test.completed", lang, score=pre_score)
+                await send_reply(
+                    update,
+                    welcome_real,
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id),
+                    parse_mode="Markdown"
+                )
+                return
+        await start(update, context)
         return
 
     # 7. State: Viewing the Opening Story of Module X (X > 1)
@@ -963,10 +974,11 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
     # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
     current_module_id, current_lesson_id, quiz_completed, lang = result
+    quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
 
     # Block progression to next MODULE if quiz not attempted
     # (They must at least try the quiz — pass or fail doesn't matter)
-    if is_last_lesson_of_module(current_module_id, current_lesson_id) and not quiz_completed:
+    if is_last_lesson_of_module(current_module_id, current_lesson_id) and quiz_completed == 0:
         module = get_module_by_id(current_module_id)
         await send_reply(
             update,
@@ -1122,6 +1134,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
     # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
     current_module_id, current_lesson_id, quiz_completed, lang = result
+    quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
 
     if quiz_completed == 1:
         await send_reply(
@@ -2424,7 +2437,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             progress = get_learner_progress(user_id)
             
             if errors == 0:
-                if progress and progress[2] == 0:
+                quiz_comp = int(progress[2]) if (progress and progress[2] is not None) else 0
+                if quiz_comp == 0:
                     increment_first_attempt_quizzes(user_id)
                 update_quiz_status(user_id, 1)
                 
