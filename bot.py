@@ -3,6 +3,7 @@ import json
 import logging
 import asyncio
 import csv
+import re
 from dotenv import load_dotenv
 
 
@@ -93,6 +94,52 @@ def get_command_button(button_name, lang='en'):
     """Get translated command button text."""
     return get_text(f"command_buttons.{button_name}", lang)
 
+def get_localized_field(field_value, lang, default_val=""):
+    """
+    Get localized string from a dictionary containing language keys.
+    If field_value is a string, returns it directly.
+    If field_value is a dict, returns key for 'lang', falls back to 'en', or gets any available key.
+    """
+    if not field_value:
+        return default_val
+    if isinstance(field_value, dict):
+        val = field_value.get(lang)
+        if val is not None:
+            return val
+        val = field_value.get("en")
+        if val is not None:
+            return val
+        for k in ["pcm", "ha", "yo", "ig"]:
+            if k in field_value:
+                return field_value[k]
+        if field_value.values():
+            return list(field_value.values())[0]
+        return default_val
+    return str(field_value)
+
+def get_localized_options(options_value, lang, default_val=None):
+    """
+    Get localized options list.
+    """
+    if default_val is None:
+        default_val = []
+    if not options_value:
+        return default_val
+    if isinstance(options_value, dict):
+        val = options_value.get(lang)
+        if val is not None:
+            return val
+        val = options_value.get("en")
+        if val is not None:
+            return val
+        for k in ["pcm", "ha", "yo", "ig"]:
+            if k in options_value:
+                return options_value[k]
+        if options_value.values():
+            return list(options_value.values())[0]
+        return default_val
+    return options_value
+
 # ============== INLINE BUTTON HELPER ==============
 
 def get_main_menu_buttons(lang='en', user_id=None, show_quiz=None, context=None):
@@ -173,8 +220,8 @@ def get_main_menu_buttons(lang='en', user_id=None, show_quiz=None, context=None)
             "ha": "Littafin Tunanina",
             "yo": "Iwe Iṣaro Mi",
             "ig": "Akwụkwọ M"
-        }.get(lang, "My Journal"), callback_data="cmd_journal")]
-        # [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
+        }.get(lang, "My Journal"), callback_data="cmd_journal")],
+        [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
     ])
     return InlineKeyboardMarkup(buttons)
 
@@ -256,7 +303,7 @@ def get_help_keyboard_buttons(lang='en', user_id=None, context=None):
             "yo": "Iwe Iṣaro Mi",
             "ig": "Akwụkwọ M"
         }.get(lang, "My Journal"), callback_data="cmd_journal")],
-        # [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")],
+        [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")],
         [InlineKeyboardButton(community_label, url=os.getenv("TELEGRAM_GROUP_URL", "https://t.me/YOUR_TELEGRAM_GROUP_LINK"))]
     ])
     return InlineKeyboardMarkup(buttons)
@@ -384,6 +431,360 @@ def get_quiz_correct_answer(module_id):
             return module["quiz"]["answer"]
     return "A"
 
+# ============== ACCESSIBILITY VOICE UTILITIES ==============
+
+def clean_text_for_tts(text):
+    """Clean raw message text to make it sound natural when spoken by TTS."""
+    if not text:
+        return ""
+    # 1. Replace markdown links [label](url) with just label
+    text = re.sub(r'\[([^\]]+)\]\([^\)]+\)', r'\1', text)
+    
+    # 2. Replace URLs with a natural spoken description
+    text = re.sub(r'https?://[^\s]+', 'the link', text)
+    
+    # 3. Format quiz options "A) ..." to "Option A. "
+    text = re.sub(r'\b([A-F])\)', r'Option \1. ', text)
+    
+    # 4. Remove unwanted symbols/emojis
+    symbols_to_remove = [
+        '*', '_', '`', '👉', '👇', '✅', '🎉', '📊', '📝', '📖', 
+        '📚', '🤜', '🤛', '🔊', '🔇', '🏆', '🥇', '🥈', '🥉', 
+        '👤', '🔙', '✍️', '❓', '❌', '🎓', '🌟', '📢'
+    ]
+    for sym in symbols_to_remove:
+        text = text.replace(sym, '')
+        
+    # 5. Clean up extra whitespaces/newlines
+    text = re.sub(r'\n+', '\n', text).strip()
+    return text
+
+def extract_option_letter(text):
+    """Normalize and extract quiz option letter (A, B, C, D, etc.) from message/transcription."""
+    if not text:
+        return None
+    text_clean = text.strip().upper().rstrip('.')
+    
+    # Remove common prefix words
+    for prefix in ["OPTION ", "CHOICE ", "SELECT ", "CHOOSE ", "ANSWER ", "LETTER "]:
+        if text_clean.startswith(prefix):
+            text_clean = text_clean[len(prefix):].strip()
+            
+    # If the remaining is just a letter, or a letter followed by a parenthesis/dot
+    if len(text_clean) >= 1 and text_clean[0] in ['A', 'B', 'C', 'D', 'E', 'F']:
+        if len(text_clean) == 1 or not text_clean[1].isalnum():
+            return text_clean[0]
+            
+    # Also check if it's a word matching one of the letters in a sentence
+    tokens = [t.strip(".,()\"'") for t in text.upper().split()]
+    for token in tokens:
+        if token in ['A', 'B', 'C', 'D', 'E', 'F']:
+            return token
+            
+    return None
+
+def extract_module_number(text):
+    """Normalize and extract a module number (1 to 6) from message/transcription."""
+    if not text:
+        return None
+    text_lower = text.lower()
+    
+    num_map = {
+        "one": 1, "first": 1, "1": 1, "dáya": 1, "daya": 1, "kín-in-ní": 1, "kininni": 1, "mbụ": 1, "mbu": 1,
+        "two": 2, "second": 2, "2": 2, "biyu": 2, "kejì": 2, "keji": 2, "abụọ": 2, "abuo": 2,
+        "three": 3, "third": 3, "3": 3, "uku": 3, "kẹta": 3, "keta": 3, "atọ": 3, "ato": 3,
+        "four": 4, "fourth": 4, "4": 4, "hudu": 4, "kẹrin": 4, "kerin": 4, "anọ": 4, "ano": 4,
+        "five": 5, "fifth": 5, "5": 5, "biyar": 5, "kàrún-ún": 5, "karun": 5, "ise": 5, "íse": 5,
+        "six": 6, "sixth": 6, "6": 6, "shida": 6, "kẹfà": 6, "kefa": 6, "isii": 6
+    }
+    
+    module_synonyms = ["module", "modul", "modulo", "modulu", "mọdulu", "modúlu"]
+    
+    # Split into words/tokens
+    tokens = re.findall(r'\w+', text_lower)
+    
+    has_module_keyword = any(syn in tokens for syn in module_synonyms)
+    
+    for i, token in enumerate(tokens):
+        if token in module_synonyms:
+            if i + 1 < len(tokens) and tokens[i+1] in num_map:
+                return num_map[tokens[i+1]]
+            if i - 1 >= 0 and tokens[i-1] in num_map:
+                return num_map[tokens[i-1]]
+                
+    if has_module_keyword:
+        for token in tokens:
+            if token in num_map:
+                return num_map[token]
+                
+    for syn in module_synonyms:
+        for token in tokens:
+            if token.startswith(syn) and len(token) > len(syn):
+                num_part = token[len(syn):]
+                if num_part in num_map:
+                    return num_map[num_part]
+                    
+    for syn in module_synonyms:
+        for word, num in num_map.items():
+            if f"{syn} {word}" in text_lower or f"{word} {syn}" in text_lower:
+                return num
+                
+    return None
+
+async def jump_to_module(update: Update, context: ContextTypes.DEFAULT_TYPE, module_idx: int) -> None:
+    """Jump the user directly to a specific module (0-indexed)."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    
+    if module_idx < 0 or module_idx >= len(MODULES):
+        await send_reply(update, get_text("error_generic", lang))
+        return
+        
+    target_module = MODULES[module_idx]
+    target_module_id = target_module["module_id"]
+    
+    # Get the first lesson of the target module
+    if target_module["lessons"]:
+        target_lesson_id = target_module["lessons"][0]["lesson_id"]
+    else:
+        target_lesson_id = "start"
+        
+    # Update learner progress in DB, reset quiz completed status to 0
+    update_learner_progress(user_id, target_module_id, target_lesson_id, quiz_completed=0)
+    
+    # Clear any awaiting states in context.user_data to avoid confusing flow
+    for key in ["awaiting_reflection", "awaiting_quote_card", "awaiting_lessons_complete", "story_read", "quiz_question_idx", "quiz_errors", "quiz_module_id"]:
+        context.user_data.pop(key, None)
+        
+    module_num = str(module_idx + 1)
+    lesson_num = "1"
+    
+    # If the target module has an opening story, show that first
+    if target_module.get("opening_story"):
+        context.user_data["story_read"] = target_module_id
+        
+        story_header = {
+            "en": "📖 *Opening Story*",
+            "pcm": "📖 *Opening Story*",
+            "ha": "📖 *Labarin Budewa*",
+            "yo": "📖 *Itan Ibẹrẹ*",
+            "ig": "📖 *Akụkọ Mbido*"
+        }.get(lang, "📖 Opening Story")
+        
+        next_button = InlineKeyboardMarkup([[
+            InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev"),
+            InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")
+        ]])
+        
+        await send_reply(
+            update,
+            f"{story_header}\n\n{get_localized_field(target_module.get('opening_story'), lang)}",
+            reply_markup=next_button,
+            parse_mode="Markdown"
+        )
+    else:
+        # Show lesson 1 of the target module directly
+        lesson_header = get_text(
+            "lesson_header", lang, 
+            module_num=module_num, 
+            module_title=get_localized_field(target_module.get('title'), lang), 
+            lesson_num=lesson_num, 
+            lesson_title=get_localized_field(target_module["lessons"][0].get('title'), lang)
+        )
+        
+        video_file_id = target_module["lessons"][0].get("video")
+        if video_file_id:
+            try:
+                chat_msg = update.callback_query.message if update.callback_query else update.message
+                await chat_msg.reply_video(
+                    video=video_file_id,
+                    caption=lesson_header,
+                    parse_mode="Markdown"
+                )
+                await send_reply(
+                    update,
+                    get_localized_field(target_module["lessons"][0].get('content'), lang),
+                    parse_mode="Markdown",
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
+                )
+            except Exception as e:
+                logger.error(f"Error sending lesson video on jump: {e}")
+                await send_reply(
+                    update,
+                    f"{lesson_header}\n\n{get_localized_field(target_module['lessons'][0].get('content'), lang)}",
+                    parse_mode="Markdown",
+                    reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
+                )
+        else:
+            await send_reply(
+                update,
+                f"{lesson_header}\n\n{get_localized_field(target_module['lessons'][0].get('content'), lang)}",
+                parse_mode="Markdown",
+                reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
+            )
+
+async def process_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE, module_id: str, q_idx: int, selected_answer: str) -> None:
+    """Process a module quiz answer (called from button callback or voice/text input)."""
+    user_id = update.effective_user.id
+    lang = get_language_preference(user_id)
+    query = update.callback_query
+    
+    module = get_module_by_id(module_id)
+    if not module or "quiz" not in module:
+        if query:
+            await query.edit_message_text(get_text("error_generic", lang))
+        else:
+            await send_reply(update, get_text("error_generic", lang))
+        return
+        
+    quizzes = module["quiz"]
+    if not isinstance(quizzes, list):
+        quizzes = [quizzes]
+        
+    if q_idx >= len(quizzes):
+        q_idx = 0
+        
+    quiz_data = quizzes[q_idx]
+    correct_answer = quiz_data["answer"]
+    feedback = get_localized_field(quiz_data.get("feedback"), lang)
+    
+    is_correct = (selected_answer == correct_answer)
+    
+    if "quiz_errors" not in context.user_data:
+        context.user_data["quiz_errors"] = 0
+        
+    if not is_correct:
+        context.user_data["quiz_errors"] += 1
+        
+    fb_title = {
+        "en": "📢 *Feedback:*",
+        "pcm": "📢 *Feedback:*",
+        "ha": "📢 *Maganar Gaskiya:*",
+        "yo": "📢 *Esi Iṣaju:*",
+        "ig": "📢 *Azịza na Nkowasi:*"
+    }.get(lang, "Feedback:")
+    
+    ans_status = "✅ Correct!" if is_correct else f"❌ Incorrect (Correct was {correct_answer})"
+    
+    feedback_text = (
+        f"❓ *{get_localized_field(quiz_data.get('question'), lang)}*\n\n"
+        f"Your Answer: *{selected_answer}* — {ans_status}\n\n"
+        f"{fb_title} {feedback}"
+    )
+    
+    if q_idx + 1 < len(quizzes):
+        next_q_idx = q_idx + 1
+        buttons = [
+            [InlineKeyboardButton("Next Question ➡️", callback_data=f"quiz_q|{module_id}|{next_q_idx}")],
+            [InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")]
+        ]
+        reply_markup = InlineKeyboardMarkup(buttons)
+        if query:
+            await query.edit_message_text(feedback_text, reply_markup=reply_markup, parse_mode="Markdown")
+        else:
+            await send_reply(update, feedback_text, reply_markup=reply_markup, parse_mode="Markdown")
+    else:
+        errors = context.user_data.get("quiz_errors", 0)
+        progress = get_learner_progress(user_id)
+        
+        if errors == 0:
+            context.user_data.pop("quiz_question_idx", None)
+            context.user_data.pop("quiz_errors", None)
+            context.user_data.pop("quiz_module_id", None)
+            quiz_comp = int(progress[2]) if (progress and progress[2] is not None) else 0
+            if quiz_comp == 0:
+                increment_first_attempt_quizzes(user_id)
+            update_quiz_status(user_id, 1)
+            
+            completion_text = (
+                f"{feedback_text}\n\n"
+                f"🎉 *Quiz Complete!* You scored 3/3 correct!\n\n"
+                f"{get_text('quiz_correct', lang)}"
+            )
+            buttons = [
+                [InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")],
+                [InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")]
+            ]
+            reply_markup = InlineKeyboardMarkup(buttons)
+            
+            badge_path = None
+            try:
+                badge_name = TRANSLATIONS.get("badges", {}).get(module_id, {}).get(lang, "Badge")
+                badge_path = generate_badge_image(module_id, badge_name, lang, user_id)
+            except Exception as e:
+                logger.error(f"Error generating badge image on perfect score: {e}")
+            
+            if query:
+                await query.delete_message()
+            
+            chat_msg = query.message if query else update.message
+            if badge_path and os.path.exists(badge_path):
+                try:
+                    with open(badge_path, "rb") as bf:
+                        await chat_msg.reply_photo(
+                            photo=bf,
+                            caption=completion_text,
+                            reply_markup=reply_markup,
+                            parse_mode="Markdown"
+                        )
+                        if get_voice_responses(user_id):
+                            output_filename = f"assets/voice_reply_{user_id}.ogg"
+                            clean_txt = clean_text_for_tts(completion_text)
+                            if len(clean_txt) > 800:
+                                clean_txt = clean_txt[:800] + "..."
+                            if synthesize_speech(clean_txt, output_filename):
+                                try:
+                                    with open(output_filename, "rb") as vf:
+                                        await chat_msg.reply_voice(voice=vf)
+                                except Exception as ve:
+                                    logger.error(f"Error sending synthesized voice completion: {ve}")
+                                finally:
+                                    if os.path.exists(output_filename):
+                                        os.remove(output_filename)
+                except Exception as e:
+                    logger.error(f"Error sending badge photo: {e}")
+                    await send_reply(
+                        update,
+                        text=completion_text,
+                        reply_markup=reply_markup,
+                        parse_mode="Markdown"
+                    )
+                finally:
+                    try:
+                        if badge_path and os.path.exists(badge_path):
+                            os.remove(badge_path)
+                    except Exception:
+                        pass
+            else:
+                await send_reply(
+                    update,
+                    text=completion_text,
+                    reply_markup=reply_markup,
+                    parse_mode="Markdown"
+                )
+        else:
+            update_quiz_status(user_id, 2)
+            score = 3 - errors
+            completion_text = (
+                f"{feedback_text}\n\n"
+                f"📊 *Quiz Complete!* You scored {score}/3.\n\n"
+                f"{get_text('quiz_incorrect', lang, correct_answer=correct_answer)}"
+            )
+            buttons = [
+                [
+                    InlineKeyboardButton(get_text("quiz_retry_button", lang), callback_data="quiz_retry"),
+                    InlineKeyboardButton(get_text("quiz_skip_button", lang), callback_data="quiz_skip")
+                ],
+                [
+                    InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")
+                ]
+            ]
+            reply_markup = InlineKeyboardMarkup(buttons)
+            if query:
+                await query.edit_message_text(completion_text, reply_markup=reply_markup, parse_mode="Markdown")
+            else:
+                await send_reply(update, completion_text, reply_markup=reply_markup, parse_mode="Markdown")
+
 # ============== REPLY HELPER ==============
 
 async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
@@ -402,11 +803,11 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
             parse_mode=parse_mode
         )
         
-    # Check for voice accessibility preference (disabled for now)
+    # Check for voice accessibility preference (ENABLED)
     user_id = update.effective_user.id if update.effective_user else None
-    if False:  # user_id and get_voice_responses(user_id):
+    if user_id and get_voice_responses(user_id):
         # Clean text of raw markdown formatting for a natural audio reading experience
-        clean_text = text.replace('*', '').replace('_', '').replace('`', '').replace('👉', '').replace('👇', '').replace('✅', '').replace('🎉', '').replace('📊', '').replace('📝', '').replace('📖', '').replace('📚', '').replace('🤛', '').replace('🤜', '')
+        clean_text = clean_text_for_tts(text)
         
         # Safe length truncation to optimize TTS request speed
         if len(clean_text) > 800:
@@ -501,7 +902,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
             else:
                 module, lesson = get_module_lesson(current_module_id, current_lesson_id)
                 if module and lesson:
-                    welcome_back = get_text("welcome_back", lang, module_title=module['title'], lesson_title=lesson['title'])
+                    welcome_back = get_text("welcome_back", lang, module_title=get_localized_field(module.get('title'), lang), lesson_title=get_localized_field(lesson.get('title'), lang))
                     await send_reply(
                         update,
                         welcome_back,
@@ -581,9 +982,9 @@ async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
     menu_text = get_text("menu_header", lang) + "\n\n"
     
     for i, module in enumerate(MODULES):
-        menu_text += f"*Module {i+1}: {module['title']}*\n"
+        menu_text += f"*Module {i+1}: {get_localized_field(module.get('title'), lang)}*\n"
         for lesson in module["lessons"]:
-            menu_text += f" • {lesson['title']}\n"
+            menu_text += f" • {get_localized_field(lesson.get('title'), lang)}\n"
         menu_text += "\n"
     
     menu_text += get_text("menu_continue", lang)
@@ -612,6 +1013,15 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     # FIXED: Unpack 4 values (module, lesson, quiz_status, language)
     current_module_id, current_lesson_id, quiz_completed, lang = result
     quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
+
+    if current_lesson_id == "start":
+        await send_reply(
+            update,
+            get_text("not_started", lang),
+            reply_markup=get_main_menu_buttons(lang, user_id=user_id)
+        )
+        return
+
     module, lesson = get_module_lesson(current_module_id, current_lesson_id)
 
     if module and lesson:
@@ -627,8 +1037,8 @@ async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             "progress_message", lang,
             module_num=module_index + 1,
             total_modules=total_modules,
-            module_title=module['title'],
-            lesson_title=lesson['title']
+            module_title=get_localized_field(module.get('title'), lang),
+            lesson_title=get_localized_field(lesson.get('title'), lang)
         )
         
         # Calculate completed modules and badges
@@ -687,7 +1097,7 @@ async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, mo
     quote_card_file = None
     if quote_text:
         try:
-            quote_card_file = generate_quote_card_image(module_id, module['title'], quote_text, lang, user_id)
+            quote_card_file = generate_quote_card_image(module_id, get_localized_field(module.get('title'), lang), quote_text, lang, user_id)
             
             import urllib.parse
             module_num = module_id.replace("module_", "")
@@ -739,7 +1149,7 @@ async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, mo
             logger.error(f"Error generating or sending quote card: {e}")
             await send_reply(
                 update,
-                get_text("lessons_complete", lang, module_title=module['title']),
+                get_text("lessons_complete", lang, module_title=get_localized_field(module.get('title'), lang)),
                 reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
         finally:
@@ -751,7 +1161,7 @@ async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, mo
     else:
         await send_reply(
             update,
-            get_text("lessons_complete", lang, module_title=module['title']),
+            get_text("lessons_complete", lang, module_title=get_localized_field(module.get('title'), lang)),
             reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
 
@@ -825,7 +1235,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             if module:
                 await send_reply(
                     update,
-                    get_text("lessons_complete", lang, module_title=module['title']),
+                    get_text("lessons_complete", lang, module_title=get_localized_field(module.get('title'), lang)),
                     reply_markup=get_main_menu_buttons(lang, user_id=user_id, show_quiz=True)
                 )
             return
@@ -845,10 +1255,10 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         if module and lesson:
             module_num = current_module_id.replace("module_", "")
             lesson_num = current_lesson_id.split("_")[-1]
-            lesson_header = get_text("lesson_header", lang, module_num=module_num, module_title=module['title'], lesson_num=lesson_num, lesson_title=lesson['title'])
+            lesson_header = get_text("lesson_header", lang, module_num=module_num, module_title=get_localized_field(module.get('title'), lang), lesson_num=lesson_num, lesson_title=get_localized_field(lesson.get('title'), lang))
             await send_reply(
                 update,
-                f"{lesson_header}\n\n{lesson['content']}",
+                f"{lesson_header}\n\n{get_localized_field(lesson.get('content'), lang)}",
                 parse_mode="Markdown",
                 reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
             )
@@ -882,7 +1292,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         if prev_module:
             existing_ref = get_learner_reflection(user_id, current_module_id)
             if existing_ref:
-                module_title = prev_module["title"]
+                module_title = get_localized_field(prev_module.get('title'), lang)
                 takeaway_val = existing_ref.strip()
                 if len(takeaway_val) > 150:
                     takeaway_val = takeaway_val[:147] + "..."
@@ -939,7 +1349,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             ]])
             await send_reply(
                 update,
-                f"{story_header}\n\n{module['opening_story']}",
+                f"{story_header}\n\n{get_localized_field(module.get('opening_story'), lang)}",
                 reply_markup=next_button,
                 parse_mode="Markdown"
             )
@@ -953,7 +1363,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             if module and lesson:
                 module_num = prev_module_id.replace("module_", "")
                 lesson_num = prev_lesson_id.split("_")[-1]
-                lesson_header = get_text("lesson_header", lang, module_num=module_num, module_title=module['title'], lesson_num=lesson_num, lesson_title=lesson['title'])
+                lesson_header = get_text("lesson_header", lang, module_num=module_num, module_title=get_localized_field(module.get('title'), lang), lesson_num=lesson_num, lesson_title=get_localized_field(lesson.get('title'), lang))
                 
                 if is_last_lesson_of_module(prev_module_id, prev_lesson_id):
                     context.user_data["awaiting_quote_card"] = prev_module_id
@@ -962,7 +1372,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     
                 await send_reply(
                     update,
-                    f"{lesson_header}\n\n{lesson['content']}",
+                    f"{lesson_header}\n\n{get_localized_field(lesson.get('content'), lang)}",
                     parse_mode="Markdown",
                     reply_markup=get_main_menu_buttons(lang, user_id=user_id)
                 )
@@ -981,7 +1391,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         if module:
             await send_reply(
                 update,
-                get_text("lessons_complete", lang, module_title=module['title']),
+                get_text("lessons_complete", lang, module_title=get_localized_field(module.get('title'), lang)),
                 reply_markup=get_main_menu_buttons(lang, user_id=user_id)
             )
             return
@@ -1014,7 +1424,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         module = get_module_by_id(current_module_id)
         await send_reply(
             update,
-            get_text("quiz_not_completed", lang, module_title=module['title']),
+            get_text("quiz_not_completed", lang, module_title=get_localized_field(module.get('title'), lang)),
             reply_markup=get_main_menu_buttons(lang, user_id=user_id, show_quiz=True)
         )
         return
@@ -1074,7 +1484,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     
                     await send_reply(
                         update,
-                        f"{story_header}\n\n{module['opening_story']}",
+                        f"{story_header}\n\n{get_localized_field(module.get('opening_story'), lang)}",
                         reply_markup=next_button,
                         parse_mode="Markdown"
                     )
@@ -1100,9 +1510,9 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             lesson_header = get_text(
                 "lesson_header", lang, 
                 module_num=module_num, 
-                module_title=module['title'], 
+                module_title=get_localized_field(module.get('title'), lang), 
                 lesson_num=lesson_num, 
-                lesson_title=lesson['title']
+                lesson_title=get_localized_field(lesson.get('title'), lang)
             )
             
             # Check if this lesson has a video configured
@@ -1119,7 +1529,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     # Send text contents as a follow-up with keyboard buttons
                     await send_reply(
                         update,
-                        lesson['content'],
+                        get_localized_field(lesson.get('content'), lang),
                         parse_mode="Markdown",
                         reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
                     )
@@ -1128,7 +1538,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                     # Fallback to standard text layout on error
                     await send_reply(
                         update,
-                        f"{lesson_header}\n\n{lesson['content']}",
+                        f"{lesson_header}\n\n{get_localized_field(lesson.get('content'), lang)}",
                         parse_mode="Markdown",
                         reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
                     )
@@ -1136,7 +1546,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 # Standard text lesson
                 await send_reply(
                     update,
-                    f"{lesson_header}\n\n{lesson['content']}",
+                    f"{lesson_header}\n\n{get_localized_field(lesson.get('content'), lang)}",
                     parse_mode="Markdown",
                     reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
                 )
@@ -1183,7 +1593,7 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         module = get_module_by_id(current_module_id)
         await send_reply(
             update,
-            get_text("quiz_not_ready", lang, module_title=module['title']),
+            get_text("quiz_not_ready", lang, module_title=get_localized_field(module.get('title'), lang)),
             reply_markup=get_main_menu_buttons(lang, user_id=user_id)
         )
         return
@@ -1208,12 +1618,12 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             context.user_data["quiz_question_idx"] = 0
             
         quiz_data = quizzes[q_idx]
-        options = quiz_data["options"]
+        options = get_localized_options(quiz_data.get("options"), lang)
 
         # Create quiz instructions and buttons
         options_text = "\n".join(options)
-        question_with_options = f"{quiz_data['question']}\n\n{options_text}"
-        quiz_header = get_text("quiz_instructions", lang, module_title=module['title'], quiz_question=question_with_options)
+        question_with_options = f"{get_localized_field(quiz_data.get('question'), lang)}\n\n{options_text}"
+        quiz_header = get_text("quiz_instructions", lang, module_title=get_localized_field(module.get('title'), lang), quiz_question=question_with_options)
         
         # Create answer buttons in a single row using short letters
         buttons = [[InlineKeyboardButton(f" {option[0]} ", callback_data=f"quiz|{current_module_id}|{q_idx}|{option[0]}") for option in options]]
@@ -1254,7 +1664,7 @@ async def journal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     journal_text = get_text("journal_header", lang)
     for module_id, ref_text in reflections:
         module = get_module_by_id(module_id)
-        module_title = module["title"] if module else module_id
+        module_title = get_localized_field(module.get('title'), lang, module_id) if module else module_id
         journal_text += f"📙 *{module_title}*\n_{ref_text}_\n\n"
         
     # Check for custom exit pledge
@@ -2643,16 +3053,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             return
         
         module_id = parts[1]
-        
-        module = get_module_by_id(module_id)
-        if not module or "quiz" not in module:
-            await query.edit_message_text(get_text("error_generic", lang))
-            return
-            
-        quizzes = module["quiz"]
-        if not isinstance(quizzes, list):
-            quizzes = [quizzes]
-            
         if len(parts) == 4:
             q_idx = int(parts[2])
             selected_answer = parts[3]
@@ -2660,125 +3060,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             q_idx = context.user_data.get("quiz_question_idx", 0)
             selected_answer = parts[2]
             
-        if q_idx >= len(quizzes):
-            q_idx = 0
-            
-        quiz_data = quizzes[q_idx]
-        correct_answer = quiz_data["answer"]
-        feedback = quiz_data.get("feedback", "")
-        
-        is_correct = (selected_answer == correct_answer)
-        
-        if "quiz_errors" not in context.user_data:
-            context.user_data["quiz_errors"] = 0
-            
-        if not is_correct:
-            context.user_data["quiz_errors"] += 1
-            
-        fb_title = {
-            "en": "📢 *Feedback:*",
-            "pcm": "📢 *Feedback:*",
-            "ha": "📢 *Maganar Gaskiya:*",
-            "yo": "📢 *Esi Iṣaju:*",
-            "ig": "📢 *Azịza na Nkowasi:*"
-        }.get(lang, "Feedback:")
-        
-        ans_status = "✅ Correct!" if is_correct else f"❌ Incorrect (Correct was {correct_answer})"
-        
-        feedback_text = (
-            f"❓ *{quiz_data['question']}*\n\n"
-            f"Your Answer: *{selected_answer}* — {ans_status}\n\n"
-            f"{fb_title} {feedback}"
-        )
-        
-        if q_idx + 1 < len(quizzes):
-            next_q_idx = q_idx + 1
-            buttons = [
-                [InlineKeyboardButton("Next Question ➡️", callback_data=f"quiz_q|{module_id}|{next_q_idx}")],
-                [InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")]
-            ]
-            reply_markup = InlineKeyboardMarkup(buttons)
-            await query.edit_message_text(feedback_text, reply_markup=reply_markup, parse_mode="Markdown")
-        else:
-            errors = context.user_data.get("quiz_errors", 0)
-            progress = get_learner_progress(user_id)
-            
-            if errors == 0:
-                context.user_data.pop("quiz_question_idx", None)
-                context.user_data.pop("quiz_errors", None)
-                context.user_data.pop("quiz_module_id", None)
-                quiz_comp = int(progress[2]) if (progress and progress[2] is not None) else 0
-                if quiz_comp == 0:
-                    increment_first_attempt_quizzes(user_id)
-                update_quiz_status(user_id, 1)
-                
-                completion_text = (
-                    f"{feedback_text}\n\n"
-                    f"🎉 *Quiz Complete!* You scored 3/3 correct!\n\n"
-                    f"{get_text('quiz_correct', lang)}"
-                )
-                buttons = [
-                    [InlineKeyboardButton(get_text("continue_next_lesson", lang), callback_data="cmd_next")],
-                    [InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")]
-                ]
-                reply_markup = InlineKeyboardMarkup(buttons)
-                
-                badge_path = None
-                try:
-                    badge_name = TRANSLATIONS.get("badges", {}).get(module_id, {}).get(lang, "Badge")
-                    badge_path = generate_badge_image(module_id, badge_name, lang, user_id)
-                except Exception as e:
-                    logger.error(f"Error generating badge image on perfect score: {e}")
-                
-                await query.delete_message()
-                if badge_path and os.path.exists(badge_path):
-                    try:
-                        with open(badge_path, "rb") as bf:
-                            await query.message.reply_photo(
-                                photo=bf,
-                                caption=completion_text,
-                                reply_markup=reply_markup,
-                                parse_mode="Markdown"
-                            )
-                    except Exception as e:
-                        logger.error(f"Error sending badge photo: {e}")
-                        await query.message.reply_text(
-                            text=completion_text,
-                            reply_markup=reply_markup,
-                            parse_mode="Markdown"
-                        )
-                    finally:
-                        try:
-                            os.remove(badge_path)
-                        except Exception:
-                            pass
-                else:
-                    await query.message.reply_text(
-                        text=completion_text,
-                        reply_markup=reply_markup,
-                        parse_mode="Markdown"
-                    )
-            else:
-                update_quiz_status(user_id, 2)
-                score = 3 - errors
-                completion_text = (
-                    f"{feedback_text}\n\n"
-                    f"📊 *Quiz Complete!* You scored {score}/3.\n\n"
-                    f"{get_text('quiz_incorrect', lang, correct_answer=correct_answer)}"
-                )
-                buttons = [
-                    [
-                        InlineKeyboardButton(get_text("quiz_retry_button", lang), callback_data="quiz_retry"),
-                        InlineKeyboardButton(get_text("quiz_skip_button", lang), callback_data="quiz_skip")
-                    ],
-                    [
-                        InlineKeyboardButton(get_command_button("back", lang), callback_data="cmd_prev")
-                    ]
-                ]
-                reply_markup = InlineKeyboardMarkup(buttons)
-                await query.edit_message_text(completion_text, reply_markup=reply_markup, parse_mode="Markdown")
+        await process_quiz_answer(update, context, module_id, q_idx, selected_answer)
+        return
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    """Handle text messages."""
+    """Handle text messages and transcribed voice inputs."""
     user_message = update.message.text
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
@@ -2792,7 +3077,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Move to email onboarding step
         context.user_data["awaiting_email"] = True
         ask_email_text = get_text("ask_email", lang)
-        await update.message.reply_text(ask_email_text)
+        await send_reply(update, ask_email_text)
         return
 
     # Intercept email onboarding step
@@ -2805,7 +3090,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Move to state onboarding step
         context.user_data["awaiting_state"] = True
         ask_state_text = get_text("ask_state", lang)
-        await update.message.reply_text(ask_state_text)
+        await send_reply(update, ask_state_text)
         return
 
     # Intercept state onboarding step
@@ -2816,7 +3101,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         update_state(user_id, state_val)
         
         # Onboarding registration complete! Now show welcome message and prompt Pre-Test
-        welcome_text = get_text("start_welcome", lang, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
+        welcome_text = get_text("start_welcome", lang, course_title=get_localized_field(COURSE_TITLE, lang, "Young Men Against Gender Based Violence"), course_description=get_localized_field(COURSE_DESCRIPTION, lang, ""))
         pretest_button_label = {
             "en": "✍️ Take Pre-Test Quiz",
             "pcm": "✍️ Start Pre-Test Quiz",
@@ -2828,7 +3113,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         keyboard = InlineKeyboardMarkup([
             [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
         ])
-        await update.message.reply_text(
+        await send_reply(
+            update,
             welcome_text,
             reply_markup=keyboard,
             parse_mode="Markdown"
@@ -2843,7 +3129,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
         # Build interactive social sharing prompt for this specific reflection
         module = get_module_by_id(module_id)
-        module_title = module["title"] if module else module_id
+        module_title = get_localized_field(module.get('title'), lang, module_id) if module else module_id
         
         # Truncate user reflection to keep it safe for X and WhatsApp url lengths
         takeaway_val = user_message.strip()
@@ -2874,7 +3160,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         ])
         
         saved_msg = get_text("reflection_share_prompt", lang)
-        await update.message.reply_text(
+        await send_reply(
+            update,
             saved_msg,
             reply_markup=keyboard,
             parse_mode="Markdown"
@@ -2891,7 +3178,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Move to pledge writing step
         context.user_data["awaiting_pledge"] = True
         pledge_prompt = get_text("post_test.pledge_prompt", lang, name=cert_name)
-        await update.message.reply_text(pledge_prompt)
+        await send_reply(update, pledge_prompt)
         return
 
     # Intercept personal pledges for graduations
@@ -2910,12 +3197,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
         if admin_ids and user_id not in admin_ids:
-            await update.message.reply_text("You are not authorized to perform this action.")
+            await send_reply(update, "You are not authorized to perform this action.")
             return
             
         target_id_str = user_message.strip()
         if not target_id_str.isdigit():
-            await update.message.reply_text(
+            await send_reply(
+                update,
                 "❌ Invalid User ID. Please make sure you enter a purely numeric Telegram User ID.\n\n"
                 "Use /admin to open the dashboard again."
             )
@@ -2928,7 +3216,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             reset_learner_data(target_id)
             
             # Send confirmation to admin
-            await update.message.reply_text(
+            await send_reply(
+                update,
                 f"✅ *Success!* Progress for user `{target_id}` has been completely reset.\n\n"
                 f"They have been removed from progress tracking, and their reflections and reminders have been deleted.",
                 parse_mode="Markdown"
@@ -2947,13 +3236,92 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 
         except Exception as e:
             logger.error(f"Error resetting user progress: {e}")
-            await update.message.reply_text("❌ An error occurred while resetting progress in the database.")
+            await send_reply(update, "❌ An error occurred while resetting progress in the database.")
             
         return
 
-    # Check for navigation keywords
-    if user_message.lower().strip() in ["next", "continue", "go next", "move on"]:
+    # --- 1. Intercept option letter inputs for active tests or quizzes ---
+    option_letter = extract_option_letter(user_message)
+    if option_letter:
+        # Check active pretest
+        if "pretest_current" in context.user_data:
+            q_idx = context.user_data["pretest_current"]
+            questions = TRANSLATIONS["post_test"]["questions"]
+            if q_idx < len(questions):
+                options = questions[q_idx]["options"].get(lang, questions[q_idx]["options"]["en"])
+                valid_letters = [opt[0].upper() for opt in options]
+                if option_letter in valid_letters:
+                    if "pretest_answers" not in context.user_data:
+                        context.user_data["pretest_answers"] = {}
+                    context.user_data["pretest_answers"][q_idx] = option_letter
+                    await send_pre_test_question(update, context, q_idx + 1)
+                    return
+
+        # Check active posttest
+        elif "posttest_current" in context.user_data:
+            q_idx = context.user_data["posttest_current"]
+            questions = TRANSLATIONS["post_test"]["questions"]
+            if q_idx < len(questions):
+                options = questions[q_idx]["options"].get(lang, questions[q_idx]["options"]["en"])
+                valid_letters = [opt[0].upper() for opt in options]
+                if option_letter in valid_letters:
+                    if "posttest_answers" not in context.user_data:
+                        context.user_data["posttest_answers"] = {}
+                    context.user_data["posttest_answers"][q_idx] = option_letter
+                    await send_post_test_question(update, context, q_idx + 1)
+                    return
+
+        # Check active module quiz
+        elif "quiz_module_id" in context.user_data and "quiz_question_idx" in context.user_data:
+            module_id = context.user_data["quiz_module_id"]
+            q_idx = context.user_data["quiz_question_idx"]
+            module = get_module_by_id(module_id)
+            if module and "quiz" in module:
+                quizzes = module["quiz"]
+                if not isinstance(quizzes, list):
+                    quizzes = [quizzes]
+                if q_idx < len(quizzes):
+                    options = quizzes[q_idx]["options"]
+                    valid_letters = [opt[0].upper() for opt in options]
+                    if option_letter in valid_letters:
+                        await process_quiz_answer(update, context, module_id, q_idx, option_letter)
+                        return
+
+    # --- 2. Intercept module selection/jumping commands ---
+    module_num = extract_module_number(user_message)
+    if module_num is not None:
+        await jump_to_module(update, context, module_num - 1)
+        return
+
+    # --- 3. Check for general navigation and menu command keywords ---
+    msg_clean = user_message.lower().strip().rstrip('.')
+    
+    # Navigation mapping
+    if msg_clean in ["next", "continue", "go next", "move on", "forward", "tẹsiwaju", "ci gaba", "gaa n'ihu"]:
         await next_lesson_handler(update, context)
+        return
+    if msg_clean in ["back", "previous", "go back", "prev", "padà", "koma baya", "gaa n'azụ"]:
+        await prev_lesson_handler(update, context)
+        return
+        
+    # Main commands mapping
+    if msg_clean in ["menu", "outline", "modules", "course menu", "show menu", "mẹnu", "tsarin darussa", "ihere"]:
+        await menu_command(update, context)
+        return
+    if msg_clean in ["help", "info", "assistance", "support", "get help", "iranwọ", "taimako", "enyemaka"]:
+        await help_command(update, context)
+        return
+    if msg_clean in ["progress", "score", "status", "my progress", "how am I doing", "itẹsiwaju", "ci gaba na koyo", "ọganihu"]:
+        await progress_command(update, context)
+        return
+    if msg_clean in ["journal", "reflections", "my journal", "notes", "diary", "akọsilẹ", "tunanina", "akwụkwọ m"]:
+        await journal_command(update, context)
+        return
+    if msg_clean in ["quiz", "test", "question", "take quiz", "start quiz", "jarrabawa", "idanwo", "ule"]:
+        await quiz_command(update, context)
+        return
+    if msg_clean in ["start", "restart", "begin"]:
+        await start(update, context)
         return
 
     # Increment active AI queries for the peer facilitator calculations
@@ -2967,7 +3335,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         current_module_id, current_lesson_id, _, _ = result
         module, lesson = get_module_lesson(current_module_id, current_lesson_id)
         if module and lesson:
-            current_context = f"Current Module: {module['title']}. Current Lesson: {lesson['title']}. Content: {lesson['content']}"
+            current_context = f"Current Module: {get_localized_field(module.get('title'), lang)}. Current Lesson: {get_localized_field(lesson.get('title'), lang)}. Content: {get_localized_field(lesson.get('content'), lang)}"
             context_for_openai = f"Course Overview: {full_course_text}\n\nUser is currently in: {current_context}"
         else:
             context_for_openai = full_course_text
@@ -2975,7 +3343,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         context_for_openai = full_course_text
 
     response = get_openai_response(user_message, context_for_openai, language=lang)
-    await update.message.reply_text(
+    await send_reply(
+        update,
         response,
         reply_markup=get_main_menu_buttons(lang, user_id=user_id)
     )
@@ -3069,13 +3438,13 @@ def main() -> None:
     application.add_handler(CommandHandler("quiz", quiz_command, filters=filters.ChatType.PRIVATE))
     application.add_handler(CommandHandler("language", language_command, filters=filters.ChatType.PRIVATE))
     application.add_handler(CommandHandler("journal", journal_command, filters=filters.ChatType.PRIVATE))
-    # application.add_handler(CommandHandler("accessibility", accessibility_command, filters=filters.ChatType.PRIVATE))
+    application.add_handler(CommandHandler("accessibility", accessibility_command, filters=filters.ChatType.PRIVATE))
     application.add_handler(CommandHandler("admin", admin_command, filters=filters.ChatType.PRIVATE))
 
     # Message, voice, and button handlers
     application.add_handler(MessageHandler((filters.VIDEO | filters.Document.ALL) & filters.ChatType.PRIVATE, handle_video_upload))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.ChatType.PRIVATE, handle_message))
-    # application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
+    application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
     application.add_handler(CallbackQueryHandler(button_handler))
 
     # Run the bot

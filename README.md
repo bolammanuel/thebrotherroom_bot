@@ -117,19 +117,57 @@ Once the bot is running (either locally or deployed):
 
 (This section provides a brief overview of the modules and lessons defined in `course_content.json`)
 
-**Module 1: Understanding Gender-Based Violence**
-- What is GBV?
-- Types and Forms of GBV
+**Module 1: Understanding Gender & Masculinity**
+- Sex vs Gender
+- The Key Insight
+- What is Positive Masculinity?
 
-**Module 2: Exploring Positive Masculinity**
-- Defining Masculinity
-- Traits of Positive Masculinity
-- Challenging Harmful Stereotypes
+**Module 2: Harmful Norms & Toxic Masculinity**
+- What Are Harmful Gender Norms?
+- What is Toxic Masculinity?
+- The Cost of Toxic Norms
 
-**Module 3: The Role of Young Men in Prevention**
-- Being an Ally
-- Promoting Equality
+**Module 3: Introduction to SGBV**
+- What is SGBV?
+- Who Are the Victims?
+- The Impact of SGBV
 
-**Module 4: Building Healthy Relationships**
-- Communication and Consent
-- Conflict Resolution without Violence
+**Module 4: Root Causes of SGBV**
+- Power Imbalance
+- Culture and Socialisation
+- Economic Factors
+
+**Module 5: Role of Men as Change Agents**
+- Why Men Must Be Part of the Solution
+- What Allyship Looks Like
+- Personal Responsibility
+
+**Module 6: Healthy Masculinity & Relationships**
+- Consent — The Foundation of Everything
+- Communication and Conflict
+- Emotional Intelligence
+
+**Module 7: Bystander Intervention**
+- Recognising Abuse
+- How to Intervene Safely — The 5Ds
+- Supporting Survivors
+
+**Module 8: Peer Influence & Leadership**
+- Understanding Your Influence
+- Leading by Example
+- Becoming an Advocate
+
+**Module 9: Community Action & Advocacy**
+- Why Community Action Matters
+- The Power of Storytelling
+- How to Engage Your Community
+
+**Module 10: Networks & Movement Building**
+- Why Networks Matter
+- Collaboration Over Competition
+- Sustaining the Movement
+
+**Module 11: Personal Action Plan**
+- What You Now Know
+- Building Your Personal Action Plan
+- Accountability and the Pledge
