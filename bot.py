@@ -828,7 +828,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
             return
 
     # 3. State: Ready to take Quiz or viewing Quiz instructions
-    if quiz_completed == 0 and is_last_lesson_of_module(current_module_id, current_lesson_id) and "awaiting_lessons_complete" not in context.user_data and "awaiting_quote_card" not in context.user_data:
+    if is_last_lesson_of_module(current_module_id, current_lesson_id) and "awaiting_lessons_complete" not in context.user_data and "awaiting_quote_card" not in context.user_data:
         # Go back to Quote Card
         context.user_data["awaiting_lessons_complete"] = current_module_id
         await send_quote_card(update, context, current_module_id, lang, user_id)
@@ -989,10 +989,7 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
         await send_quote_card(update, context, module_id, lang, user_id)
         return
     
-    if is_user_graduated(user_id):
-        await send_graduation_dashboard(update, context, lang, user_id)
-        return
-        
+    
     result = get_learner_progress(user_id)
 
     if not result or not result[0]:
@@ -1147,8 +1144,11 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
             )
     else:
-        # Course complete — Route to the scored exit post-test exam!
-        await send_post_test_welcome(update, context)
+        # Course complete — Check if already graduated, otherwise route to scored post-test exam
+        if is_user_graduated(user_id):
+            await send_graduation_dashboard(update, context, lang, user_id)
+        else:
+            await send_post_test_welcome(update, context)
 
 async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show quiz for current module."""
@@ -1192,10 +1192,12 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         if not isinstance(quizzes, list):
             quizzes = [quizzes]
             
-        # Re-start from 0 if accessed via message command (/quiz) or if idx is not set
-        if "quiz_question_idx" not in context.user_data or update.message:
+        # Re-start from 0 if accessing a new module's quiz, via message command (/quiz), or if idx is not set
+        quiz_module = context.user_data.get("quiz_module_id")
+        if quiz_module != current_module_id or "quiz_question_idx" not in context.user_data or update.message:
             context.user_data["quiz_question_idx"] = 0
             context.user_data["quiz_errors"] = 0
+            context.user_data["quiz_module_id"] = current_module_id
             
         q_idx = context.user_data.get("quiz_question_idx", 0)
         if q_idx >= len(quizzes):
@@ -1493,7 +1495,8 @@ def generate_quote_card_image(module_id, module_title, quote_text, lang, user_id
     draw.rectangle([45, 45, width - 45, height - 45], outline=(219, 161, 71, 255), width=3)
     
     # 3. Load typography
-    assets_dir = "assets"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    assets_dir = os.path.join(base_dir, "assets")
     fonts_dir = os.path.join(assets_dir, "fonts")
     try:
         font_header = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 26)
@@ -1596,7 +1599,7 @@ def generate_quote_card_image(module_id, module_title, quote_text, lang, user_id
     paste_logo("young_mens_foundation_logo.png", width - 75 - yh_w - 15, 110, target_w=54, align_right=True)
     
     # Save PNG image
-    output_path = f"assets/quote_card_{module_id}_{user_id}.png"
+    output_path = os.path.join(assets_dir, f"quote_card_{module_id}_{user_id}.png")
     final_img = img.convert("RGB")
     final_img.save(output_path, "PNG")
     return output_path
@@ -1804,7 +1807,8 @@ def generate_certificate_image(name, date_str, user_id):
     img = Image.new("RGB", (width, height), (232, 226, 213))
     draw = ImageDraw.Draw(img)
     
-    assets_dir = "assets"
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    assets_dir = os.path.join(base_dir, "assets")
     
     # Helper to paste transparent PNG dynamically scaled
     def paste_transparent_pro(filename, x, y, target_width=None, align_right=False, align_bottom=False):
@@ -1853,7 +1857,7 @@ def generate_certificate_image(name, date_str, user_id):
     c_navy = (15, 32, 67)        # Deep navy headers and course title
 
     # Load fonts
-    fonts_dir = "assets/fonts"
+    fonts_dir = os.path.join(assets_dir, "fonts")
     try:
         font_cert = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 110)
         font_of_completion = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 46)
@@ -1911,7 +1915,7 @@ def generate_certificate_image(name, date_str, user_id):
     v_hash = hashlib.sha256(f"TBR-{user_id}-{date_str}".encode()).hexdigest()[:12].upper()
     draw.text((1000, 1345), f"VERIFICATION ID: TBR-{v_hash}", fill=c_gray, font=font_footer, anchor="mm")
     
-    output_path = f"assets/certificate_{user_id}.png"
+    output_path = os.path.join(assets_dir, f"certificate_{user_id}.png")
     img.save(output_path)
     return output_path
 
@@ -2599,6 +2603,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         context.user_data.pop("quiz_question_idx", None)
         context.user_data.pop("quiz_errors", None)
+        context.user_data.pop("quiz_module_id", None)
         
         # Deliver badge on skip as they are completing the module
         progress = get_learner_progress(user_id)
@@ -2707,6 +2712,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             if errors == 0:
                 context.user_data.pop("quiz_question_idx", None)
                 context.user_data.pop("quiz_errors", None)
+                context.user_data.pop("quiz_module_id", None)
                 quiz_comp = int(progress[2]) if (progress and progress[2] is not None) else 0
                 if quiz_comp == 0:
                     increment_first_attempt_quizzes(user_id)
