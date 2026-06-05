@@ -2552,7 +2552,8 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         [InlineKeyboardButton("Peer Facilitator Leaderboard", callback_data="admin_leaderboard")],
         [InlineKeyboardButton("Program Impact Analytics", callback_data="admin_analytics")],
         [InlineKeyboardButton("Export Progress Report (CSV)", callback_data="admin_export_csv")],
-        [InlineKeyboardButton("Reset Participant Progress", callback_data="admin_reset_prompt")]
+        [InlineKeyboardButton("Reset Participant Progress", callback_data="admin_reset_prompt")],
+        [InlineKeyboardButton("⚠️ Wipe Database (Fresh Test)", callback_data="admin_wipe_prompt")]
     ])
     
     await send_reply(update, dashboard_text, reply_markup=keyboard, parse_mode="Markdown")
@@ -2906,6 +2907,63 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             f"{participant_list}",
             parse_mode="Markdown"
         )
+        return
+        
+    elif data == "admin_wipe_prompt":
+        await query.delete_message()
+        admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+        admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+        if admin_ids and user_id not in admin_ids:
+            await query.message.reply_text("You are not authorized to perform this action.")
+            return
+
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("🔴 Yes, WIPE DATABASE", callback_data="admin_wipe_confirm")],
+            [InlineKeyboardButton("❌ Cancel / Back", callback_data="cmd_admin")]
+        ])
+        await query.message.reply_text(
+            "⚠️ *WARNING: WIPE DATABASE*\n\n"
+            "This action will completely delete all participants, progress, reflections, and reminders. "
+            "This is irreversible and should only be done to start a fresh test.\n\n"
+            "Are you absolutely sure you want to proceed?",
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+        return
+
+    elif data == "admin_wipe_confirm":
+        await query.delete_message()
+        admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+        admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+        if admin_ids and user_id not in admin_ids:
+            await query.message.reply_text("You are not authorized to perform this action.")
+            return
+
+        try:
+            from db_manager import get_connection
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("DELETE FROM learners")
+            cursor.execute("DELETE FROM reflections")
+            cursor.execute("DELETE FROM reminders")
+            conn.commit()
+            conn.close()
+
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]])
+            await query.message.reply_text(
+                "✅ *Success!*\n\n"
+                "The database has been completely wiped. All participants, reflections, and reminders have been deleted for a fresh test.",
+                reply_markup=keyboard,
+                parse_mode="Markdown"
+            )
+        except Exception as e:
+            logger.error(f"Error wiping database from callback: {e}")
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]])
+            await query.message.reply_text(
+                f"❌ *Error Wiping Database:*\n\n`{str(e)}`",
+                reply_markup=keyboard,
+                parse_mode="Markdown"
+            )
         return
     
     if data == "cmd_next":
