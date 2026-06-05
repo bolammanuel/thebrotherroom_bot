@@ -521,7 +521,7 @@ DASHBOARD_HTML = """
     </div>
 
     <script>
-        const expectedToken = "%s"; // Injected by Flask server
+        const expectedToken = "ADMIN_DASHBOARD_PASSWORD_PLACEHOLDER"; // Injected by Flask server
 
         function checkStoredAuth() {
             const token = localStorage.getItem("dashboard_auth_token");
@@ -681,7 +681,7 @@ DASHBOARD_HTML = """
     </script>
 </body>
 </html>
-""" % ADMIN_TOKEN
+""".replace("ADMIN_DASHBOARD_PASSWORD_PLACEHOLDER", ADMIN_TOKEN)
 
 @app.route("/")
 def index_route():
@@ -707,3 +707,8 @@ def run_dashboard_server():
     logger.info(f"Dashboard server starting on port {port}...")
     # Run server without debugger, threaded, safely locally or in cloud
     app.run(host="0.0.0.0", port=port, debug=False, use_reloader=False)
+
+if __name__ == "__main__":
+    # Setup console logging for direct run
+    logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    run_dashboard_server()

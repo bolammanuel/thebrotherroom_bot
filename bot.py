@@ -2741,8 +2741,7 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
             await update.message.reply_text(heard_msg, parse_mode="Markdown")
             
             # Pipe transcription text straight into handle_message handler
-            update.message.text = transcription
-            await handle_message(update, context)
+            await handle_message(update, context, user_message=transcription)
         else:
             fail_msg = {
                 "en": "Sorry, I couldn't understand that voice message. Please try speaking clearly or typing instead.",
@@ -3076,9 +3075,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             
         await process_quiz_answer(update, context, module_id, q_idx, selected_answer)
         return
-async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, user_message: str = None) -> None:
     """Handle text messages and transcribed voice inputs."""
-    user_message = update.message.text
+    if user_message is None:
+        user_message = update.message.text
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
 
@@ -3471,7 +3471,17 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(button_handler))
 
     # Run the bot
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    try:
+        application.run_polling(allowed_updates=Update.ALL_TYPES)
+    except Exception as e:
+        logger.error(f"Telegram Bot Polling Error: {e}")
+        logger.info("Keeping process alive so that the Analytics Dashboard web server remains accessible at http://localhost:8080/")
+        import time
+        try:
+            while True:
+                time.sleep(3600)
+        except KeyboardInterrupt:
+            logger.info("Shutting down...")
 
 if __name__ == "__main__":
     main()
