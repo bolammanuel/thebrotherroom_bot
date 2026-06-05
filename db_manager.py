@@ -155,18 +155,18 @@ def enroll_learner(user_id, language='en', full_name=None):
     conn.close()
 
 def is_learner_registered(user_id):
-    """Check if learner has completed profile registration (name, state)."""
+    """Check if learner has completed profile registration (name, email, state)."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT full_name, state FROM learners WHERE user_id = %s
+        SELECT full_name, email, state FROM learners WHERE user_id = %s
     """, (user_id,))
     result = cursor.fetchone()
     conn.close()
     if not result:
         return False
-    full_name, state = result
-    return bool(full_name and state)
+    full_name, email, state = result
+    return bool(full_name and email and state)
 
 def get_learner_progress(user_id):
     """Get learner's current progress (module, lesson, quiz status, language)."""
@@ -346,6 +346,18 @@ def update_address(user_id, address):
         SET address = %s, last_activity = CURRENT_TIMESTAMP
         WHERE user_id = %s
     """, (address, user_id))
+    conn.commit()
+    conn.close()
+
+def update_email(user_id, email):
+    """Update learner's registered email address."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET email = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (email, user_id))
     conn.commit()
     conn.close()
 

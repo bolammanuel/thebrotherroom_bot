@@ -20,12 +20,12 @@
     "yo": "Kọkọ, jọwọ sọ fun wa orukọ rẹ ni kikun:",
     "ig": "Nke mbụ, biko gwa anyị aha gị n'uju:"
   },
-  "ask_address": {
-    "en": "Thank you. Now, what is your residential address?",
-    "pcm": "Thank you. Now, wetin be your address where you dey stay?",
-    "ha": "Godiya. Yanzu, menene adireshin gidan ku?",
-    "yo": "O ṣeun. Bayi, kini adirẹsi ile rẹ?",
-    "ig": "Daalụ. Ugbu a, gịnị bụ adreesị ebe obibi gị?"
+  "ask_email": {
+    "en": "Thank you. Now, what is your email address?",
+    "pcm": "Thank you. Now, wetin be your email address?",
+    "ha": "Godiya. Yanzu, menene adireshin imel na ku?",
+    "yo": "O ṣeun. Bayi, kini adirẹsi imeeli rẹ?",
+    "ig": "Daalụ. Ugbu a, gịnị bụ adreesị ozi-e gị?"
   },
   "ask_state": {
     "en": "Great. Which State in Nigeria do you reside in?",
