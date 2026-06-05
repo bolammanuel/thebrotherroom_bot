@@ -479,32 +479,35 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await send_graduation_dashboard(update, context, lang, user_id)
         return
         
-    # Check if learner already has progress
-    result = get_learner_progress(user_id)
-    
-    if result and result[0]:
-        # Returning learner — welcome them back
-        current_module_id, current_lesson_id, quiz_completed, lang = result
-        quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
+    # Check if learner already has completed profile registration
+    from db_manager import is_learner_registered
+    if is_learner_registered(user_id):
+        # Check if learner already has progress
+        result = get_learner_progress(user_id)
         
-        # Check if they have completed the entire course (last module, last lesson, quiz completed)
-        next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
-        if next_module_id is None and next_lesson_id is None and quiz_completed in [1, 2]:
-            # They want to retake the course (as stated in the course_complete message)!
-            # Reset progress in database
-            reset_learner_data(user_id)
-            # Clear user_data and continue to onboarding selection
-            context.user_data.clear()
-        else:
-            module, lesson = get_module_lesson(current_module_id, current_lesson_id)
-            if module and lesson:
-                welcome_back = get_text("welcome_back", lang, module_title=module['title'], lesson_title=lesson['title'])
-                await send_reply(
-                    update,
-                    welcome_back,
-                    reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
-                )
-                return
+        if result and result[0]:
+            # Returning learner — welcome them back
+            current_module_id, current_lesson_id, quiz_completed, lang = result
+            quiz_completed = int(quiz_completed) if quiz_completed is not None else 0
+            
+            # Check if they have completed the entire course (last module, last lesson, quiz completed)
+            next_module_id, next_lesson_id = get_next_lesson(current_module_id, current_lesson_id)
+            if next_module_id is None and next_lesson_id is None and quiz_completed in [1, 2]:
+                # They want to retake the course (as stated in the course_complete message)!
+                # Reset progress in database
+                reset_learner_data(user_id)
+                # Clear user_data and continue to onboarding selection
+                context.user_data.clear()
+            else:
+                module, lesson = get_module_lesson(current_module_id, current_lesson_id)
+                if module and lesson:
+                    welcome_back = get_text("welcome_back", lang, module_title=module['title'], lesson_title=lesson['title'])
+                    await send_reply(
+                        update,
+                        welcome_back,
+                        reply_markup=get_main_menu_buttons(lang, user_id=user_id, context=context)
+                    )
+                    return
     
     # New learner — show language selection
     await send_reply(
@@ -2354,25 +2357,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         full_name = query.from_user.full_name if query.from_user else None
         enroll_learner(user_id, lang_code, full_name=full_name)
         
-        if is_new_user or context.user_data.get('awaiting_language_selection'):
+        from db_manager import is_learner_registered
+        if not is_learner_registered(user_id) or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
             
-            # Show welcome message encouraging Pre-Test
-            welcome_text = get_text("start_welcome", lang_code, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
-            pretest_button_label = {
-                "en": "✍️ Take Pre-Test Quiz",
-                "pcm": "✍️ Start Pre-Test Quiz",
-                "ha": "✍️ Fara Jarrabawar Farko",
-                "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
-                "ig": "✍️ Malite Ule Mbụ"
-            }.get(lang_code, "✍️ Take Pre-Test Quiz")
+            # Start profile registration onboarding
+            context.user_data['awaiting_full_name'] = True
             
-            keyboard = InlineKeyboardMarkup([
-                [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
-            ])
+            ask_name_text = get_text("ask_full_name", lang_code)
             await query.edit_message_text(
-                welcome_text,
-                reply_markup=keyboard,
+                ask_name_text,
                 parse_mode="Markdown"
             )
         else:
@@ -2788,6 +2782,58 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_message = update.message.text
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
+
+    # Intercept full name onboarding step
+    if context.user_data.get("awaiting_full_name"):
+        context.user_data.pop("awaiting_full_name", None)
+        full_name = user_message.strip()
+        update_full_name(user_id, full_name)
+        
+        # Move to address onboarding step
+        context.user_data["awaiting_address"] = True
+        ask_address_text = get_text("ask_address", lang)
+        await update.message.reply_text(ask_address_text)
+        return
+
+    # Intercept address onboarding step
+    if context.user_data.get("awaiting_address"):
+        context.user_data.pop("awaiting_address", None)
+        address = user_message.strip()
+        from db_manager import update_address
+        update_address(user_id, address)
+        
+        # Move to state onboarding step
+        context.user_data["awaiting_state"] = True
+        ask_state_text = get_text("ask_state", lang)
+        await update.message.reply_text(ask_state_text)
+        return
+
+    # Intercept state onboarding step
+    if context.user_data.get("awaiting_state"):
+        context.user_data.pop("awaiting_state", None)
+        state_val = user_message.strip()
+        from db_manager import update_state
+        update_state(user_id, state_val)
+        
+        # Onboarding registration complete! Now show welcome message and prompt Pre-Test
+        welcome_text = get_text("start_welcome", lang, course_title=COURSE_TITLE, course_description=COURSE_DESCRIPTION)
+        pretest_button_label = {
+            "en": "✍️ Take Pre-Test Quiz",
+            "pcm": "✍️ Start Pre-Test Quiz",
+            "ha": "✍️ Fara Jarrabawar Farko",
+            "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
+            "ig": "✍️ Malite Ule Mbụ"
+        }.get(lang, "✍️ Take Pre-Test Quiz")
+        
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
+        ])
+        await update.message.reply_text(
+            welcome_text,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+        return
 
     # Intercept private reflections
     if context.user_data.get("awaiting_reflection"):

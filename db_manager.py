@@ -112,7 +112,9 @@ def init_db():
         "voice_responses_enabled": "INTEGER DEFAULT 0",
         "full_name": "TEXT DEFAULT NULL",
         "email": "TEXT DEFAULT NULL",
-        "country": "TEXT DEFAULT NULL"
+        "country": "TEXT DEFAULT NULL",
+        "address": "TEXT DEFAULT NULL",
+        "state": "TEXT DEFAULT NULL"
     }
     
     for col, col_def in new_cols.items():
@@ -151,6 +153,20 @@ def enroll_learner(user_id, language='en', full_name=None):
     
     conn.commit()
     conn.close()
+
+def is_learner_registered(user_id):
+    """Check if learner has completed full profile registration (name, address, state)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT full_name, address, state FROM learners WHERE user_id = %s
+    """, (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    if not result:
+        return False
+    full_name, address, state = result
+    return bool(full_name and address and state)
 
 def get_learner_progress(user_id):
     """Get learner's current progress (module, lesson, quiz status, language)."""
@@ -318,6 +334,30 @@ def update_full_name(user_id, full_name):
         SET full_name = %s, last_activity = CURRENT_TIMESTAMP
         WHERE user_id = %s
     """, (full_name, user_id))
+    conn.commit()
+    conn.close()
+
+def update_address(user_id, address):
+    """Update learner's registered address."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET address = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (address, user_id))
+    conn.commit()
+    conn.close()
+
+def update_state(user_id, state):
+    """Update learner's registered state."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET state = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (state, user_id))
     conn.commit()
     conn.close()
 

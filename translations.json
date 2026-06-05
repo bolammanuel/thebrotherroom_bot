@@ -13,6 +13,27 @@
     "yo",
     "ig"
   ],
+  "ask_full_name": {
+    "en": "First, please tell us your full name:",
+    "pcm": "First, abeg tell us your full name:",
+    "ha": "Da farko, da fatan za a gaya mana cikakken sunanka:",
+    "yo": "Kọkọ, jọwọ sọ fun wa orukọ rẹ ni kikun:",
+    "ig": "Nke mbụ, biko gwa anyị aha gị n'uju:"
+  },
+  "ask_address": {
+    "en": "Thank you. Now, what is your residential address?",
+    "pcm": "Thank you. Now, wetin be your address where you dey stay?",
+    "ha": "Godiya. Yanzu, menene adireshin gidan ku?",
+    "yo": "O ṣeun. Bayi, kini adirẹsi ile rẹ?",
+    "ig": "Daalụ. Ugbu a, gịnị bụ adreesị ebe obibi gị?"
+  },
+  "ask_state": {
+    "en": "Great. Which State in Nigeria do you reside in?",
+    "pcm": "Great. Which State for Nigeria you dey live?",
+    "ha": "Madalla. Wace Jiha kake zama a Najeriya?",
+    "yo": "O tayọ. Ipinle wo ni o n gbe ni Nigeria?",
+    "ig": "Ọ dị mma. Kedu steeti na Nigeria ka ị bi?"
+  },
   "language_selection": {
     "en": "The Brothers' Room\n\nWelcome, brother.\n\nMy name is Tobi — I will be your guide through this course.\n\nThis is a free 6-week programme for men who want to understand gender-based violence, challenge harmful norms, and become real agents of change in their communities.\n\nNo judgment here. Na just us brothers talking honestly.\n\nFirst things first — which language would you like to use?",
     "pcm": "The Brothers' Room\n\nWelcome, brother.\n\nMy name is Tobi — I will be your guide through this course.\n\nThis is a free 6-week programme for men who want to understand gender-based violence, challenge harmful norms, and become real agents of change in their communities.\n\nNo judgment here. Na just us brothers talking honestly.\n\nFirst things first — which language would you like to use?",
