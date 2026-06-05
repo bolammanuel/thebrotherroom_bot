@@ -162,26 +162,7 @@ DASHBOARD_HTML = """
             font-family: 'Outfit', sans-serif;
         }
 
-        /* Premium Ankara Decorative Border top */
-        .ankara-bar {
-            height: 6px;
-            width: 100%;
-            background: repeating-linear-gradient(
-                45deg,
-                #f97316,
-                #f97316 10px,
-                #e11d48 10px,
-                #e11d48 20px,
-                #f59e0b 20px,
-                #f59e0b 30px,
-                #10b981 30px,
-                #10b981 40px
-            );
-            position: fixed;
-            top: 0;
-            left: 0;
-            z-index: 1000;
-        }
+
 
         .container {
             max-width: 1200px;
@@ -437,13 +418,10 @@ DASHBOARD_HTML = """
     </style>
 </head>
 <body>
-    <div class="ankara-bar"></div>
-
     <!-- Security Auth Overlay -->
     <div id="loginOverlay" class="login-overlay" style="display: none;">
         <div class="card login-box">
-            <span class="logo-icon">🔑</span>
-            <h2 style="margin-top: 1rem;">Facilitator Authentication</h2>
+            <h2 style="margin-top: 0.5rem;">Facilitator Authentication</h2>
             <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 0.5rem;">Access requires dashboard facilitator password.</p>
             <input type="password" id="passwordInput" class="login-input" placeholder="Enter password...">
             <button onclick="checkAuth()" class="btn">Authenticate</button>
@@ -455,7 +433,6 @@ DASHBOARD_HTML = """
     <div class="container" id="dashboardContent">
         <header>
             <div class="logo-group">
-                <span class="logo-icon">🏠</span>
                 <div>
                     <h1 class="title-main">The Brothers' Room</h1>
                     <p class="subtitle">Positive Masculinity & GBV Prevention Analytics Dashboard</p>
@@ -471,22 +448,22 @@ DASHBOARD_HTML = """
             <div class="card kpi-card">
                 <div class="kpi-label">Total Participants</div>
                 <div class="kpi-value" id="kpiEnrollments">-</div>
-                <div class="kpi-trend">📈 Active learners registered</div>
+                <div class="kpi-trend">Active learners registered</div>
             </div>
             <div class="card kpi-card">
                 <div class="kpi-label">Graduates</div>
                 <div class="kpi-value" id="kpiGraduates">-</div>
-                <div class="kpi-trend" style="color: #0ea5e9;">🎓 Completed all modules</div>
+                <div class="kpi-trend" style="color: #0ea5e9;">Completed all modules</div>
             </div>
             <div class="card kpi-card">
                 <div class="kpi-label">Avg Post-Test Score</div>
                 <div class="kpi-value" id="kpiAvgScore">- <span style="font-size:1rem; font-weight:normal; color:#94a3b8;">/ 50</span></div>
-                <div class="kpi-trend" style="color: #e11d48;">💡 Passing cutoff is 35/50</div>
+                <div class="kpi-trend" style="color: #e11d48;">Passing cutoff is 35/50</div>
             </div>
             <div class="card kpi-card">
                 <div class="kpi-label">Facilitator AI Queries</div>
                 <div class="kpi-value" id="kpiAiQueries">-</div>
-                <div class="kpi-trend" style="color: #f59e0b;">💬 Questions answered dynamically</div>
+                <div class="kpi-trend" style="color: #f59e0b;">Questions answered dynamically</div>
             </div>
         </div>
 
