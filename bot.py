@@ -2538,7 +2538,7 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
     admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
     admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
     
-    if admin_ids and user_id not in admin_ids:
+    if not admin_ids or user_id not in admin_ids:
         await send_reply(update, "You are not authorized to view the Admin Dashboard.")
         return
         
@@ -2598,7 +2598,7 @@ async def show_admin_analytics(update: Update, context: ContextTypes.DEFAULT_TYP
     # Secure admin authentication
     admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
     admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
-    if admin_ids and user_id not in admin_ids:
+    if not admin_ids or user_id not in admin_ids:
         await send_reply(update, "You are not authorized to view the Admin Dashboard.")
         return
         
@@ -2876,7 +2876,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
-        if admin_ids and user_id not in admin_ids:
+        if not admin_ids or user_id not in admin_ids:
             await query.message.reply_text("You are not authorized to perform this action.")
             return
             
@@ -2913,7 +2913,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
-        if admin_ids and user_id not in admin_ids:
+        if not admin_ids or user_id not in admin_ids:
             await query.message.reply_text("You are not authorized to perform this action.")
             return
 
@@ -2935,7 +2935,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
-        if admin_ids and user_id not in admin_ids:
+        if not admin_ids or user_id not in admin_ids:
             await query.message.reply_text("You are not authorized to perform this action.")
             return
 
@@ -3023,14 +3023,44 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.answer(text=toast_msg, show_alert=True)
         
         message_text = query.message.text or ""
-        is_help_menu = "help_menu" in TRANSLATIONS and any(
-            h_text[:30] in message_text for h_text in TRANSLATIONS["help_menu"].values() if h_text
-        )
         
-        if is_help_menu:
-            reply_markup = get_help_keyboard_buttons(lang, user_id=user_id, context=context)
+        # Check if the user is on the welcome/pretest onboarding screen
+        is_welcome_screen = False
+        start_welcome = TRANSLATIONS.get("start_welcome", {})
+        for w_text in start_welcome.values():
+            if w_text and message_text and (w_text[:40] in message_text or message_text[:40] in w_text):
+                is_welcome_screen = True
+                break
+
+        if is_welcome_screen:
+            pretest_button_label = {
+                "en": "✍️ Take Pre-Test Quiz",
+                "pcm": "✍️ Start Pre-Test Quiz",
+                "ha": "✍️ Fara Jarrabawar Farko",
+                "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
+                "ig": "✍️ Malite Ule Mbụ"
+            }.get(lang, "✍️ Take Pre-Test Quiz")
+            
+            voice_label = {
+                "en": f"Voice: {'ON 🔊' if new_status else 'OFF 🔇'}",
+                "pcm": f"Voice: {'ON 🔊' if new_status else 'OFF 🔇'}",
+                "ha": f"Murya: {'A KUNNE 🔊' if new_status else 'A KASHE 🔇'}",
+                "yo": f"Ohun: {'MÚ KÚN 🔊' if new_status else 'MÚ KÚRÒ 🔇'}",
+                "ig": f"Olu: {'MERE 🔊' if new_status else 'PAA 🔇'}"
+            }.get(lang, f"Voice: {'ON 🔊' if new_status else 'OFF 🔇'}")
+            
+            reply_markup = InlineKeyboardMarkup([
+                [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")],
+                [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
+            ])
         else:
-            reply_markup = get_main_menu_buttons(lang, user_id=user_id, context=context)
+            is_help_menu = "help_menu" in TRANSLATIONS and any(
+                h_text[:30] in message_text for h_text in TRANSLATIONS["help_menu"].values() if h_text
+            )
+            if is_help_menu:
+                reply_markup = get_help_keyboard_buttons(lang, user_id=user_id, context=context)
+            else:
+                reply_markup = get_main_menu_buttons(lang, user_id=user_id, context=context)
             
         await query.edit_message_reply_markup(reply_markup=reply_markup)
         
@@ -3182,8 +3212,18 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
             "ig": "✍️ Malite Ule Mbụ"
         }.get(lang, "✍️ Take Pre-Test Quiz")
         
+        voice_enabled = get_voice_responses(user_id)
+        voice_label = {
+            "en": f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}",
+            "pcm": f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}",
+            "ha": f"Murya: {'A KUNNE 🔊' if voice_enabled else 'A KASHE 🔇'}",
+            "yo": f"Ohun: {'MÚ KÚN 🔊' if voice_enabled else 'MÚ KÚRÒ 🔇'}",
+            "ig": f"Olu: {'MERE 🔊' if voice_enabled else 'PAA 🔇'}"
+        }.get(lang, f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}")
+
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")]
+            [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")],
+            [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
         ])
         await send_reply(
             update,
@@ -3268,7 +3308,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
         # Double check sender is admin
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
-        if admin_ids and user_id not in admin_ids:
+        if not admin_ids or user_id not in admin_ids:
             await send_reply(update, "You are not authorized to perform this action.")
             return
             
@@ -3427,7 +3467,7 @@ async def handle_video_upload(update: Update, context: ContextTypes.DEFAULT_TYPE
     admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
     admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
     
-    if admin_ids and user_id not in admin_ids:
+    if not admin_ids or user_id not in admin_ids:
         return
 
     file_id = None
