@@ -2714,8 +2714,8 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
         ogg_path = f"assets/voice_input_{user_id}.ogg"
         await voice_file.download_to_drive(ogg_path)
         
-        # Transcribe using Whisper
-        transcription = transcribe_voice(ogg_path)
+        # Transcribe using Whisper with language guidance
+        transcription = transcribe_voice(ogg_path, language=lang)
         
         # Clean up temporary audio file
         if os.path.exists(ogg_path):
@@ -3413,33 +3413,44 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
         return
 
     # --- 3. Check for general navigation and menu command keywords ---
-    msg_clean = user_message.lower().strip().rstrip('.')
+    msg_clean = user_message.lower().strip().rstrip('.?!')
+    words = msg_clean.split()
     
-    # Navigation mapping
-    if msg_clean in ["next", "continue", "go next", "move on", "forward", "tẹsiwaju", "ci gaba", "gaa n'ihu"]:
+    # Define keyword lists
+    next_keywords = ["next", "continue", "forward", "tẹsiwaju", "ci gaba", "gaa n'ihu", "move on"]
+    back_keywords = ["back", "previous", "prev", "padà", "koma baya", "gaa n'azụ", "go back"]
+    menu_keywords = ["menu", "outline", "modules", "mẹnu", "tsarin darussa", "ihere", "course menu"]
+    help_keywords = ["help", "info", "support", "iranwọ", "taimako", "enyemaka", "get help"]
+    progress_keywords = ["progress", "score", "status", "itẹsiwaju", "ci gaba na koyo", "ọganihu", "how am i doing"]
+    journal_keywords = ["journal", "reflection", "reflections", "diary", "akọsilẹ", "tunanina", "akwụkwọ m", "my journal"]
+    quiz_keywords = ["quiz", "test", "jarrabawa", "idanwo", "ule", "take quiz"]
+    start_keywords = ["start", "restart", "begin", "bẹrẹ", "fara", "malite"]
+
+    # Match if exact match, or if it's a short command phrase (3 words or less) containing the keyword
+    is_short = len(words) <= 3
+    
+    if msg_clean in next_keywords or (is_short and any(kw in msg_clean for kw in next_keywords)):
         await next_lesson_handler(update, context)
         return
-    if msg_clean in ["back", "previous", "go back", "prev", "padà", "koma baya", "gaa n'azụ"]:
+    if msg_clean in back_keywords or (is_short and any(kw in msg_clean for kw in back_keywords)):
         await prev_lesson_handler(update, context)
         return
-        
-    # Main commands mapping
-    if msg_clean in ["menu", "outline", "modules", "course menu", "show menu", "mẹnu", "tsarin darussa", "ihere"]:
+    if msg_clean in menu_keywords or (is_short and any(kw in msg_clean for kw in menu_keywords)):
         await menu_command(update, context)
         return
-    if msg_clean in ["help", "info", "assistance", "support", "get help", "iranwọ", "taimako", "enyemaka"]:
+    if msg_clean in help_keywords or (is_short and any(kw in msg_clean for kw in help_keywords)):
         await help_command(update, context)
         return
-    if msg_clean in ["progress", "score", "status", "my progress", "how am I doing", "itẹsiwaju", "ci gaba na koyo", "ọganihu"]:
+    if msg_clean in progress_keywords or (is_short and any(kw in msg_clean for kw in progress_keywords)):
         await progress_command(update, context)
         return
-    if msg_clean in ["journal", "reflections", "my journal", "notes", "diary", "akọsilẹ", "tunanina", "akwụkwọ m"]:
+    if msg_clean in journal_keywords or (is_short and any(kw in msg_clean for kw in journal_keywords)):
         await journal_command(update, context)
         return
-    if msg_clean in ["quiz", "test", "question", "take quiz", "start quiz", "jarrabawa", "idanwo", "ule"]:
+    if msg_clean in quiz_keywords or (is_short and any(kw in msg_clean for kw in quiz_keywords)):
         await quiz_command(update, context)
         return
-    if msg_clean in ["start", "restart", "begin"]:
+    if msg_clean in start_keywords or (is_short and any(kw in msg_clean for kw in start_keywords)):
         await start(update, context)
         return
 

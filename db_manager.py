@@ -1,7 +1,11 @@
 import os
 import psycopg2
+import logging
 from psycopg2 import sql
 from dotenv import load_dotenv
+
+# Setup logging
+logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
@@ -47,8 +51,12 @@ class CompatibleConnection:
 def get_connection():
     """Get a database connection, falling back to SQLite locally if DATABASE_URL is not set."""
     if DATABASE_URL:
-        conn = psycopg2.connect(DATABASE_URL)
-        return CompatibleConnection(conn, is_sqlite=False)
+        try:
+            conn = psycopg2.connect(DATABASE_URL)
+            return CompatibleConnection(conn, is_sqlite=False)
+        except Exception as e:
+            logger.error(f"Failed to connect to PostgreSQL database: {e}")
+            raise e
     else:
         import sqlite3
         conn = sqlite3.connect("learner_progress.db")
@@ -57,6 +65,11 @@ def get_connection():
 def init_db():
     """Initialize the database with required tables and dynamic column migrations."""
     conn = get_connection()
+    if conn.is_sqlite:
+        logger.info("Initializing database using local SQLite file (learner_progress.db).")
+    else:
+        logger.info("Initializing database using live PostgreSQL database.")
+    
     cursor = conn.cursor()
     
     # Create learners table with language preference

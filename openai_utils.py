@@ -41,14 +41,33 @@ def get_openai_response(prompt, course_content, language='en'):
         }
         return fallbacks.get(language, fallbacks["en"])
 
-def transcribe_voice(audio_file_path):
-    """Transcribe a voice note (.ogg/.mp3/etc.) using OpenAI Whisper-1."""
+def transcribe_voice(audio_file_path, language='en'):
+    """Transcribe a voice note (.ogg/.mp3/etc.) using OpenAI Whisper-1 with language guiding prompts."""
     try:
         client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        
+        # Whisper uses ISO-639-1 language codes.
+        # Pidgin doesn't have an official code, so we use English ('en') with a Pidgin prompt.
+        whisper_lang = language
+        if language == "pcm":
+            whisper_lang = "en"
+            
+        prompts = {
+            "en": "This is a conversation about positive masculinity, gender-based violence, respect, relationships, and consent in The Brothers' Room.",
+            "pcm": "How far, my brother. Wetin we dey talk for here na about positive masculinity, respect, consent, and Gender-Based Violence for inside The Brothers' Room.",
+            "ha": "Sannu brother. Wannan tattaunawa ce game da kyakkyawar dabi'a ta namiji, yaki da cin zarafi, girmamawa, da yarda a The Brothers' Room.",
+            "yo": "A ti gba ètò yìí gbọ́. Ẹ jẹ́ kọ́ sọ̀rọ̀ nípa ọkùnrin rere, ìfẹ́, ọ̀wọ̀, àti ìfohùnṣọ̀kan. Ẹ̀kọ́ The Brothers' Room nìyí.",
+            "ig": "Nnọọ nwanne. Nke a bụ mkparịta ụka gbasara ezi omume nwoke, ime ihe ike, ugwu, mmekọrịta, na nkwenye na The Brothers' Room."
+        }
+        
+        prompt = prompts.get(language, prompts["en"])
+        
         with open(audio_file_path, "rb") as audio_file:
             transcript = client.audio.transcriptions.create(
                 model="whisper-1",
-                file=audio_file
+                file=audio_file,
+                language=whisper_lang,
+                prompt=prompt
             )
             return transcript.text.strip()
     except Exception as e:
