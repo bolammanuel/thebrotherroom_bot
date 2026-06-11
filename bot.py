@@ -1921,8 +1921,30 @@ async def grade_post_test(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         # PASSED (score >= 35)
         passed_text = get_text("post_test.passed", lang, score=score)
         await send_reply(update, passed_text)
-        # Put user into a state waiting for their preferred name
-        context.user_data["awaiting_cert_name"] = True
+        
+        # Fetch their name from the DB (saved during onboarding)
+        from db_manager import get_connection
+        learner_name = ""
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+            cursor.execute("SELECT full_name FROM learners WHERE user_id = %s", (user_id,))
+            row = cursor.fetchone()
+            learner_name = row[0] if row else ""
+            conn.close()
+        except Exception as e:
+            logger.error(f"Error fetching learner name for post_test completion: {e}")
+            
+        if not learner_name:
+            learner_name = update.effective_user.full_name or "Participant"
+            
+        # Store in user_data for use in the certificate generation
+        context.user_data["cert_name"] = learner_name
+        
+        # Move directly to pledge writing step
+        context.user_data["awaiting_pledge"] = True
+        pledge_prompt = get_text("post_test.pledge_prompt", lang, name=learner_name)
+        await send_reply(update, pledge_prompt)
     else:
         # FAILED
         failed_text = get_text("post_test.failed", lang, score=score)
@@ -1961,7 +1983,7 @@ def generate_quote_card_image(module_id, module_title, quote_text, lang, user_id
     try:
         font_header = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 26)
         font_subheader = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 20)
-        font_quote = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 38)
+        font_quote = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 48)
         font_quote_large = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 140)
         font_footer = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 20)
     except Exception as e:
@@ -2319,26 +2341,26 @@ def generate_certificate_image(name, date_str, user_id):
     # Load fonts
     fonts_dir = os.path.join(assets_dir, "fonts")
     try:
-        font_cert = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 110)
-        font_of_completion = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 46)
-        font_presented = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 32)
-        font_name = ImageFont.truetype(os.path.join(fonts_dir, "DancingScript-Bold.ttf"), 105)
-        font_desc = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 26)
-        font_course = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 36)
-        font_sig_name = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 32)
-        font_sig_title = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 26)
+        font_cert = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 115)
+        font_of_completion = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 52)
+        font_presented = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 38)
+        font_name = ImageFont.truetype(os.path.join(fonts_dir, "DancingScript-Bold.ttf"), 125)
+        font_desc = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 32)
+        font_course = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 44)
+        font_sig_name = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 36)
+        font_sig_title = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 30)
         font_footer = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 20)
     except Exception as e:
         logger.error(f"Font loading error: {e}, falling back to defaults")
         try:
-            font_cert = ImageFont.truetype("Arial.ttf", 110)
-            font_of_completion = ImageFont.truetype("Arial.ttf", 46)
-            font_presented = ImageFont.truetype("Arial.ttf", 32)
-            font_name = ImageFont.truetype("Times New Roman.ttf", 105)
-            font_desc = ImageFont.truetype("Arial.ttf", 26)
-            font_course = ImageFont.truetype("Times New Roman.ttf", 36)
-            font_sig_name = ImageFont.truetype("Arial.ttf", 32)
-            font_sig_title = ImageFont.truetype("Arial.ttf", 26)
+            font_cert = ImageFont.truetype("Arial.ttf", 115)
+            font_of_completion = ImageFont.truetype("Arial.ttf", 52)
+            font_presented = ImageFont.truetype("Arial.ttf", 38)
+            font_name = ImageFont.truetype("Times New Roman.ttf", 125)
+            font_desc = ImageFont.truetype("Arial.ttf", 32)
+            font_course = ImageFont.truetype("Times New Roman.ttf", 44)
+            font_sig_name = ImageFont.truetype("Arial.ttf", 36)
+            font_sig_title = ImageFont.truetype("Arial.ttf", 30)
             font_footer = ImageFont.truetype("Arial.ttf", 20)
         except Exception:
             font_cert = font_of_completion = font_presented = font_name = font_desc = font_course = font_sig_name = font_sig_title = font_footer = ImageFont.load_default()
@@ -2353,8 +2375,8 @@ def generate_certificate_image(name, date_str, user_id):
     draw.text((1000, 700), name.title(), fill=c_navy, font=font_name, anchor="mm")
     
     # Description Section
-    draw.text((1000, 840), "for successfully completing the 6-week conversational course on", fill=c_gray, font=font_desc, anchor="mm")
-    draw.text((1000, 900), "Positive Masculinity & Gender-Based Violence (GBV) Prevention", fill=c_navy, font=font_course, anchor="mm")
+    draw.text((1000, 830), "for successfully completing the 6-week conversational course on", fill=c_gray, font=font_desc, anchor="mm")
+    draw.text((1000, 910), "Positive Masculinity & Gender-Based Violence (GBV) Prevention", fill=c_navy, font=font_course, anchor="mm")
     
     # Bottom Left - Rotimi Olawale (Executive Director) Signatory
     sig_x = 480
@@ -3458,18 +3480,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
         )
         return
 
-    # Intercept preferred name for certificate
-    if context.user_data.get("awaiting_cert_name"):
-        context.user_data.pop("awaiting_cert_name", None)
-        cert_name = user_message.strip()
-        context.user_data["cert_name"] = cert_name
-        update_full_name(user_id, cert_name)  # Save to DB permanently!
-        
-        # Move to pledge writing step
-        context.user_data["awaiting_pledge"] = True
-        pledge_prompt = get_text("post_test.pledge_prompt", lang, name=cert_name)
-        await send_reply(update, pledge_prompt)
-        return
 
     # Intercept personal pledges for graduations
     if context.user_data.get("awaiting_pledge"):

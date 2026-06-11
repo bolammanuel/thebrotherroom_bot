@@ -33,7 +33,7 @@ def send_certificate_email(recipient_email, learner_name, certificate_image_path
         <html>
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px;">
             <div style="text-align: center; margin-bottom: 20px;">
-                <h2 style="color: #0F2043; margin-bottom: 5px;">T H E   B R O T H E R S '   R O O M</h2>
+                <h2 style="color: #0F2043; margin-bottom: 5px; letter-spacing: 8px; font-weight: bold;">THE BROTHERS' ROOM</h2>
                 <hr style="border: 0; border-top: 2px solid #dba147; width: 150px; margin: 0 auto;">
             </div>
             

@@ -12,7 +12,11 @@ load_dotenv()
 from email_utils import send_certificate_email
 
 def run_test():
-    recipient = input("Enter the test recipient email address: ").strip()
+    if len(sys.argv) > 1:
+        recipient = sys.argv[1].strip()
+    else:
+        recipient = input("Enter the test recipient email address: ").strip()
+        
     if not recipient:
         print("Recipient email cannot be empty!")
         return
@@ -36,15 +40,20 @@ def run_test():
     print(f"SMTP Server: {smtp_host}:{os.getenv('SMTP_PORT', '587')}")
     print(f"SMTP User:   {smtp_user}")
     
-    # We will generate a mock empty file to test attachment delivery
+    # We will generate a mock 1x1 pixel PNG file to test attachment delivery
     test_cert_path = "assets/test_certificate_stub.png"
     
     # Ensure assets directory exists
     os.makedirs("assets", exist_ok=True)
     
-    # Create a simple dummy text/image stub
+    # Create a valid 1x1 transparent PNG stub
+    png_1x1 = (
+        b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01'
+        b'\x08\x06\x00\x00\x00\x1f\x15c4\x00\x00\x00\rIDATx\x9cc`\x00\x00\x00'
+        b'\x02\x00\x01H\xaf\xa4q\x00\x00\x00\x00IEND\xaeB`\x82'
+    )
     with open(test_cert_path, "wb") as f:
-        f.write(b"PNG STUB DATA FOR EMAIL TESTING")
+        f.write(png_1x1)
         
     try:
         success = send_certificate_email(recipient, "Test Learner Name", test_cert_path)
