@@ -968,5 +968,33 @@
     "ha": "❌ Ban yarda ba",
     "yo": "❌ Nko fohùnṣọ̀kan",
     "ig": "❌ Ekwetaghị m"
+  },
+  "ask_gender": {
+    "en": "Before we begin, please select your gender: 🙋‍♂️🙋‍♀️\n\nThis course is specifically designed for young men to reflect, discuss positive masculinity, and prevent Gender-Based Violence (GBV).",
+    "pcm": "Before we start, abeg select your gender: 🙋‍♂️🙋‍♀️\n\nThis course dey design specially for young men make they look inside themselves, follow talk positive masculinity, and stop Gender-Based Violence (GBV).",
+    "ha": "Kafin mu fara, don Allah zaɓi jinsinku: 🙋‍♂️🙋‍♀️\n\nWannan darasi an tsara shi ne musamman ga samari don yin tunani, tattauna kyakkyawar dabi'ar namiji, da kuma rigakafin cin zarafi na jinsi (GBV).",
+    "yo": "Kí a tó bẹ̀rẹ̀, jọwọ yan ẹya rẹ: 🙋‍♂️🙋‍♀️\n\nẸkọ yii jẹ apẹrẹ fun awọn ọdọ ọkunrin lati ṣe iṣaro ara ẹni, sọrọ nipa okunrin rere, ati lati dena Ijagba lori Eya (GBV).",
+    "ig": "Tupu anyị amalite, biko họrọ nwoke ma ọ bụ nwanyị: 🙋‍♂️🙋‍♀️\n\nEmebere usoro ihe omume a maka ụmụ nwoke na-eto eto iji tụgharịa uche, kwurịta ezi omume nwoke, na igbochi ime ihe ike dabere na nwoke na nwanyị (GBV)."
+  },
+  "button_gender_male": {
+    "en": "🙋‍♂️ Male",
+    "pcm": "🙋‍♂️ Male",
+    "ha": "🙋‍♂️ Namiji",
+    "yo": "🙋‍♂️ Ọkunrin",
+    "ig": "🙋‍♂️ Nwoke"
+  },
+  "button_gender_female": {
+    "en": "🙋‍♀️ Female",
+    "pcm": "🙋‍♀️ Female",
+    "ha": "🙋‍♀️ Mace",
+    "yo": "🙋‍♀️ Obinrin",
+    "ig": "🙋‍♀️ Nwanyị"
+  },
+  "female_caveat": {
+    "en": "❌ *Access Restricted*\n\nThank you for your interest! However, *The Brothers' Room* is designed specifically as a safe, reflective space for young men to discuss positive masculinity, accountability, and the prevention of Gender-Based Violence (GBV).\n\nBecause of this focus, access is restricted to male participants. We appreciate your understanding!",
+    "pcm": "❌ *No Access*\n\nThank you as you want register! But *The Brothers' Room* dey design specially as a safe and reflective space for young men to talk positive masculinity, accountability, and how we fit stop Gender-Based Violence (GBV).\n\nBecause of this, only male fit access the course. Thank you for your understanding!",
+    "ha": "❌ *An Hani Shiga*\n\nMungode da sha'awar ku! Sai dai, *The Brothers' Room* an tsara shi ne musamman a matsayin amintaccen fili don samari su tattauna kyakkyawar dabi'ar namiji, riƙe amana, da rigakafin cin zarafi na jinsi (GBV).\n\nSaboda wannan dalili, shiga kwas ɗin ya takaita ga maza kawai. Muna godiya da fahimtar ku!",
+    "yo": "❌ *Ko le Wọle*\n\nO ṣeun fun ifẹ rẹ! Sibẹsibẹ, *The Brothers' Room* jẹ apẹrẹ pataki fun awọn ọdọ ọkunrin lati sọrọ nipa okunrin rere, gbigba ẹbi, ati dena Ijagba lori Eya (GBV).\n\nNitori eyi, awọn ọkunrin nikan ni o le wo ẹkọ yii. A dupẹ fun oye rẹ!",
+    "ig": "❌ *A Machibidoro Nnweta*\n\nDaaalụ maka mmasị gị! Agbanyeghị, *The Brothers' Room* bụ nke emere karịsịa maka ụmụ nwoke na-eto eto iji tụgharịa uche ma kwurịta gbasara ezi omume nwoke na igbochi ime ihe ike dabere na nwoke na nwanyị (GBV).\n\nN'ihi nke a, ọ bụ naanị ụmụ nwoke nwere ike ịbanye na ya. Anyị na-ekele gị maka nghọta gị!"
   }
 }

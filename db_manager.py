@@ -127,7 +127,8 @@ def init_db():
         "email": "TEXT DEFAULT NULL",
         "country": "TEXT DEFAULT NULL",
         "address": "TEXT DEFAULT NULL",
-        "state": "TEXT DEFAULT NULL"
+        "state": "TEXT DEFAULT NULL",
+        "gender": "TEXT DEFAULT NULL"
     }
     
     for col, col_def in new_cols.items():
@@ -782,6 +783,29 @@ def backup_sqlite_db():
         return True, backup_file
     except Exception as e:
         return False, str(e)
+
+
+def update_gender(user_id, gender):
+    """Update learner's registered gender."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET gender = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (gender, user_id))
+    conn.commit()
+    conn.close()
+
+
+def get_learner_gender(user_id):
+    """Get learner's registered gender."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT gender FROM learners WHERE user_id = %s", (user_id,))
+    result = cursor.fetchone()
+    conn.close()
+    return result[0] if result else None
 
 
 

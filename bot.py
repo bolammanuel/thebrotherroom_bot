@@ -830,6 +830,28 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
                     except Exception:
                         pass
 
+async def check_gender_blocked(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
+    """Check if the user is registered as female and blocked from access. Returns True if blocked."""
+    if not update.effective_user:
+        return False
+    user_id = update.effective_user.id
+    from db_manager import get_learner_gender
+    if get_learner_gender(user_id) == 'female':
+        lang = get_language_preference(user_id)
+        caveat_text = get_text("female_caveat", lang)
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(get_text("restart_registration_button", lang), callback_data="cmd_restart_reg")]
+        ])
+        if update.callback_query:
+            await update.callback_query.answer()
+            if update.callback_query.message:
+                await update.callback_query.message.reply_text(caveat_text, reply_markup=keyboard, parse_mode="Markdown")
+        else:
+            await send_reply(update, caveat_text, reply_markup=keyboard, parse_mode="Markdown")
+        return True
+    return False
+
+
 # ============== GRADUATION HOOKS FOR A4 CERTIFICATE LIFECYCLE ==============
 
 def is_user_graduated(user_id):
@@ -874,6 +896,8 @@ async def send_graduation_dashboard(update, context, lang, user_id):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Start command - show language selection or welcome back returning learners."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
@@ -938,6 +962,8 @@ async def reset_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
  
 async def community_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Prompt user to join the Telegram discussion group."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     group_url = os.getenv("TELEGRAM_GROUP_URL", "https://t.me/YOUR_TELEGRAM_GROUP_LINK")
@@ -966,6 +992,8 @@ async def community_command(update: Update, context: ContextTypes.DEFAULT_TYPE) 
  
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Help command."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
@@ -977,6 +1005,8 @@ async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show course outline."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
@@ -999,6 +1029,8 @@ async def menu_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def progress_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show learner progress."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     result = get_learner_progress(user_id)
     
@@ -1172,6 +1204,8 @@ async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, mo
 
 async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /prev command, /back command, and Back button."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
@@ -1386,6 +1420,8 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle /next command and next button."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
@@ -1570,6 +1606,8 @@ async def next_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show quiz for current module."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     result = get_learner_progress(user_id)
 
@@ -1651,6 +1689,8 @@ async def quiz_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
 
 async def journal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Show the learner's private reflections journal with social sharing features."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id if update.effective_user else None
     if not user_id and update.callback_query:
         user_id = update.callback_query.from_user.id
@@ -1733,6 +1773,8 @@ async def journal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
 
 async def language_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Change language preference."""
+    if await check_gender_blocked(update, context):
+        return
     await send_reply(
         update,
         TRANSLATIONS["language_change"]["en"],
@@ -2730,6 +2772,8 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
 
 async def accessibility_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Toggle voice response accessibility for visually impaired users."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     current_status = get_voice_responses(user_id)
     new_status = not current_status
@@ -2749,6 +2793,8 @@ async def accessibility_command(update: Update, context: ContextTypes.DEFAULT_TY
 
 async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming voice messages by transcribing them via Whisper and piping to text handler."""
+    if await check_gender_blocked(update, context):
+        return
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
@@ -2820,6 +2866,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     user_id = query.from_user.id
     data = query.data
     
+    # Block restricted female users from clicking other buttons
+    if data != "cmd_restart_reg" and await check_gender_blocked(update, context):
+        return
+    
     # Language selection
     if data.startswith("lang_"):
         lang_code = data.split("_")[1]
@@ -2836,16 +2886,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if not is_learner_registered(user_id) or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
             
-            # Show Voice version preference prompt
-            ask_voice_text = get_text("ask_voice_preference", lang_code)
+            # Show Gender selection prompt
+            ask_gender_text = get_text("ask_gender", lang_code)
             keyboard = InlineKeyboardMarkup([
                 [
-                    InlineKeyboardButton(get_text("button_voice_on", lang_code), callback_data="voicepref_yes"),
-                    InlineKeyboardButton(get_text("button_voice_off", lang_code), callback_data="voicepref_no")
+                    InlineKeyboardButton(get_text("button_gender_male", lang_code), callback_data="gender_male"),
+                    InlineKeyboardButton(get_text("button_gender_female", lang_code), callback_data="gender_female")
                 ]
             ])
             await query.edit_message_text(
-                ask_voice_text,
+                ask_gender_text,
                 reply_markup=keyboard,
                 parse_mode="Markdown"
             )
@@ -2862,7 +2912,35 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     lang = get_language_preference(user_id)
 
     # Onboarding callbacks
-    if data in ["voicepref_yes", "voicepref_no"]:
+    if data == "gender_female":
+        await query.delete_message()
+        from db_manager import update_gender
+        update_gender(user_id, "female")
+        
+        caveat_text = get_text("female_caveat", lang)
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(get_text("restart_registration_button", lang), callback_data="cmd_restart_reg")]
+        ])
+        await send_reply(update, caveat_text, reply_markup=keyboard, parse_mode="Markdown")
+        return
+
+    elif data == "gender_male":
+        await query.delete_message()
+        from db_manager import update_gender
+        update_gender(user_id, "male")
+        
+        # Move to Voice version preference prompt
+        ask_voice_text = get_text("ask_voice_preference", lang)
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(get_text("button_voice_on", lang), callback_data="voicepref_yes"),
+                InlineKeyboardButton(get_text("button_voice_off", lang), callback_data="voicepref_no")
+            ]
+        ])
+        await send_reply(update, ask_voice_text, reply_markup=keyboard, parse_mode="Markdown")
+        return
+
+    elif data in ["voicepref_yes", "voicepref_no"]:
         await query.delete_message()
         enable_voice = (data == "voicepref_yes")
         set_voice_responses(user_id, enable_voice)
@@ -3263,6 +3341,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, user_message: str = None) -> None:
     """Handle text messages and transcribed voice inputs."""
+    if await check_gender_blocked(update, context):
+        return
     if user_message is None:
         user_message = update.message.text
     user_id = update.effective_user.id
