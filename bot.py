@@ -1134,6 +1134,10 @@ async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, mo
                 "ig": "🖼 *Nke a bụ Kaadị Ntụgharị uche gị maka Modul {num}!* Chekwaa ya na gallery gị ma kọrọ ya na WhatsApp Status, Facebook, ma ọ bụ Instagram ka ị kpalie ndị ikom ọzọ."
             }.get(lang, "Here is your shareable quote card!").format(num=module_num)
             
+            download_tip = get_text("quote_card_download_tip", lang)
+            if download_tip:
+                caption_text = f"{caption_text}\n\n{download_tip}"
+            
             if hashtags:
                 caption_text = f"{caption_text}\n\n{hashtags}"
             
@@ -2353,9 +2357,49 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
     current_date = datetime.datetime.now().strftime("%B %d, %Y")
     certificate_file = generate_certificate_image(learner_name, current_date, user_id)
     
+    # Fetch learner's email address from database
+    email = None
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT email FROM learners WHERE user_id = %s", (user_id,))
+        row = cursor.fetchone()
+        email = row[0] if row else None
+        conn.close()
+    except Exception as e:
+        logger.error(f"Error fetching learner email for certificate: {e}")
+
+    # Try to email the certificate first
+    email_sent = False
+    if email:
+        try:
+            from email_utils import send_certificate_email
+            email_sent = send_certificate_email(email, learner_name, certificate_file)
+        except Exception as ee:
+            logger.error(f"Error calling send_certificate_email: {ee}")
+
     group_url = os.getenv("TELEGRAM_GROUP_URL", "https://t.me/YOUR_TELEGRAM_GROUP_LINK")
     congrats_text = get_text("course_complete", lang).replace("https://t.me/YOUR_TELEGRAM_GROUP_LINK", group_url)
     
+    if email_sent:
+        email_success_note = {
+            "en": f"📧 *Awesome news, brother!* We have successfully sent your Certificate of Completion to your registered email address: `{email}`.",
+            "pcm": f"📧 *Correct news, brother!* We don successfully send your Certificate of Completion to your email address: `{email}`.",
+            "ha": f"📧 *Labari mai dadi, brother!* Mun yi nasarar aika Takardar Shaidarku ta kammala karatu zuwa adireshin imel na ku: `{email}`.",
+            "yo": f"📧 *Iro to dara, brother!* A ti fi Iwe-ẹri rẹ ranṣẹ si imeeli rẹ: `{email}`.",
+            "ig": f"📧 *Ozi ọma, nwanne m!* Anyị eziterela Asambodo Mmezu gị na ozi-e gị: `{email}`."
+        }.get(lang, f"We have sent your certificate to {email}.")
+        congrats_text = f"{congrats_text}\n\n{email_success_note}\n\nHere is a copy in the chat for your convenience:"
+    else:
+        email_fail_note = {
+            "en": "🎓 We have generated your Certificate of Completion! (Note: We couldn't send it to your email address because SMTP is not configured or there was a delivery issue). Here is your copy directly in the chat:",
+            "pcm": "🎓 We don compile your Certificate of Completion! (Note: We no fit send am to your email because SMTP no dey active or network fail). See your copy here inside the chat:",
+            "ha": "🎓 Mun hada Takardar Shaidarku ta kammala karatu! (Telesan: Ba mu sami damar aika shi zuwa imel na ku ba). Ga katin shaidarku a nan cikin hira:",
+            "yo": "🎓 A ti ṣẹda Iwe-ẹri Ipari rẹ! (Àkíyèsí: A ko le fi ranṣẹ si imeeli rẹ). Eyi ni kọpi rẹ ninu iwiregbe yii:",
+            "ig": "🎓 Anyị emepụtala Asambodo Mmezu gị! (Rịba ama: Anyị enweghị ike iziga ya na ozi-e gị). Nke a bụ asambodo gị na nkata a:"
+        }.get(lang, "Here is your Certificate of Completion:")
+        congrats_text = f"{congrats_text}\n\n{email_fail_note}"
+
     try:
         import urllib.parse
         share_msg = get_text("share_message", lang)
@@ -2792,12 +2836,17 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if not is_learner_registered(user_id) or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
             
-            # Start profile registration onboarding
-            context.user_data['awaiting_full_name'] = True
-            
-            ask_name_text = get_text("ask_full_name", lang_code)
+            # Show Voice version preference prompt
+            ask_voice_text = get_text("ask_voice_preference", lang_code)
+            keyboard = InlineKeyboardMarkup([
+                [
+                    InlineKeyboardButton(get_text("button_voice_on", lang_code), callback_data="voicepref_yes"),
+                    InlineKeyboardButton(get_text("button_voice_off", lang_code), callback_data="voicepref_no")
+                ]
+            ])
             await query.edit_message_text(
-                ask_name_text,
+                ask_voice_text,
+                reply_markup=keyboard,
                 parse_mode="Markdown"
             )
         else:
@@ -2811,6 +2860,48 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     # Command buttons
     lang = get_language_preference(user_id)
+
+    # Onboarding callbacks
+    if data in ["voicepref_yes", "voicepref_no"]:
+        await query.delete_message()
+        enable_voice = (data == "voicepref_yes")
+        set_voice_responses(user_id, enable_voice)
+        
+        # Move to Data Privacy Consent prompt
+        consent_text = get_text("ask_data_consent", lang)
+        keyboard = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton(get_text("button_consent_yes", lang), callback_data="consent_yes"),
+                InlineKeyboardButton(get_text("button_consent_no", lang), callback_data="consent_no")
+            ]
+        ])
+        await send_reply(update, consent_text, reply_markup=keyboard, parse_mode="Markdown")
+        return
+        
+    elif data == "consent_yes":
+        await query.delete_message()
+        # Start profile registration onboarding: ask Full Name
+        context.user_data['awaiting_full_name'] = True
+        ask_name_text = get_text("ask_full_name", lang)
+        await send_reply(update, ask_name_text, parse_mode="Markdown")
+        return
+        
+    elif data == "consent_no":
+        await query.delete_message()
+        # Halt registration
+        halt_text = get_text("consent_declined", lang)
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(get_text("restart_registration_button", lang), callback_data="cmd_restart_reg")]
+        ])
+        await send_reply(update, halt_text, reply_markup=keyboard, parse_mode="Markdown")
+        return
+        
+    elif data == "cmd_restart_reg":
+        await query.delete_message()
+        reset_learner_data(user_id)
+        context.user_data.clear()
+        await start(update, context)
+        return
 
     # Intercept pre-test callbacks
     if data == "pretest_start":

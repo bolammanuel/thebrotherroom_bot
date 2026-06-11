@@ -905,5 +905,68 @@
     "ha": "Na kammala Modul {module_num} na darasin The Brothers' Room! Ga wani muhimmin darasi: \"{quote}\"\n\nShiga cikin wannan shiri domin inganta rayuwar maza a nan: https://t.me/thebrotherroom_bot",
     "yo": "Mo ṣẹṣẹ pari Modulu {module_num} ti ẹkọ The Brothers' Room! Eyi ni ẹkọ pataki kan: \"{quote}\"\n\nDarapọ mọ ẹgbẹ fun idagbasoke awọn ọkunrin nibi: https://t.me/thebrotherroom_bot",
     "ig": "Agụchala m Modul {module_num} na The Brothers' Room! Nke a bụ ihe ọmụmụ dị mkpa: \"{quote}\"\n\nSoro anyị n'ije maka ịkwado ụmụ nwoke ebe a: https://t.me/thebrotherroom_bot"
+  },
+  "ask_voice_preference": {
+    "en": "Accessibility: Would you like to enable the Voice Version? 🔊\n\nIf enabled, the bot will send audio voice notes alongside all text lessons. This is helpful if you have difficulty reading, are visually impaired, or prefer listening.",
+    "pcm": "Accessibility: You wan make the bot dey read all lessons as voice notes? 🔊\n\nIf you click Yes, the bot go dey send audio voice notes follow the text messages. E good for brothers wey get small eye problem, or wey like to listen to audio.",
+    "ha": "Samun Dama: Kuna son kunna Muryar Darussa? 🔊\n\nIdan an kunna, bot zai aika da muryar saumi tare da duk darussan rubutu. Wannan yana da amfani idan kuna da wahalar karatu, rashin gani sosai, ko kuma kuka fi son saurare.",
+    "yo": "Irọrun: Ṣe o fẹ ki a fi ohun ranṣẹ si ọ? 🔊\n\nTi o ba mu bẹẹni, bot yoo ma fi ohun ranṣẹ pẹlu gbogbo awọn ẹkọ kikọ. Eyi wulo ti o ba nira lati kawe, ti o ba ni iṣoro oju, tabi ti o ba fẹran lati tẹtisi ohun.",
+    "ig": "Nnweta: Ị ga-achọ ka bot a na-agụpụta ihe ọmụmụ n'olu? 🔊\n\nỌ bụrụ na ị mee ya, bot ga-ezitere gị ndekọ olu yana ederede ihe ọmụmụ niile. Nke a na-enyere aka ma ọ bụrụ na ị na-enwe nsogbu ịgụ ihe, nsogbu anya, ma ọ bụ na-ahọrọ ịnụ olu."
+  },
+  "ask_data_consent": {
+    "en": "Data Privacy Consent 🔒\n\nTo enroll you in the course, save your learning progress, and dynamically generate & email your Certificate of Completion, we need to collect and securely store your:\n• Full Name\n• Email Address\n• State of residence\n\nWe do not share your data with anyone. Do you consent to this?",
+    "pcm": "Data Privacy Consent 🔒\n\nTo register you for this course, save where you dey learn, and generate & email your Certificate of Completion, we need to collect and secure your:\n• Full Name\n• Email Address\n• State wey you dey live\n\nWe no dey share your details with anyone. You agree to this one?",
+    "ha": "Yarda da Sirri 🔒\n\nDomin sanya ku a cikin kwas din, adana ci gaban karatunku, da kuma samar & aika Takardar Shaidarku ta imel, muna buƙatar tattarawa da kuma kiyaye amintaccen bayananku:\n• Cikakken Suna\n• Adireshin Imel\n• Jiha\n\nBa ma raba bayananku da kowa. Kun amince da wannan?",
+    "yo": "Ifohùnṣọ̀kan lori Aabo Data 🔒\n\nLati forukọsilẹ rẹ fun ẹkọ naa, fi itẹsiwaju rẹ pamọ, ati lati ṣẹda & fi Iwe-ẹri rẹ ranṣẹ si imeeli rẹ, a nilo lati gba ati tọju awọn nkan wọnyi lailewu:\n• Orukọ rẹ ni kikun\n• Adirẹsi imeeli rẹ\n• Ipinle ti o ngbe\n\nA ki yoo pin data rẹ pẹlu ẹnikẹni. Ṣe o fohùnṣọ̀kan si eyi?",
+    "ig": "Nkwenye Nzuzo data 🔒\n\nIji debanye aha gị na ihe ọmụmụ a, chekwaa ọganihu gị, ma mepụta & zitere gị Asambodo Mmezu gị na ozi-e gị, anyị kwesịrị ịnakọta ma chekwaa:\n• Aha gị n'uju\n• Adreesị ozi-e gị\n• Steeti ebe ị bi\n\nAnyị anaghị ekwurịta data gị na onye ọ bụla. Ị kwetara na nke a?"
+  },
+  "consent_declined": {
+    "en": "❌ *Registration Halted*\n\nWe respect your privacy. However, without saving your name, email, and state, we cannot track your progress or generate your completion certificate.\n\nIf you change your mind and wish to enroll, click the button below to start again.",
+    "pcm": "❌ *Registration Stop*\n\nWe respect your privacy. But without saving your name, email, and state, we no fit track where you stop or generate your certificate.\n\nIf you change your mind, click the button below make we start again.",
+    "ha": "❌ *An Dakatar da Yin Rajista*\n\nMuna girmama sirrin ku. Sai dai, ba tare da adana sunanku, imel, da jiha ba, ba za mu iya bin diddigin ci gaban ku ko samar da takardar shaidar ku ba.\n\nIdan kun canza shawara kuma kuna son yin rajista, danna maballin da ke ƙasa don sake farawa.",
+    "yo": "❌ *Iforukọsilẹ Duro*\n\nA bọwọ fun aṣiri rẹ. Sibẹisẹ, laisi fifipamọ orukọ rẹ, imeeli, ati ipinlẹ rẹ, a ko le tọju itẹsiwaju rẹ tabi ṣẹda iwe-ẹri ipari rẹ.\n\nTi o ba yi ipinnu rẹ pada ti o fẹ forukọsilẹ, tẹ bọtini ti o wa ni isalẹ lati bẹrẹ lẹẹkansi.",
+    "ig": "❌ *A Kwụsịrị Ndebanye aha*\n\nAnyị na-akwanyere nzuzo gị ùgwù. Agbanyeghị, na-enweghị nchekwa aha gị, ozi-e gị na steeti gị, anyị enweghị ike soro ọganihu gị ma ọ bụ mepụta asambodo gị.\n\nỌ bụrụ na ị gbanwee obi gị ma chọọ idebanye aha, kpachapụ bọtini dị n'okpuru ebe a ka ịmalite ọzọ."
+  },
+  "restart_registration_button": {
+    "en": "🔄 Restart Registration",
+    "pcm": "🔄 Start Again",
+    "ha": "🔄 Sake Fara Rajista",
+    "yo": "🔄 Tun Iforukọsilẹ Bẹrẹ",
+    "ig": "🔄 Malite Ndebanye aha Ọzọ"
+  },
+  "quote_card_download_tip": {
+    "en": "⚠️ *Note:* Press and hold the image (or tap the ⋮ icon at the top right) and select *'Save to gallery'* or *'Download'* to save it to your phone before sharing!",
+    "pcm": "⚠️ *Note:* Hold the photo (or tap the ⋮ icon for top right) then select *'Save to gallery'* or *'Download'* so you fit save am for your phone before you share!",
+    "ha": "⚠️ *Telesan:* Latsa ka riƙe hoton (ko danna alamar ⋮ a saman dama) kuma zaɓi *'Ajiye a Gallery'* ko *'Sauke'* don adana shi a wayarka kafin rabawa!",
+    "yo": "⚠️ *Àkíyèsí:* Tẹ aworan naa mọlẹ (tabi tẹ aami ⋮ ni apa ọtun oke) ki o yan *'Fipamọ si Gallery'* tabi *'Gba lati ayelujara'* lati fi pamọ si foonu rẹ ṣaaju pinpin!",
+    "ig": "⚠️ *Rịba ama:* Pịgide onyonyo ahụ (ma ọ bụ pịa akara ⋮ n'elu aka nri) wee họrọ *'Chekwaa na Gallery'* ma ọ bụ *'Budata'* ka ị chekwaa ya na ekwentị gị tupu ị kesaa!"
+  },
+  "button_voice_on": {
+    "en": "🔊 Yes, Enable Voice",
+    "pcm": "🔊 Yes, Enable Voice",
+    "ha": "🔊 Ee, Kunna Sauti",
+    "yo": "🔊 Bẹ́ẹ̀ ni, Kun Ohun",
+    "ig": "🔊 Ee, Gbanye Olu"
+  },
+  "button_voice_off": {
+    "en": "🔇 No, Text Only",
+    "pcm": "🔇 No, Text Only",
+    "ha": "🔇 A'a, Rubutu Kawai",
+    "yo": "🔇 Bẹ́ẹ̀ kọ́, Kikọ Nikan",
+    "ig": "🔇 Mba, Ederede Nani"
+  },
+  "button_consent_yes": {
+    "en": "✅ I Consent / Agree",
+    "pcm": "✅ I Agree / Consent",
+    "ha": "✅ Na yarda",
+    "yo": "✅ Mo fohùnṣọ̀kan",
+    "ig": "✅ Ekweere m"
+  },
+  "button_consent_no": {
+    "en": "❌ I Do Not Consent",
+    "pcm": "❌ I No Agree",
+    "ha": "❌ Ban yarda ba",
+    "yo": "❌ Nko fohùnṣọ̀kan",
+    "ig": "❌ Ekwetaghị m"
   }
 }
