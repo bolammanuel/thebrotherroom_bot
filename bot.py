@@ -2781,7 +2781,11 @@ async def show_admin_leaderboard(update: Update, context: ContextTypes.DEFAULT_T
     for idx, item in enumerate(page_items):
         rank = start_idx + idx + 1
         badge = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else "👤"
-        text += f"{badge} *Rank {rank}:* {item['full_name']} (ID: `{item['user_id']}`)\n"
+        name_str = item['full_name'] if item['full_name'] else f"User {item['user_id']}"
+        # Escape special markdown characters in the participant name to prevent parsing entity crashes
+        for char in ["_", "*", "`", "["]:
+            name_str = name_str.replace(char, f"\\{char}")
+        text += f"{badge} *Rank {rank}:* {name_str} (ID: `{item['user_id']}`)\n"
         text += f"   • Engagement Score: *{item['engagement_score']}*\n"
         text += f"   • Modules Completed: {item['modules_completed']}/{len(MODULES)}\n"
         text += f"   • First-Attempt Quizzes: {item['first_attempt_quizzes']}\n"
@@ -3190,15 +3194,22 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 for row in rows:
                     p_id, p_name = row
                     name_str = p_name if p_name else "Anonymous User"
+                    # Escape special markdown characters in the participant name to prevent entity parsing crashes
+                    for char in ["_", "*", "`", "["]:
+                        name_str = name_str.replace(char, f"\\{char}")
                     participant_list += f"• {name_str} — ID: `{p_id}`\n"
             else:
                 participant_list = "\n\n_(No registered participants found)_"
         except Exception as e:
             logger.error(f"Error fetching learners for reset list: {e}")
-            participant_list = f"\n\n_(Could not fetch participant list: {str(e)})_"
+            err_str = str(e)
+            for char in ["_", "*", "`", "["]:
+                err_str = err_str.replace(char, f"\\{char}")
+            participant_list = f"\n\n_(Could not fetch participant list: {err_str})_"
 
         context.user_data["awaiting_reset_user_id"] = True
-        await query.message.reply_text(
+        await send_reply(
+            update,
             "🔄 *Reset Participant Progress*\n\n"
             "Please type or paste the Telegram User ID of the participant you want to reset. *You can enter multiple IDs (separated by commas or spaces) to reset them in bulk.*\n\n"
             "This will completely delete their progress, reflections, and reminders so they can start over."
