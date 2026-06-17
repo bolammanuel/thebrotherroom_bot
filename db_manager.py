@@ -117,6 +117,8 @@ def init_db():
         existing_cols = [r[0] for r in cursor.fetchall()]
         
     new_cols = {
+        "enrollment_date": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
+        "last_activity": "TIMESTAMP DEFAULT CURRENT_TIMESTAMP",
         "post_test_score": "INTEGER DEFAULT -1",
         "pre_test_score": "INTEGER DEFAULT -1",
         "pledge_text": "TEXT DEFAULT NULL",
