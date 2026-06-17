@@ -93,6 +93,11 @@ def send_monthly_status_email(admin_email):
         logger.warning("SMTP credentials not fully configured. Skipping monthly status report email.")
         return False
 
+    recipients = [email.strip() for email in admin_email.split(",") if email.strip()]
+    if not recipients:
+        logger.warning("No valid admin email addresses found in ADMIN_EMAIL. Skipping status report email.")
+        return False
+
     try:
         from dashboard import get_stats_data
         stats = get_stats_data()
@@ -115,7 +120,7 @@ def send_monthly_status_email(admin_email):
     try:
         msg = MIMEMultipart()
         msg['From'] = smtp_sender
-        msg['To'] = admin_email
+        msg['To'] = ", ".join(recipients)
         msg['Subject'] = "The Brothers' Room - Monthly Program & System Status Report"
 
         # HTML body with sleek styling
@@ -185,9 +190,9 @@ def send_monthly_status_email(admin_email):
             server.starttls()
             
         server.login(smtp_user, smtp_password)
-        server.sendmail(smtp_sender, admin_email, msg.as_string())
+        server.sendmail(smtp_sender, recipients, msg.as_string())
         server.quit()
-        logger.info(f"Monthly status report email successfully sent to {admin_email}")
+        logger.info(f"Monthly status report email successfully sent to {', '.join(recipients)}")
         return True
     except Exception as e:
         logger.error(f"Error sending monthly status email to {admin_email}: {e}")
