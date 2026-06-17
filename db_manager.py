@@ -128,7 +128,8 @@ def init_db():
         "country": "TEXT DEFAULT NULL",
         "address": "TEXT DEFAULT NULL",
         "state": "TEXT DEFAULT NULL",
-        "gender": "TEXT DEFAULT NULL"
+        "gender": "TEXT DEFAULT NULL",
+        "age": "INTEGER DEFAULT NULL"
     }
     
     for col, col_def in new_cols.items():
@@ -179,18 +180,18 @@ def enroll_learner(user_id, language='en', full_name=None):
     conn.close()
 
 def is_learner_registered(user_id):
-    """Check if learner has completed profile registration (name, email, state)."""
+    """Check if learner has completed profile registration (name, email, state, age)."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT full_name, email, state FROM learners WHERE user_id = %s
+        SELECT full_name, email, state, age FROM learners WHERE user_id = %s
     """, (user_id,))
     result = cursor.fetchone()
     conn.close()
     if not result:
         return False
-    full_name, email, state = result
-    return bool(full_name and email and state)
+    full_name, email, state, age = result
+    return bool(full_name and email and state and age is not None)
 
 def get_learner_progress(user_id):
     """Get learner's current progress (module, lesson, quiz status, language)."""
@@ -394,6 +395,18 @@ def update_state(user_id, state):
         SET state = %s, last_activity = CURRENT_TIMESTAMP
         WHERE user_id = %s
     """, (state, user_id))
+    conn.commit()
+    conn.close()
+
+def update_age(user_id, age):
+    """Update learner's registered age."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET age = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (age, user_id))
     conn.commit()
     conn.close()
 

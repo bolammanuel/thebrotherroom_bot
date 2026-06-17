@@ -20,6 +20,20 @@
     "yo": "Kọkọ, jọwọ sọ fun wa orukọ rẹ ni kikun (bii o ṣe fẹ ki o han lori Iwe-ẹri rẹ):",
     "ig": "Nke mbụ, biko gwa anyị aha gị n'uju (otú ị ga-achọ ka e bipụta ya na Asambodo Mmezu gị):"
   },
+  "ask_age": {
+    "en": "Thank you. Now, how old are you?",
+    "pcm": "Thank you. Now, how old you be?",
+    "ha": "Godiya. Shekarunka nawa?",
+    "yo": "O ṣeun. Ọdun melo ni ọ?",
+    "ig": "Daalụ. Gịnị bụ afọ gị?"
+  },
+  "invalid_age_error": {
+    "en": "Please enter a valid age (as a number, e.g., 25):",
+    "pcm": "Abeg type correct age as number (e.g., 25):",
+    "ha": "Da fatan za a shigar da shekaru masu kyau (azaman lamba, misali, 25):",
+    "yo": "Jọwọ tẹ ọjọ-ori to tọ sii (bi nọmba, apẹẹrẹ, 25):",
+    "ig": "Biko tinye afọ ziri ezi (dị ka nọmba, dịka, 25):"
+  },
   "ask_email": {
     "en": "Thank you. Now, what is your email address?",
     "pcm": "Thank you. Now, wetin be your email address?",

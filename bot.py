@@ -2546,6 +2546,73 @@ async def reminder_scheduler(application: Application) -> None:
                 else:
                     logger.error(f"Automated database backup failed: {details}")
                 LAST_BACKUP_TIME = current_time
+
+            # 0.5. Send Monthly Program Status Report to Administrator
+            try:
+                admin_email = os.getenv("ADMIN_EMAIL")
+                if admin_email:
+                    conn = get_connection()
+                    cursor = conn.cursor()
+                    cursor.execute("""
+                        SELECT next_send_time FROM reminders 
+                        WHERE user_id = 0 AND reminder_type = 'monthly_status_report'
+                    """)
+                    row = cursor.fetchone()
+                    
+                    import datetime
+                    now = datetime.datetime.now()
+                    
+                    is_due = False
+                    if not row:
+                        is_due = True
+                        if conn.is_sqlite:
+                            next_send = "datetime('now', '+30 days')"
+                        else:
+                            next_send = "CURRENT_TIMESTAMP + INTERVAL '30 days'"
+                        cursor.execute(f"""
+                            INSERT INTO reminders (user_id, reminder_type, pledge_text, reminders_sent, next_send_time)
+                            VALUES (0, 'monthly_status_report', NULL, 0, {next_send})
+                        """)
+                        conn.commit()
+                    else:
+                        next_send_time = row[0]
+                        if isinstance(next_send_time, str):
+                            try:
+                                val = next_send_time.split(".")[0]
+                                next_send_dt = datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S")
+                            except Exception:
+                                next_send_dt = now
+                        else:
+                            next_send_dt = next_send_time
+                        
+                        if now >= next_send_dt:
+                            is_due = True
+                            
+                    conn.close()
+                    
+                    if is_due:
+                        from email_utils import send_monthly_status_email
+                        success = send_monthly_status_email(admin_email)
+                        
+                        if success:
+                            conn = get_connection()
+                            cursor = conn.cursor()
+                            if conn.is_sqlite:
+                                next_send = "datetime('now', '+30 days')"
+                            else:
+                                next_send = "CURRENT_TIMESTAMP + INTERVAL '30 days'"
+                            cursor.execute(f"""
+                                UPDATE reminders 
+                                SET next_send_time = {next_send}, reminders_sent = reminders_sent + 1
+                                WHERE user_id = 0 AND reminder_type = 'monthly_status_report'
+                            """)
+                            conn.commit()
+                            conn.close()
+                            logger.info(f"Successfully sent monthly status report email to {admin_email}")
+                        else:
+                            logger.error(f"Failed to send monthly status report email to {admin_email}")
+            except Exception as e:
+                logger.error(f"Error in monthly status report scheduler check: {e}")
                 
             # Initialize Sunday checks for any active learners that don't have them scheduled
             init_sunday_checks()
@@ -2744,7 +2811,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT user_id, full_name, email, state, current_module_id, current_lesson_id, quiz_completed, 
+        SELECT user_id, full_name, email, state, age, current_module_id, current_lesson_id, quiz_completed, 
                language_preference, enrollment_date, post_test_score, pledge_text,
                ai_questions_count, first_attempt_quizzes
         FROM learners
@@ -2762,7 +2829,7 @@ async def export_admin_csv(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     with open(csv_file_path, "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow([
-            "User ID", "Full Name", "Email Address", "State", "Current Module", "Current Lesson", "Quiz Status", 
+            "User ID", "Full Name", "Email Address", "State", "Age", "Current Module", "Current Lesson", "Quiz Status", 
             "Language Preference", "Enrollment Date", "Post-Test Score", "Personal Pledge",
             "AI Questions Asked", "First-Attempt Quizzes Passed"
         ])
@@ -3376,6 +3443,29 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
         full_name = user_message.strip()
         update_full_name(user_id, full_name)
         
+        # Move to age onboarding step
+        context.user_data["awaiting_age"] = True
+        ask_age_text = get_text("ask_age", lang)
+        await send_reply(update, ask_age_text)
+        return
+
+    # Intercept age onboarding step
+    if context.user_data.get("awaiting_age"):
+        age_str = user_message.strip()
+        # Validate that age is a valid integer between 10 and 100
+        try:
+            age_val = int(age_str)
+            if not (10 <= age_val <= 100):
+                raise ValueError()
+        except ValueError:
+            error_msg = get_text("invalid_age_error", lang)
+            await send_reply(update, error_msg)
+            return
+
+        context.user_data.pop("awaiting_age", None)
+        from db_manager import update_age
+        update_age(user_id, age_val)
+
         # Move to email onboarding step
         context.user_data["awaiting_email"] = True
         ask_email_text = get_text("ask_email", lang)
