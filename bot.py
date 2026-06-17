@@ -21,7 +21,7 @@ from db_manager import (
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
     get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name,
     get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent, get_all_learner_reflections,
-    reset_learner_data, backup_sqlite_db
+    reset_learner_data, backup_sqlite_db, is_learner_registered
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
 
@@ -1923,7 +1923,6 @@ async def grade_post_test(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
         await send_reply(update, passed_text)
         
         # Fetch their name from the DB (saved during onboarding)
-        from db_manager import get_connection
         learner_name = ""
         try:
             conn = get_connection()
@@ -3007,7 +3006,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         full_name = query.from_user.full_name if query.from_user else None
         enroll_learner(user_id, lang_code, full_name=full_name)
         
-        from db_manager import is_learner_registered
         if not is_learner_registered(user_id) or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
             
@@ -3249,7 +3247,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             return
 
         try:
-            from db_manager import get_connection
             conn = get_connection()
             cursor = conn.cursor()
             cursor.execute("DELETE FROM learners")
