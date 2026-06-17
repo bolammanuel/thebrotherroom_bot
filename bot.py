@@ -2753,12 +2753,35 @@ async def show_admin_leaderboard(update: Update, context: ContextTypes.DEFAULT_T
         await send_reply(update, "📭 No learners registered in the database yet.", reply_markup=keyboard)
         return
         
-    text = "🏆 *Peer Facilitator Leaderboard (Engagement Rankings)*\n\n"
+    query = update.callback_query
+    page = 0
+    if query and query.data and "|" in query.data:
+        try:
+            page = int(query.data.split("|")[1])
+        except Exception:
+            page = 0
+            
+    total_items = len(leaderboard)
+    items_per_page = 10
+    total_pages = (total_items + items_per_page - 1) // items_per_page
+    
+    if page < 0:
+        page = 0
+    if page >= total_pages:
+        page = total_pages - 1
+        
+    start_idx = page * items_per_page
+    end_idx = start_idx + items_per_page
+    page_items = leaderboard[start_idx:end_idx]
+    
+    text = f"🏆 *Peer Facilitator Leaderboard (Engagement Rankings)*\n"
+    text += f"Total registered: {total_items} learners | Page {page + 1}/{total_pages}\n\n"
     text += "Ranks are computed based on: *Progress (10 pts)* + *First-Attempt Quizzes (5 pts)* + *AI Inquiries (3 pts)*.\n\n"
     
-    for idx, item in enumerate(leaderboard[:10]):
-        badge = "🥇" if idx == 0 else "🥈" if idx == 1 else "🥉" if idx == 2 else "👤"
-        text += f"{badge} *Rank {idx + 1}:* {item['full_name']} (ID: `{item['user_id']}`)\n"
+    for idx, item in enumerate(page_items):
+        rank = start_idx + idx + 1
+        badge = "🥇" if rank == 1 else "🥈" if rank == 2 else "🥉" if rank == 3 else "👤"
+        text += f"{badge} *Rank {rank}:* {item['full_name']} (ID: `{item['user_id']}`)\n"
         text += f"   • Engagement Score: *{item['engagement_score']}*\n"
         text += f"   • Modules Completed: {item['modules_completed']}/{len(MODULES)}\n"
         text += f"   • First-Attempt Quizzes: {item['first_attempt_quizzes']}\n"
@@ -2767,9 +2790,18 @@ async def show_admin_leaderboard(update: Update, context: ContextTypes.DEFAULT_T
             text += f"   • Exit Exam Score: *{item['post_test_score']}/50* (GRADUATED)\n"
         text += "\n"
         
-    keyboard = InlineKeyboardMarkup([
-        [InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]
-    ])
+    navigation_buttons = []
+    if page > 0:
+        navigation_buttons.append(InlineKeyboardButton("⬅️ Prev 10", callback_data=f"admin_leaderboard|{page - 1}"))
+    if end_idx < total_items:
+        navigation_buttons.append(InlineKeyboardButton("Next 10 ➡️", callback_data=f"admin_leaderboard|{page + 1}"))
+        
+    keyboard_layout = []
+    if navigation_buttons:
+        keyboard_layout.append(navigation_buttons)
+    keyboard_layout.append([InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")])
+    
+    keyboard = InlineKeyboardMarkup(keyboard_layout)
     
     await send_reply(update, text, reply_markup=keyboard, parse_mode="Markdown")
 
@@ -3122,7 +3154,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await admin_command(update, context)
         return
         
-    elif data == "admin_leaderboard":
+    elif data.startswith("admin_leaderboard"):
         await query.delete_message()
         await show_admin_leaderboard(update, context)
         return
@@ -3163,12 +3195,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 participant_list = "\n\n_(No registered participants found)_"
         except Exception as e:
             logger.error(f"Error fetching learners for reset list: {e}")
-            participant_list = "\n\n_(Could not fetch participant list)_"
+            participant_list = f"\n\n_(Could not fetch participant list: {str(e)})_"
 
         context.user_data["awaiting_reset_user_id"] = True
         await query.message.reply_text(
             "🔄 *Reset Participant Progress*\n\n"
-            "Please type or paste the Telegram User ID of the participant you want to reset. This will completely delete their progress, reflections, and reminders so they can start over."
+            "Please type or paste the Telegram User ID of the participant you want to reset. *You can enter multiple IDs (separated by commas or spaces) to reset them in bulk.*\n\n"
+            "This will completely delete their progress, reflections, and reminders so they can start over."
             f"{participant_list}",
             parse_mode="Markdown"
         )
@@ -3590,44 +3623,62 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
             await send_reply(update, "You are not authorized to perform this action.")
             return
             
-        target_id_str = user_message.strip()
-        if not target_id_str.isdigit():
+        # Parse multiple User IDs separated by commas, spaces, semicolons, or newlines
+        cleaned_msg = user_message.replace(",", " ").replace(";", " ").replace("\n", " ")
+        raw_ids = []
+        for part in cleaned_msg.split():
+            part = part.strip()
+            if part.isdigit():
+                raw_ids.append(int(part))
+                
+        if not raw_ids:
             await send_reply(
                 update,
-                "❌ Invalid User ID. Please make sure you enter a purely numeric Telegram User ID.\n\n"
-                "Use /admin to open the dashboard again."
+                "❌ *No valid User IDs found.*\n\n"
+                "Please make sure you type or paste purely numeric Telegram User IDs (separated by commas or spaces).\n\n"
+                "Use /admin to open the dashboard again.",
+                parse_mode="Markdown"
             )
             return
             
-        target_id = int(target_id_str)
+        success_ids = []
+        fail_ids = []
         
-        # Perform DB reset
-        try:
-            reset_learner_data(target_id)
-            
-            # Send confirmation to admin
-            await send_reply(
-                update,
-                f"✅ *Success!* Progress for user `{target_id}` has been completely reset.\n\n"
-                f"They have been removed from progress tracking, and their reflections and reminders have been deleted.",
-                parse_mode="Markdown"
-            )
-            
-            # Try to notify the participant
+        # Perform DB reset for each ID
+        for target_id in raw_ids:
             try:
-                await context.bot.send_message(
-                    chat_id=target_id,
-                    text="🔄 *Your progress has been reset by an administrator.*\n\n"
-                         "You can start the course again from the beginning by sending /start!",
-                    parse_mode="Markdown"
-                )
-            except Exception as e:
-                logger.info(f"Could not send reset notification to user {target_id}: {e}")
+                reset_learner_data(target_id)
+                success_ids.append(target_id)
                 
-        except Exception as e:
-            logger.error(f"Error resetting user progress: {e}")
-            await send_reply(update, "❌ An error occurred while resetting progress in the database.")
+                # Try to notify the participant
+                try:
+                    await context.bot.send_message(
+                        chat_id=target_id,
+                        text="🔄 *Your progress has been reset by an administrator.*\n\n"
+                             "You can start the course again from the beginning by sending /start!",
+                        parse_mode="Markdown"
+                    )
+                except Exception as e:
+                    logger.info(f"Could not send reset notification to user {target_id}: {e}")
+            except Exception as e:
+                logger.error(f"Error resetting user progress for {target_id}: {e}")
+                fail_ids.append(target_id)
+                
+        # Send details report to admin
+        report = "🔄 *Reset Progress Report*\n\n"
+        if success_ids:
+            report += f"✅ *Successfully Reset ({len(success_ids)}):*\n"
+            for sid in success_ids:
+                report += f"• `{sid}`\n"
+            report += "\nThese participants have been removed from tracking, and their reflections and reminders have been deleted.\n\n"
             
+        if fail_ids:
+            report += f"❌ *Failed to Reset ({len(fail_ids)}):*\n"
+            for fid in fail_ids:
+                report += f"• `{fid}`\n"
+            report += "\n"
+            
+        await send_reply(update, report, parse_mode="Markdown")
         return
 
     # --- 1. Intercept option letter inputs for active tests or quizzes ---
