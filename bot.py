@@ -2733,6 +2733,7 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         [InlineKeyboardButton("Peer Facilitator Leaderboard", callback_data="admin_leaderboard")],
         [InlineKeyboardButton("Program Impact Analytics", callback_data="admin_analytics")],
         [InlineKeyboardButton("Export Progress Report (CSV)", callback_data="admin_export_csv")],
+        [InlineKeyboardButton("📧 Send Status Report (Email)", callback_data="admin_send_report")],
         [InlineKeyboardButton("Reset Participant Progress", callback_data="admin_reset_prompt")],
         [InlineKeyboardButton("⚠️ Wipe Database (Fresh Test)", callback_data="admin_wipe_prompt")]
     ])
@@ -3170,6 +3171,77 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await query.delete_message()
         await export_admin_csv(update, context)
         return
+        
+    elif data == "admin_send_report":
+        await query.delete_message()
+        admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
+        admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
+        if not admin_ids or user_id not in admin_ids:
+            await query.message.reply_text("You are not authorized to perform this action.")
+            return
+
+        admin_email = os.getenv("ADMIN_EMAIL")
+        if not admin_email:
+            await send_reply(update, "❌ *Error*: `ADMIN_EMAIL` environment variable is not configured.")
+            return
+
+        load_msg = await query.message.reply_text("⏳ Generating and sending status report to administrators...")
+
+        try:
+            from email_utils import send_monthly_status_email
+            success = send_monthly_status_email(admin_email)
+            await load_msg.delete()
+            
+            if success:
+                conn = get_connection()
+                cursor = conn.cursor()
+                cursor.execute("""
+                    SELECT 1 FROM reminders 
+                    WHERE user_id = 0 AND reminder_type = 'monthly_status_report'
+                """)
+                exists = cursor.fetchone()
+                
+                if conn.is_sqlite:
+                    next_send = "datetime('now', '+30 days')"
+                else:
+                    next_send = "CURRENT_TIMESTAMP + INTERVAL '30 days'"
+                    
+                if exists:
+                    cursor.execute(f"""
+                        UPDATE reminders 
+                        SET next_send_time = {next_send}, reminders_sent = reminders_sent + 1
+                        WHERE user_id = 0 AND reminder_type = 'monthly_status_report'
+                    """)
+                else:
+                    cursor.execute(f"""
+                        INSERT INTO reminders (user_id, reminder_type, pledge_text, reminders_sent, next_send_time)
+                        VALUES (0, 'monthly_status_report', NULL, 1, {next_send})
+                    """)
+                conn.commit()
+                conn.close()
+
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]])
+                await send_reply(
+                    update,
+                    f"✅ *Report Dispatched Successfully!*\n\n"
+                    f"The on-demand system status and participant analytics report has been emailed to:\n"
+                    f"`{admin_email}`",
+                    reply_markup=keyboard,
+                    parse_mode="Markdown"
+                )
+            else:
+                keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]])
+                await send_reply(
+                    update,
+                    "❌ *Failed to Dispatch Email*\n\n"
+                    "The SMTP server failed to deliver the message. Please check the logs/credentials.",
+                    reply_markup=keyboard,
+                    parse_mode="Markdown"
+                )
+        except Exception as e:
+            logger.error(f"Error sending on-demand status email: {e}")
+            await send_reply(update, f"❌ *Error*: {e}")
+            return
         
     elif data == "admin_reset_prompt":
         await query.delete_message()

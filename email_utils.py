@@ -81,8 +81,8 @@ def send_certificate_email(recipient_email, learner_name, certificate_image_path
         logger.error(f"Error sending certificate email to {recipient_email}: {e}")
         return False
 
-def send_monthly_status_email(admin_email):
-    """Send a monthly system status and statistics report to the administrator email via SMTP."""
+def send_monthly_status_email(admin_email, start_date=None, end_date=None):
+    """Send a system status and statistics report to the administrator email via SMTP."""
     smtp_host = os.getenv("SMTP_HOST")
     smtp_port = os.getenv("SMTP_PORT", "587")
     smtp_user = os.getenv("SMTP_USER")
@@ -90,7 +90,7 @@ def send_monthly_status_email(admin_email):
     smtp_sender = os.getenv("SMTP_SENDER", smtp_user)
 
     if not smtp_host or not smtp_user or not smtp_password:
-        logger.warning("SMTP credentials not fully configured. Skipping monthly status report email.")
+        logger.warning("SMTP credentials not fully configured. Skipping status report email.")
         return False
 
     recipients = [email.strip() for email in admin_email.split(",") if email.strip()]
@@ -100,9 +100,9 @@ def send_monthly_status_email(admin_email):
 
     try:
         from dashboard import get_stats_data
-        stats = get_stats_data()
+        stats = get_stats_data(start_date, end_date)
     except Exception as e:
-        logger.error(f"Error fetching stats for monthly status email: {e}")
+        logger.error(f"Error fetching stats for status email: {e}")
         stats = {}
 
     total_enrollments = stats.get("total_enrollments", 0)
@@ -118,10 +118,18 @@ def send_monthly_status_email(admin_email):
     progress_breakdown = "".join([f"<li><strong>{mod}:</strong> {count}</li>" for mod, count in module_progress.items()])
 
     try:
+        if start_date or end_date:
+            date_range_str = f" ({start_date or 'Start'} to {end_date or 'Present'})"
+            subject_line = f"The Brothers' Room - Program Status Report{date_range_str}"
+            subtitle_str = f"Facilitator Report: {start_date or 'Start'} - {end_date or 'Present'}"
+        else:
+            subject_line = "The Brothers' Room - Monthly Program & System Status Report"
+            subtitle_str = "Facilitator Monthly Report"
+
         msg = MIMEMultipart()
         msg['From'] = smtp_sender
         msg['To'] = ", ".join(recipients)
-        msg['Subject'] = "The Brothers' Room - Monthly Program & System Status Report"
+        msg['Subject'] = subject_line
 
         # HTML body with sleek styling
         body = f"""
@@ -129,7 +137,7 @@ def send_monthly_status_email(admin_email):
         <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px;">
             <div style="text-align: center; margin-bottom: 20px;">
                 <h2 style="color: #0F2043; margin-bottom: 5px; letter-spacing: 2px; font-weight: bold;">THE BROTHERS' ROOM</h2>
-                <h4 style="color: #dba147; margin-top: 0; font-weight: normal;">Facilitator Monthly Report</h4>
+                <h4 style="color: #dba147; margin-top: 0; font-weight: normal;">{subtitle_str}</h4>
                 <hr style="border: 0; border-top: 2px solid #dba147; width: 150px; margin: 0 auto;">
             </div>
             
