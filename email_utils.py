@@ -73,7 +73,7 @@ def send_certificate_email(recipient_email, learner_name, certificate_image_path
             server.starttls()
             
         server.login(smtp_user, smtp_password)
-        server.sendmail(smtp_sender, recipient_email, msg.as_string())
+        server.sendmail(smtp_user, recipient_email, msg.as_string())
         server.quit()
         logger.info(f"Certificate email successfully sent to {recipient_email}")
         return True
@@ -198,7 +198,7 @@ def send_monthly_status_email(admin_email, start_date=None, end_date=None, raise
             server.starttls()
             
         server.login(smtp_user, smtp_password)
-        server.sendmail(smtp_sender, recipients, msg.as_string())
+        server.sendmail(smtp_user, recipients, msg.as_string())
         server.quit()
         logger.info(f"Monthly status report email successfully sent to {', '.join(recipients)}")
         return True
