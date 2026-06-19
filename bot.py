@@ -3189,7 +3189,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
         try:
             from email_utils import send_monthly_status_email
-            success = send_monthly_status_email(admin_email)
+            success = send_monthly_status_email(admin_email, raise_on_error=True)
             await load_msg.delete()
             
             if success:
@@ -3240,7 +3240,23 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 )
         except Exception as e:
             logger.error(f"Error sending on-demand status email: {e}")
-            await send_reply(update, f"❌ *Error*: {e}")
+            try:
+                await load_msg.delete()
+            except Exception:
+                pass
+            
+            keyboard = InlineKeyboardMarkup([[InlineKeyboardButton("🔙 Back to Admin Menu", callback_data="cmd_admin")]])
+            err_str = str(e)
+            for char in ["_", "*", "`", "["]:
+                err_str = err_str.replace(char, f"\\{char}")
+            await send_reply(
+                update,
+                f"❌ *Failed to Dispatch Email*\n\n"
+                f"Error details: `{err_str}`\n\n"
+                "Please verify your SMTP credentials in the `.env` file and check connection ports.",
+                reply_markup=keyboard,
+                parse_mode="Markdown"
+            )
             return
         
     elif data == "admin_reset_prompt":

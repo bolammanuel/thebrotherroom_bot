@@ -879,11 +879,15 @@ def send_report_api():
         return jsonify({"error": "ADMIN_EMAIL environment variable not set"}), 400
         
     from email_utils import send_monthly_status_email
-    success = send_monthly_status_email(admin_email, start_date, end_date)
-    if success:
-        return jsonify({"success": True, "message": f"Report successfully emailed to {admin_email}"})
-    else:
-        return jsonify({"error": "Failed to send email. Check SMTP logs."}), 500
+    try:
+        success = send_monthly_status_email(admin_email, start_date, end_date, raise_on_error=True)
+        if success:
+            return jsonify({"success": True, "message": f"Report successfully emailed to {admin_email}"})
+        else:
+            return jsonify({"error": "Failed to send email. Unknown error occurred."}), 500
+    except Exception as e:
+        logger.error(f"Error sending on-demand status email from dashboard: {e}")
+        return jsonify({"error": f"Failed to send email: {str(e)}"}), 500
 
 def run_dashboard_server():
     """Run Flask dashboard server on background thread."""

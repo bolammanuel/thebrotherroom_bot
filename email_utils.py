@@ -67,9 +67,9 @@ def send_certificate_email(recipient_email, learner_name, certificate_image_path
 
         # Send email
         if smtp_port == "465":
-            server = smtplib.SMTP_SSL(smtp_host, int(smtp_port))
+            server = smtplib.SMTP_SSL(smtp_host, int(smtp_port), timeout=15)
         else:
-            server = smtplib.SMTP(smtp_host, int(smtp_port))
+            server = smtplib.SMTP(smtp_host, int(smtp_port), timeout=15)
             server.starttls()
             
         server.login(smtp_user, smtp_password)
@@ -81,7 +81,7 @@ def send_certificate_email(recipient_email, learner_name, certificate_image_path
         logger.error(f"Error sending certificate email to {recipient_email}: {e}")
         return False
 
-def send_monthly_status_email(admin_email, start_date=None, end_date=None):
+def send_monthly_status_email(admin_email, start_date=None, end_date=None, raise_on_error=False):
     """Send a system status and statistics report to the administrator email via SMTP."""
     smtp_host = os.getenv("SMTP_HOST")
     smtp_port = os.getenv("SMTP_PORT", "587")
@@ -192,9 +192,9 @@ def send_monthly_status_email(admin_email, start_date=None, end_date=None):
 
         # Send email
         if smtp_port == "465":
-            server = smtplib.SMTP_SSL(smtp_host, int(smtp_port))
+            server = smtplib.SMTP_SSL(smtp_host, int(smtp_port), timeout=15)
         else:
-            server = smtplib.SMTP(smtp_host, int(smtp_port))
+            server = smtplib.SMTP(smtp_host, int(smtp_port), timeout=15)
             server.starttls()
             
         server.login(smtp_user, smtp_password)
@@ -204,5 +204,7 @@ def send_monthly_status_email(admin_email, start_date=None, end_date=None):
         return True
     except Exception as e:
         logger.error(f"Error sending monthly status email to {admin_email}: {e}")
+        if raise_on_error:
+            raise e
         return False
 
