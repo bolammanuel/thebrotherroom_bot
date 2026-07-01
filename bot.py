@@ -832,23 +832,6 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
 
 async def check_gender_blocked(update: Update, context: ContextTypes.DEFAULT_TYPE) -> bool:
     """Check if the user is registered as female and blocked from access. Returns True if blocked."""
-    if not update.effective_user:
-        return False
-    user_id = update.effective_user.id
-    from db_manager import get_learner_gender
-    if get_learner_gender(user_id) == 'female':
-        lang = get_language_preference(user_id)
-        caveat_text = get_text("female_caveat", lang)
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(get_text("restart_registration_button", lang), callback_data="cmd_restart_reg")]
-        ])
-        if update.callback_query:
-            await update.callback_query.answer()
-            if update.callback_query.message:
-                await update.callback_query.message.reply_text(caveat_text, reply_markup=keyboard, parse_mode="Markdown")
-        else:
-            await send_reply(update, caveat_text, reply_markup=keyboard, parse_mode="Markdown")
-        return True
     return False
 
 
@@ -3010,16 +2993,16 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         if not is_learner_registered(user_id) or context.user_data.get('awaiting_language_selection'):
             context.user_data.pop('awaiting_language_selection', None)
             
-            # Show Gender selection prompt
-            ask_gender_text = get_text("ask_gender", lang_code)
+            # Skip Gender! Move directly to Voice version preference prompt
+            ask_voice_text = get_text("ask_voice_preference", lang_code)
             keyboard = InlineKeyboardMarkup([
                 [
-                    InlineKeyboardButton(get_text("button_gender_male", lang_code), callback_data="gender_male"),
-                    InlineKeyboardButton(get_text("button_gender_female", lang_code), callback_data="gender_female")
+                    InlineKeyboardButton(get_text("button_voice_on", lang_code), callback_data="voicepref_yes"),
+                    InlineKeyboardButton(get_text("button_voice_off", lang_code), callback_data="voicepref_no")
                 ]
             ])
             await query.edit_message_text(
-                ask_gender_text,
+                ask_voice_text,
                 reply_markup=keyboard,
                 parse_mode="Markdown"
             )
@@ -3030,38 +3013,6 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 success_msg,
                 reply_markup=get_main_menu_buttons(lang_code, user_id=user_id)
             )
-        return
-    
-    # Command buttons
-    lang = get_language_preference(user_id)
-
-    # Onboarding callbacks
-    if data == "gender_female":
-        await query.delete_message()
-        from db_manager import update_gender
-        update_gender(user_id, "female")
-        
-        caveat_text = get_text("female_caveat", lang)
-        keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(get_text("restart_registration_button", lang), callback_data="cmd_restart_reg")]
-        ])
-        await send_reply(update, caveat_text, reply_markup=keyboard, parse_mode="Markdown")
-        return
-
-    elif data == "gender_male":
-        await query.delete_message()
-        from db_manager import update_gender
-        update_gender(user_id, "male")
-        
-        # Move to Voice version preference prompt
-        ask_voice_text = get_text("ask_voice_preference", lang)
-        keyboard = InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton(get_text("button_voice_on", lang), callback_data="voicepref_yes"),
-                InlineKeyboardButton(get_text("button_voice_off", lang), callback_data="voicepref_no")
-            ]
-        ])
-        await send_reply(update, ask_voice_text, reply_markup=keyboard, parse_mode="Markdown")
         return
 
     elif data in ["voicepref_yes", "voicepref_no"]:
