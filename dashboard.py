@@ -529,18 +529,63 @@ DASHBOARD_HTML = """
             min-width: 0; /* Crucial to prevent Chart.js dimensions from blowing out */
         }
 
-        .top-bar {
+        /* Responsive Top Header Navbar */
+        .top-navbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 1.25rem;
+            padding-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            width: 100%;
         }
 
-        .section-title-container {
+        .navbar-brand {
+            font-size: 1.25rem;
+            font-weight: 500;
+            color: var(--text-color);
+            letter-spacing: -0.5px;
+            display: none; /* Hidden on desktop, since we have the sidebar logo */
+        }
+
+        .navbar-actions {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.5rem;
+        }
+
+        /* Compact Icon Button styling */
+        .btn-icon {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            width: 38px;
+            height: 38px;
+            border-radius: var(--border-radius);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .btn-icon:hover {
+            border-color: var(--accent-color);
+            background-color: var(--active-tab-bg);
+        }
+
+        .hamburger-btn {
+            display: none; /* CSS controls display toggle below */
+        }
+
+        .sidebar-collapsed .hamburger-btn {
+            display: inline-flex;
+        }
+
+        /* Page Headers */
+        .page-header {
+            margin-bottom: 0.5rem;
         }
 
         .section-title {
@@ -554,21 +599,6 @@ DASHBOARD_HTML = """
             font-size: 0.85rem;
             color: var(--text-muted); /* Consistent subtext color */
             margin-top: 0.15rem;
-        }
-
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-
-        /* Hamburger button only shown when sidebar is collapsed */
-        .hamburger-btn {
-            display: none !important;
-        }
-
-        .sidebar-collapsed .hamburger-btn {
-            display: inline-flex !important;
         }
 
         /* Flat Clean Cards */
@@ -999,15 +1029,8 @@ DASHBOARD_HTML = """
                 padding: 1rem;
             }
 
-            .top-bar {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .header-actions {
-                width: 100%;
-                justify-content: flex-end;
+            .navbar-brand {
+                display: inline-block;
             }
 
             .filter-bar {
@@ -1028,8 +1051,8 @@ DASHBOARD_HTML = """
                 margin-bottom: 0.25rem;
             }
 
-            /* Make selectors and action buttons stretch nicely on mobile screen */
-            .input-text, select.input-text, .btn, #sendReportBtn {
+            /* Make selectors and action buttons stretch nicely on mobile screen, but NOT icon buttons! */
+            .input-text, select.input-text, .btn-mobile-block {
                 width: 100% !important;
             }
 
@@ -1102,35 +1125,37 @@ DASHBOARD_HTML = """
 
         <!-- Main Panel -->
         <div class="main-panel">
-            <div class="top-bar">
-                <div class="section-title-container">
+            <!-- Mobile Responsive Top Header Navbar -->
+            <div class="top-navbar">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <!-- Hamburger Menu Button (Shows only when sidebar is collapsed) -->
-                    <button onclick="toggleSidebar()" class="btn btn-secondary hamburger-btn" style="padding: 0; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--border-radius);">
+                    <button onclick="toggleSidebar()" class="btn-icon hamburger-btn">
                         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="4" y1="12" x2="20" y2="12"></line>
                             <line x1="4" y1="6" x2="20" y2="6"></line>
                             <line x1="4" y1="18" x2="20" y2="18"></line>
                         </svg>
                     </button>
-                    <div>
-                        <h2 class="section-title" id="headerTitle">Dashboard Overview</h2>
-                        <div class="section-subtitle" id="headerSubtitle">Daily readings and general metrics</div>
-                    </div>
+                    <span class="navbar-brand">The Brothers' Room</span>
                 </div>
-                <div class="header-actions">
-                    <!-- Theme Toggle Button -->
-                    <button id="themeToggleBtn" onclick="toggleTheme()" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 36px; padding: 0.45rem 1rem;">
+                <div class="navbar-actions">
+                    <!-- Theme Toggle Icon-only Button -->
+                    <button id="themeToggleBtn" onclick="toggleTheme()" class="btn-icon" title="Toggle Theme">
                         <span id="themeToggleIcon" style="display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;"></span>
-                        <span id="themeToggleText">Light</span>
                     </button>
-                    <!-- Logout Button -->
-                    <button onclick="logout()" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 36px; padding: 0.45rem 1rem;">
+                    <!-- Logout Icon-only Button -->
+                    <button onclick="logout()" class="btn-icon" title="Logout">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path>
                         </svg>
-                        Logout
                     </button>
                 </div>
+            </div>
+
+            <!-- Page Title context sitting underneath top navigation bar -->
+            <div class="page-header">
+                <h2 class="section-title" id="headerTitle">Dashboard Overview</h2>
+                <div class="section-subtitle" id="headerSubtitle">Daily readings and general metrics</div>
             </div>
 
             <!-- Filter Controls (Dashboard level) -->
@@ -1164,11 +1189,11 @@ DASHBOARD_HTML = """
                         <select id="endMonth" class="input-text" style="padding: 0.35rem 0.5rem;"></select>
                         <select id="endDay" class="input-text" style="padding: 0.35rem 0.5rem;"></select>
                         
-                        <button onclick="applyCustomDateFilters()" class="btn" style="padding: 0.35rem 0.85rem; font-size: 0.72rem; margin-left: 0.25rem;">Apply</button>
+                        <button onclick="applyCustomDateFilters()" class="btn btn-mobile-block" style="padding: 0.35rem 0.85rem; font-size: 0.72rem; margin-left: 0.25rem;">Apply</button>
                     </div>
                 </div>
-                <div>
-                    <button id="sendReportBtn" onclick="triggerEmailReport()" class="btn">
+                <div style="width: 100%; max-width: max-content;" class="btn-mobile-block">
+                    <button id="sendReportBtn" onclick="triggerEmailReport()" class="btn btn-mobile-block" style="width: 100%;">
                         Email report
                     </button>
                 </div>
@@ -1267,7 +1292,7 @@ DASHBOARD_HTML = """
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
                         <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; margin: 0; color: var(--text-color);">Live updates feed</h3>
                         <!-- Icon-only Refresh Button -->
-                        <button onclick="loadActivityLog()" class="btn btn-secondary" style="padding: 0; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--border-radius);" title="Refresh">
+                        <button onclick="loadActivityLog()" class="btn-icon" title="Refresh">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M23 4v6h-6"></path>
                                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
@@ -1284,9 +1309,9 @@ DASHBOARD_HTML = """
             <div id="sectionLearners" class="tab-content" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
                     <h3 style="font-size: 0.95rem; color: var(--text-color); letter-spacing: 0.5px; margin: 0; font-weight: 400;">Registered learners</h3>
-                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap; width: 100%; max-width: max-content;" class="btn-mobile-block">
                         <!-- Download CSV Action Button -->
-                        <button onclick="downloadLearnersCSV()" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 38px;">
+                        <button onclick="downloadLearnersCSV()" class="btn btn-secondary btn-mobile-block" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 38px;">
                             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
                             </svg>
@@ -1413,13 +1438,10 @@ DASHBOARD_HTML = """
 
         function updateThemeUI(isLight) {
             const iconContainer = document.getElementById("themeToggleIcon");
-            const textContainer = document.getElementById("themeToggleText");
             if (isLight) {
                 iconContainer.innerHTML = moonIcon;
-                textContainer.innerText = "Dark";
             } else {
                 iconContainer.innerHTML = sunIcon;
-                textContainer.innerText = "Light";
             }
         }
 
