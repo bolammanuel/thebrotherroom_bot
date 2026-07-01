@@ -2401,9 +2401,9 @@ DASHBOARD_HTML = """
             const dist = lastStatsData.state_distribution;
             const entries = Object.entries(dist).sort((a, b) => b[1] - a[1]);
             
-            let csvContent = "data:text/csv;charset=utf-8,Location,Count\n";
+            let csvContent = "data:text/csv;charset=utf-8,Location,Count\\n";
             entries.forEach(([state, count]) => {
-                csvContent += `"${state}",${count}\n`;
+                csvContent += `"${state}",${count}\\n`;
             });
             
             const encodedUri = encodeURI(csvContent);
