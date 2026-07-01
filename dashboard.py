@@ -233,6 +233,18 @@ def get_stats_data(start_date=None, end_date=None):
                 pwd_counts_cleaned["Unknown"] += v
         stats["pwd_distribution"] = pwd_counts_cleaned
 
+        # 12. State/Location Breakdown
+        if start_date or end_date:
+            cursor.execute(f"SELECT state, COUNT(*) FROM learners {where_clause} GROUP BY state ORDER BY COUNT(*) DESC", params)
+        else:
+            cursor.execute("SELECT state, COUNT(*) FROM learners GROUP BY state ORDER BY COUNT(*) DESC")
+        state_counts = dict(cursor.fetchall())
+        state_counts_cleaned = {}
+        for k, v in state_counts.items():
+            k_clean = str(k).strip().title() if (k and str(k).strip()) else "Unknown"
+            state_counts_cleaned[k_clean] = state_counts_cleaned.get(k_clean, 0) + v
+        stats["state_distribution"] = state_counts_cleaned
+
     except Exception as e:
         logger.error(f"Error fetching stats data: {e}")
         stats = {
@@ -250,7 +262,8 @@ def get_stats_data(start_date=None, end_date=None):
             "reflections_today": 0,
             "reflections_week": 0,
             "age_distribution": {"Under 18": 0, "18-24": 0, "25-34": 0, "35+": 0, "Unknown": 0},
-            "pwd_distribution": {"Yes": 0, "No": 0, "Unknown": 0}
+            "pwd_distribution": {"Yes": 0, "No": 0, "Unknown": 0},
+            "state_distribution": {}
         }
     finally:
         conn.close()
@@ -1602,6 +1615,22 @@ DASHBOARD_HTML = """
                         </div>
                     </div>
 
+                    <!-- Location Distribution Card -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Location distribution</h3>
+                            <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('stateChart', 'location_distribution.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="stateChart"></canvas>
+                        </div>
+                    </div>
+
                     <!-- PWD Status Card -->
                     <div class="card">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -1712,6 +1741,7 @@ DASHBOARD_HTML = """
         let funnelChartInstance = null;
         let langChartInstance = null;
         let ageChartInstance = null;
+        let stateChartInstance = null;
         let pwdChartInstance = null;
         let lastStatsData = null; // Stores stats to redraw charts on theme toggle
 
@@ -2116,6 +2146,32 @@ DASHBOARD_HTML = """
                     }
                 });
 
+                // State/Location Chart
+                const stateCtx = document.getElementById('stateChart').getContext('2d');
+                if (stateChartInstance) stateChartInstance.destroy();
+                stateChartInstance = new Chart(stateCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(stats.state_distribution || {}),
+                        datasets: [{
+                            data: Object.values(stats.state_distribution || {}),
+                            backgroundColor: '#2481cc',
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 1000, easing: 'easeOutQuart' },
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            x: { grid: { color: gridColor }, ticks: { color: tickColor, precision: 0 } },
+                            y: { grid: { display: false }, ticks: { color: tickColor } }
+                        }
+                    }
+                });
+
                 // PWD Chart
                 const pwdCtx = document.getElementById('pwdChart').getContext('2d');
                 if (pwdChartInstance) pwdChartInstance.destroy();
@@ -2259,6 +2315,7 @@ DASHBOARD_HTML = """
             if (chartId === 'funnelChart') chartInstance = funnelChartInstance;
             else if (chartId === 'langChart') chartInstance = langChartInstance;
             else if (chartId === 'ageChart') chartInstance = ageChartInstance;
+            else if (chartId === 'stateChart') chartInstance = stateChartInstance;
             else if (chartId === 'pwdChart') chartInstance = pwdChartInstance;
             
             if (chartInstance) {
