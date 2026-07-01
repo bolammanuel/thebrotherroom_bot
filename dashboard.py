@@ -1756,13 +1756,19 @@ DASHBOARD_HTML = """
 
         function checkStoredAuth() {
             try {
-                const token = localStorage.getItem("dashboard_auth_token");
+                let token = null;
+                try {
+                    token = localStorage.getItem("dashboard_auth_token");
+                } catch (e) {
+                    console.error("localStorage access blocked:", e);
+                }
+                
                 if (token === expectedToken) {
-                    initTheme();
-                    initSidebarState();
-                    populateDateDropdowns();
-                    loadDashboardData();
-                    loadActivityLog();
+                    try { initTheme(); } catch (e) { console.error("initTheme error:", e); }
+                    try { initSidebarState(); } catch (e) { console.error("initSidebarState error:", e); }
+                    try { populateDateDropdowns(); } catch (e) { console.error("populateDateDropdowns error:", e); }
+                    try { loadDashboardData(); } catch (e) { console.error("loadDashboardData error:", e); }
+                    try { loadActivityLog(); } catch (e) { console.error("loadActivityLog error:", e); }
                     document.getElementById("dashboardContent").style.display = "flex"; 
                 } else {
                     document.getElementById("loginOverlay").style.display = "flex";
@@ -1770,6 +1776,12 @@ DASHBOARD_HTML = """
                 }
             } catch (err) {
                 console.error("Auth initialization error:", err);
+                try {
+                    document.getElementById("loginOverlay").style.display = "flex";
+                    document.getElementById("dashboardContent").style.display = "none";
+                } catch (domErr) {
+                    console.error("DOM recovery failed:", domErr);
+                }
             }
         }
 
@@ -1778,7 +1790,11 @@ DASHBOARD_HTML = """
             const loginCard = document.querySelector(".login-box");
             
             if (val === expectedToken) {
-                localStorage.setItem("dashboard_auth_token", val);
+                try {
+                    localStorage.setItem("dashboard_auth_token", val);
+                } catch (e) {
+                    console.error("localStorage write blocked:", e);
+                }
                 
                 // Success entry transitions
                 const overlay = document.getElementById("loginOverlay");
@@ -1788,11 +1804,11 @@ DASHBOARD_HTML = """
                 
                 setTimeout(() => {
                     overlay.style.display = "none";
-                    initTheme();
-                    initSidebarState();
-                    populateDateDropdowns();
-                    loadDashboardData();
-                    loadActivityLog();
+                    try { initTheme(); } catch (e) { console.error("initTheme error:", e); }
+                    try { initSidebarState(); } catch (e) { console.error("initSidebarState error:", e); }
+                    try { populateDateDropdowns(); } catch (e) { console.error("populateDateDropdowns error:", e); }
+                    try { loadDashboardData(); } catch (e) { console.error("loadDashboardData error:", e); }
+                    try { loadActivityLog(); } catch (e) { console.error("loadActivityLog error:", e); }
                     document.getElementById("dashboardContent").style.display = "flex"; 
                 }, 400);
             } else {
@@ -1830,7 +1846,11 @@ DASHBOARD_HTML = """
             content.style.transform = "scale(0.98)";
             
             setTimeout(() => {
-                localStorage.removeItem("dashboard_auth_token");
+                try {
+                    localStorage.removeItem("dashboard_auth_token");
+                } catch (e) {
+                    console.error("localStorage clear blocked:", e);
+                }
                 location.reload();
             }, 300);
         }
@@ -1838,7 +1858,11 @@ DASHBOARD_HTML = """
         // Theme Toggle
         function toggleTheme() {
             const isLight = document.body.classList.toggle("light-theme");
-            localStorage.setItem("dashboard_theme", isLight ? "light" : "dark");
+            try {
+                localStorage.setItem("dashboard_theme", isLight ? "light" : "dark");
+            } catch (e) {
+                console.error("localStorage write blocked in toggleTheme:", e);
+            }
             updateThemeUI(isLight);
             
             // Redraw charts with correct tick/font colors
@@ -1861,7 +1885,13 @@ DASHBOARD_HTML = """
 
         // Theme initialization
         function initTheme() {
-            const savedTheme = localStorage.getItem("dashboard_theme");
+            let savedTheme = null;
+            try {
+                savedTheme = localStorage.getItem("dashboard_theme");
+            } catch (e) {
+                console.error("localStorage read blocked in initTheme:", e);
+            }
+            
             if (savedTheme === "light") {
                 document.body.classList.add("light-theme");
                 updateThemeUI(true);
@@ -1875,7 +1905,11 @@ DASHBOARD_HTML = """
         function toggleSidebar() {
             const layout = document.getElementById("dashboardContent");
             const collapsed = layout.classList.toggle("sidebar-collapsed");
-            localStorage.setItem("dashboard_sidebar_collapsed", collapsed ? "true" : "false");
+            try {
+                localStorage.setItem("dashboard_sidebar_collapsed", collapsed ? "true" : "false");
+            } catch (e) {
+                console.error("localStorage write blocked in toggleSidebar:", e);
+            }
         }
 
         function initSidebarState() {
@@ -1886,7 +1920,13 @@ DASHBOARD_HTML = """
                 // Default mobile layout is collapsed
                 layout.classList.add("sidebar-collapsed");
             } else {
-                const isCollapsed = localStorage.getItem("dashboard_sidebar_collapsed") === "true";
+                let isCollapsed = false;
+                try {
+                    isCollapsed = localStorage.getItem("dashboard_sidebar_collapsed") === "true";
+                } catch (e) {
+                    console.error("localStorage read blocked in initSidebarState:", e);
+                }
+                
                 if (isCollapsed) {
                     layout.classList.add("sidebar-collapsed");
                 } else {
