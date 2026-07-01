@@ -12,3 +12,7 @@ learner_progress.db
 # Generated / Synthesized temporary assets
 assets/voice_reply_*.ogg
 assets/certificate_*.png
+
+# Node modules
+node_modules/
+
