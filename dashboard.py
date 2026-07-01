@@ -403,7 +403,7 @@ DASHBOARD_HTML = """
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Brothers' Room - Admin Analytics</title>
+    <title>The Brothers' Room - Facilitator Analytics</title>
     <!-- Inter Font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
@@ -1141,6 +1141,19 @@ DASHBOARD_HTML = """
                 height: 100%;
                 z-index: 1000;
                 box-shadow: 10px 0 30px rgba(0, 0, 0, 0.25);
+                
+                /* Collapsed state is the default on mobile to prevent FOUC flash */
+                width: 0 !important;
+                padding: 2rem 0 !important;
+                border-right: none !important;
+                opacity: 0 !important;
+            }
+
+            .app-layout:not(.sidebar-collapsed) .sidebar {
+                width: var(--sidebar-width) !important;
+                padding: 2rem 1.5rem !important;
+                border-right: 1px solid var(--border-color) !important;
+                opacity: 1 !important;
             }
 
             body.light-theme .sidebar {
@@ -1225,7 +1238,7 @@ DASHBOARD_HTML = """
     </div>
 
     <!-- Dashboard Main View -->
-    <div class="app-layout" id="dashboardContent" style="display: none;">
+    <div class="app-layout sidebar-collapsed" id="dashboardContent" style="display: none;">
         <!-- Left Sidebar Navigation -->
         <div class="sidebar">
             <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
@@ -1545,12 +1558,12 @@ DASHBOARD_HTML = """
             try {
                 const token = localStorage.getItem("dashboard_auth_token");
                 if (token === expectedToken) {
-                    document.getElementById("dashboardContent").style.display = "flex"; 
                     initTheme();
                     initSidebarState();
                     populateDateDropdowns();
                     loadDashboardData();
                     loadActivityLog();
+                    document.getElementById("dashboardContent").style.display = "flex"; 
                 } else {
                     document.getElementById("loginOverlay").style.display = "flex";
                     document.getElementById("dashboardContent").style.display = "none";
@@ -1575,12 +1588,12 @@ DASHBOARD_HTML = """
                 
                 setTimeout(() => {
                     overlay.style.display = "none";
-                    document.getElementById("dashboardContent").style.display = "flex"; 
                     initTheme();
                     initSidebarState();
                     populateDateDropdowns();
                     loadDashboardData();
                     loadActivityLog();
+                    document.getElementById("dashboardContent").style.display = "flex"; 
                 }, 400);
             } else {
                 document.getElementById("loginError").innerText = "Invalid credentials. Access Denied.";
