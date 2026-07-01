@@ -596,6 +596,30 @@ DASHBOARD_HTML = """
             background-color: var(--active-tab-bg);
         }
 
+        /* Responsive Action Button system with text labels on desktop */
+        .btn-nav-action {
+            background: var(--input-bg);
+            border: 1px solid var(--border-color);
+            color: var(--text-color);
+            height: 38px;
+            padding: 0 1rem;
+            border-radius: var(--border-radius);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+            flex-shrink: 0;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            gap: 0.5rem;
+        }
+
+        .btn-nav-action:hover {
+            border-color: var(--accent-color);
+            background-color: var(--active-tab-bg);
+        }
+
         .hamburger-btn {
             display: none; /* CSS controls display toggle below */
         }
@@ -1082,6 +1106,16 @@ DASHBOARD_HTML = """
                 align-items: stretch;
                 width: 100%;
             }
+
+            /* Collapse responsive navbar action buttons to square icon-only shapes on mobile */
+            .btn-nav-action {
+                width: 38px;
+                padding: 0;
+            }
+
+            .nav-btn-text {
+                display: none !important;
+            }
         }
     </style>
 </head>
@@ -1160,15 +1194,17 @@ DASHBOARD_HTML = """
                     <span class="navbar-brand">The Brothers' Room</span>
                 </div>
                 <div class="navbar-actions">
-                    <!-- Theme Toggle Icon-only Button -->
-                    <button id="themeToggleBtn" onclick="toggleTheme()" class="btn-icon" title="Toggle Theme">
+                    <!-- Theme Toggle Action Button with Responsive Text -->
+                    <button id="themeToggleBtn" onclick="toggleTheme()" class="btn-nav-action" title="Toggle Theme">
                         <span id="themeToggleIcon" style="display: flex; align-items: center; justify-content: center; width: 14px; height: 14px;"></span>
+                        <span class="nav-btn-text" id="themeToggleText">Light</span>
                     </button>
-                    <!-- Logout Icon-only Button -->
-                    <button onclick="logout()" class="btn-icon" title="Logout">
+                    <!-- Logout Action Button with Responsive Text -->
+                    <button onclick="logout()" class="btn-nav-action" title="Logout">
                         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path>
                         </svg>
+                        <span class="nav-btn-text">Logout</span>
                     </button>
                 </div>
             </div>
@@ -1466,10 +1502,13 @@ DASHBOARD_HTML = """
 
         function updateThemeUI(isLight) {
             const iconContainer = document.getElementById("themeToggleIcon");
+            const textContainer = document.getElementById("themeToggleText");
             if (isLight) {
                 iconContainer.innerHTML = moonIcon;
+                if (textContainer) textContainer.innerText = "Dark";
             } else {
                 iconContainer.innerHTML = sunIcon;
+                if (textContainer) textContainer.innerText = "Light";
             }
         }
 
