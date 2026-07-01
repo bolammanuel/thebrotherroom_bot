@@ -480,7 +480,7 @@ DASHBOARD_HTML = """
     <!-- Inter Font from Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <style>
         :root {
             /* Default: Telegram Dark Mode */
@@ -2627,8 +2627,12 @@ DASHBOARD_HTML = """
             }
         }
 
-        // Initialize auth check on DOM ready
-        window.addEventListener('DOMContentLoaded', checkStoredAuth);
+        // Initialize auth check on DOM ready or run immediately if already loaded
+        if (document.readyState === 'loading') {
+            window.addEventListener('DOMContentLoaded', checkStoredAuth);
+        } else {
+            checkStoredAuth();
+        }
     </script>
 </body>
 </html>
