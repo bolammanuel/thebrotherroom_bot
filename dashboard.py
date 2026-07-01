@@ -1616,18 +1616,18 @@ DASHBOARD_HTML = """
                     </div>
 
                     <!-- Location Distribution Card -->
-                    <div class="card">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                    <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                             <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Location distribution</h3>
-                            <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('stateChart', 'location_distribution.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
+                            <button class="btn btn-secondary" onclick="exportLocationCSV()" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Download location data as CSV">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
                                 </svg>
-                                <span>Export</span>
+                                <span>Export CSV</span>
                             </button>
                         </div>
-                        <div class="chart-container" style="height: 200px;">
-                            <canvas id="stateChart"></canvas>
+                        <div id="locationListContainer" style="max-height: 200px; overflow-y: auto; padding-right: 0.25rem; display: flex; flex-direction: column; gap: 0.85rem;">
+                            <!-- Injected by JS -->
                         </div>
                     </div>
 
@@ -1741,7 +1741,6 @@ DASHBOARD_HTML = """
         let funnelChartInstance = null;
         let langChartInstance = null;
         let ageChartInstance = null;
-        let stateChartInstance = null;
         let pwdChartInstance = null;
         let lastStatsData = null; // Stores stats to redraw charts on theme toggle
 
@@ -2146,32 +2145,6 @@ DASHBOARD_HTML = """
                     }
                 });
 
-                // State/Location Chart
-                const stateCtx = document.getElementById('stateChart').getContext('2d');
-                if (stateChartInstance) stateChartInstance.destroy();
-                stateChartInstance = new Chart(stateCtx, {
-                    type: 'bar',
-                    data: {
-                        labels: Object.keys(stats.state_distribution || {}),
-                        datasets: [{
-                            data: Object.values(stats.state_distribution || {}),
-                            backgroundColor: '#2481cc',
-                            borderWidth: 0,
-                        }]
-                    },
-                    options: {
-                        indexAxis: 'y',
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        animation: { duration: 1000, easing: 'easeOutQuart' },
-                        plugins: { legend: { display: false } },
-                        scales: {
-                            x: { grid: { color: gridColor }, ticks: { color: tickColor, precision: 0 } },
-                            y: { grid: { display: false }, ticks: { color: tickColor } }
-                        }
-                    }
-                });
-
                 // PWD Chart
                 const pwdCtx = document.getElementById('pwdChart').getContext('2d');
                 if (pwdChartInstance) pwdChartInstance.destroy();
@@ -2197,6 +2170,10 @@ DASHBOARD_HTML = """
                         }
                     }
                 });
+
+                // Location Distribution List
+                renderLocationList(stats);
+
             } catch (err) {
                 console.error("Error drawing charts:", err);
             }
@@ -2319,7 +2296,20 @@ DASHBOARD_HTML = """
             else if (chartId === 'pwdChart') chartInstance = pwdChartInstance;
             
             if (chartInstance) {
-                const url = chartInstance.toBase64Image();
+                const canvas = chartInstance.canvas;
+                const ctx = canvas.getContext('2d');
+                
+                // Draw a solid background behind the chart so labels are readable in external image viewer
+                ctx.save();
+                ctx.globalCompositeOperation = 'destination-over';
+                
+                const isLight = document.body.classList.contains("light-theme");
+                ctx.fillStyle = isLight ? '#ffffff' : '#0f172a';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                const url = canvas.toDataURL('image/png');
+                ctx.restore();
+                
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = filename;
@@ -2327,6 +2317,63 @@ DASHBOARD_HTML = """
                 a.click();
                 document.body.removeChild(a);
             }
+        }
+
+        // Render Location list rows with progress bars
+        function renderLocationList(stats) {
+            const container = document.getElementById("locationListContainer");
+            if (!container) return;
+            container.innerHTML = "";
+            
+            const dist = stats.state_distribution || {};
+            const entries = Object.entries(dist).sort((a, b) => b[1] - a[1]);
+            
+            let total = 0;
+            entries.forEach(e => total += e[1]);
+            if (total === 0) total = 1;
+            
+            if (entries.length === 0) {
+                container.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding-top: 2rem;">No location data available.</div>`;
+                return;
+            }
+            
+            entries.forEach(([stateName, count]) => {
+                const pct = Math.round((count / total) * 100);
+                const row = document.createElement("div");
+                row.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.85rem; color: var(--text-color);">
+                        <span style="font-weight: 500;">${stateName}</span>
+                        <span style="font-size: 0.8rem; color: var(--text-muted); font-variant-numeric: tabular-nums;">${count} learners (${pct}%)</span>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: var(--border-color); border-radius: 3px; overflow: hidden; margin-top: 0.25rem;">
+                        <div style="width: ${pct}%; height: 100%; background: var(--accent-color); border-radius: 3px; transition: width 0.8s ease-out;"></div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // Export location list as CSV
+        function exportLocationCSV() {
+            if (!lastStatsData || !lastStatsData.state_distribution) {
+                alert("No location data available to export.");
+                return;
+            }
+            const dist = lastStatsData.state_distribution;
+            const entries = Object.entries(dist).sort((a, b) => b[1] - a[1]);
+            
+            let csvContent = "data:text/csv;charset=utf-8,Location,Count\n";
+            entries.forEach(([state, count]) => {
+                csvContent += `"${state}",${count}\n`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const a = document.createElement("a");
+            a.setAttribute("href", encodedUri);
+            a.setAttribute("download", "location_distribution.csv");
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
         }
 
         // Search Learners
