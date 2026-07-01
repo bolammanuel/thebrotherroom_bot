@@ -13,6 +13,19 @@ app = Flask(__name__)
 # Authentication token configuration
 ADMIN_TOKEN = os.getenv("ADMIN_DASHBOARD_PASSWORD", "admin123")
 
+def format_lesson_id(lesson_id):
+    """Helper to convert raw database lesson IDs (e.g., lesson_1_1) to pretty layout labels (e.g., Lesson 1)."""
+    if not lesson_id:
+        return ""
+    lid = str(lesson_id).lower()
+    if lid == "start":
+        return "Start"
+    if "lesson_" in lid:
+        parts = lid.split("_")
+        if len(parts) >= 2:
+            return f"Lesson {parts[-1]}"
+    return str(lesson_id).replace("_", " ").capitalize()
+
 def get_stats_data(start_date=None, end_date=None):
     """Fetch database metrics for the analytics dashboard."""
     conn = get_connection()
@@ -266,13 +279,13 @@ def get_activity_log():
         for row in cursor.fetchall():
             uid, name, mod, les, ts, lang = row
             mod_name = str(mod).replace("module_", "Module ")
-            les_name = str(les).capitalize() if les else "Start"
+            les_name = format_lesson_id(les) if les else "Start"
             events.append({
                 "type": "activity",
                 "user_id": uid,
                 "name": name or "Anonymous Brother",
                 "timestamp": str(ts).split(".")[0],
-                "details": f"Active on {mod_name} (Lesson: {les_name})",
+                "details": f"Active on {mod_name} ({les_name})",
                 "lang": (lang or "en").upper()
             })
             
@@ -308,14 +321,22 @@ def get_activity_log():
         
     return events
 
-def get_learners_data(search_query=None, limit=20, offset=0):
-    """Fetch learners records for the table view, with search and pagination."""
+def get_learners_data(search_query=None, limit=20, offset=0, order_by="active"):
+    """Fetch learners records for the table view, with search, pagination, and sorting filters."""
     conn = get_connection()
     cursor = conn.cursor()
     
     learners = []
     total_count = 0
     try:
+        # Determine sorting criteria
+        if order_by == "alpha":
+            order_clause = "ORDER BY COALESCE(full_name, '') ASC, last_activity DESC"
+        elif order_by == "graduates":
+            order_clause = "ORDER BY CASE WHEN post_test_score >= 0 THEN 0 ELSE 1 END ASC, COALESCE(full_name, '') ASC"
+        else:
+            order_clause = "ORDER BY last_activity DESC"
+
         # Get total count with search matching user_id, full_name, email, or state
         if search_query:
             q = f"%{search_query}%"
@@ -330,10 +351,10 @@ def get_learners_data(search_query=None, limit=20, offset=0):
             cursor.execute("SELECT COUNT(*) FROM learners")
         total_count = cursor.fetchone()[0]
         
-        # Get records with pagination and order by last active DESC
+        # Get records with pagination and dynamic ordering
         if search_query:
             q = f"%{search_query}%"
-            cursor.execute("""
+            cursor.execute(f"""
                 SELECT user_id, full_name, email, age, state, language_preference, 
                        pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
                 FROM learners
@@ -341,15 +362,15 @@ def get_learners_data(search_query=None, limit=20, offset=0):
                    OR COALESCE(full_name, '') LIKE %s 
                    OR COALESCE(email, '') LIKE %s 
                    OR COALESCE(state, '') LIKE %s
-                ORDER BY last_activity DESC
+                {order_clause}
                 LIMIT %s OFFSET %s
             """, (q, q, q, q, limit, offset))
         else:
-            cursor.execute("""
+            cursor.execute(f"""
                 SELECT user_id, full_name, email, age, state, language_preference, 
                        pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
                 FROM learners
-                ORDER BY last_activity DESC
+                {order_clause}
                 LIMIT %s OFFSET %s
             """, (limit, offset))
             
@@ -365,7 +386,7 @@ def get_learners_data(search_query=None, limit=20, offset=0):
                 "pre_test": r[6] if r[6] >= 0 else "-",
                 "post_test": r[7] if r[7] >= 0 else "-",
                 "module": str(r[8]).replace("module_", "Module ") if r[8] else "-",
-                "lesson": str(r[9]).capitalize() if r[9] else "-",
+                "lesson": format_lesson_id(r[9]) if r[9] else "-",
                 "last_active": str(r[10]).split(".")[0] if r[10] else "-"
             })
     except Exception as e:
@@ -1317,6 +1338,12 @@ DASHBOARD_HTML = """
                             </svg>
                             <span>Download CSV</span>
                         </button>
+                        <!-- Sorting Dropdown -->
+                        <select id="learnerSortSelect" class="input-text btn-mobile-block" onchange="onLearnerSortChange()" style="width: 180px;">
+                            <option value="active">Order: Last Active</option>
+                            <option value="alpha">Order: Alphabetical</option>
+                            <option value="graduates">Order: Graduates First</option>
+                        </select>
                         <input type="text" id="learnerSearchInput" class="input-text" placeholder="Search by ID, name, email, or state..." onkeyup="onLearnerSearch()" style="width: 320px;">
                     </div>
                 </div>
@@ -1375,10 +1402,11 @@ DASHBOARD_HTML = """
         let langChartInstance = null;
         let lastStatsData = null; // Stores stats to redraw charts on theme toggle
 
-        // Learners pagination state
+        // Learners pagination and sorting state
         let currentLearnersPage = 0;
         const learnersPerPage = 15;
         let currentSearchQuery = "";
+        let currentSortQuery = "active";
 
         // Reusable SVG Icons for JavaScript injection
         const sunIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>`;
@@ -1407,7 +1435,7 @@ DASHBOARD_HTML = """
             const val = document.getElementById("passwordInput").value;
             if (val === expectedToken) {
                 localStorage.setItem("dashboard_auth_token", val);
-                document.getElementById("loginOverlay").style.display = "none";
+                document.getElementById("loginOverlay").style.none;
                 document.getElementById("dashboardContent").style.display = "flex"; 
                 initTheme();
                 initSidebarState();
@@ -1752,7 +1780,7 @@ DASHBOARD_HTML = """
         async function loadLearnersList() {
             try {
                 const offset = currentLearnersPage * learnersPerPage;
-                const res = await fetch(`/api/learners?token=${expectedToken}&search=${encodeURIComponent(currentSearchQuery)}&limit=${learnersPerPage}&offset=${offset}`);
+                const res = await fetch(`/api/learners?token=${expectedToken}&search=${encodeURIComponent(currentSearchQuery)}&order_by=${currentSortQuery}&limit=${learnersPerPage}&offset=${offset}`);
                 const data = await res.json();
                 
                 const tbody = document.getElementById("learnersTableBody");
@@ -1805,9 +1833,16 @@ DASHBOARD_HTML = """
             loadLearnersList();
         }
 
+        // Sort Selector Change
+        function onLearnerSortChange() {
+            currentSortQuery = document.getElementById("learnerSortSelect").value;
+            currentLearnersPage = 0;
+            loadLearnersList();
+        }
+
         // Trigger CSV download
         function downloadLearnersCSV() {
-            const url = `/api/learners/export?token=${expectedToken}&search=${encodeURIComponent(currentSearchQuery)}`;
+            const url = `/api/learners/export?token=${expectedToken}&search=${encodeURIComponent(currentSearchQuery)}&order_by=${currentSortQuery}`;
             window.location.href = url;
         }
 
@@ -2045,9 +2080,10 @@ def learners_api():
     if token != ADMIN_TOKEN:
         return jsonify({"error": "Unauthorized"}), 401
     search = request.args.get("search")
+    order_by = request.args.get("order_by", "active")
     limit = int(request.args.get("limit", 20))
     offset = int(request.args.get("offset", 0))
-    return jsonify(get_learners_data(search, limit, offset))
+    return jsonify(get_learners_data(search, limit, offset, order_by))
 
 @app.route("/api/learners/export")
 def export_learners_csv():
@@ -2056,13 +2092,22 @@ def export_learners_csv():
         return jsonify({"error": "Unauthorized"}), 401
     
     search_query = request.args.get("search")
+    order_by = request.args.get("order_by", "active")
     
     conn = get_connection()
     cursor = conn.cursor()
     try:
+        # Determine sorting criteria
+        if order_by == "alpha":
+            order_clause = "ORDER BY COALESCE(full_name, '') ASC, last_activity DESC"
+        elif order_by == "graduates":
+            order_clause = "ORDER BY CASE WHEN post_test_score >= 0 THEN 0 ELSE 1 END ASC, COALESCE(full_name, '') ASC"
+        else:
+            order_clause = "ORDER BY last_activity DESC"
+
         if search_query:
             q = f"%{search_query}%"
-            cursor.execute("""
+            cursor.execute(f"""
                 SELECT user_id, full_name, email, age, state, language_preference, 
                        pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
                 FROM learners
@@ -2070,14 +2115,14 @@ def export_learners_csv():
                    OR COALESCE(full_name, '') LIKE %s 
                    OR COALESCE(email, '') LIKE %s 
                    OR COALESCE(state, '') LIKE %s
-                ORDER BY last_activity DESC
+                {order_clause}
             """, (q, q, q, q))
         else:
-            cursor.execute("""
+            cursor.execute(f"""
                 SELECT user_id, full_name, email, age, state, language_preference, 
                        pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
                 FROM learners
-                ORDER BY last_activity DESC
+                {order_clause}
             """)
         
         rows = cursor.fetchall()
@@ -2099,7 +2144,7 @@ def export_learners_csv():
                 r[6] if r[6] >= 0 else "",
                 r[7] if r[7] >= 0 else "",
                 str(r[8]).replace("module_", "Module ") if r[8] else "",
-                str(r[9]).capitalize() if r[9] else "",
+                format_lesson_id(r[9]) if r[9] else "",
                 str(r[10]).split(".")[0] if r[10] else ""
             ])
             
