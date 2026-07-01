@@ -1027,6 +1027,40 @@ DASHBOARD_HTML = """
             border-radius: var(--border-radius);
         }
 
+        /* Eye Password Wrapper styling */
+        .password-wrapper {
+            position: relative;
+            width: 100%;
+            margin-top: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .password-wrapper .login-input {
+            margin: 0;
+            padding-right: 2.75rem; /* Space for the eye icon button */
+            width: 100%;
+        }
+
+        .password-toggle-btn {
+            position: absolute;
+            right: 0.85rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            transition: color 0.2s;
+        }
+
+        .password-toggle-btn:hover {
+            color: var(--text-color);
+        }
+
         .login-input {
             width: 100%;
             padding: 0.85rem 1rem;
@@ -1048,6 +1082,49 @@ DASHBOARD_HTML = """
             color: #ef4444;
             font-size: 0.85rem;
             margin-top: 0.5rem;
+        }
+
+        /* UI Micro-animations & Interactive Effects styling */
+        .btn, .btn-icon, .btn-nav-action, .sidebar-item, .password-toggle-btn {
+            transition: transform 0.1s ease, background-color 0.25s, border-color 0.25s, opacity 0.2s;
+        }
+
+        .btn:active, .btn-icon:active, .btn-nav-action:active, .sidebar-item:active, .password-toggle-btn:active {
+            transform: scale(0.96); /* Tactile bounce click effect */
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+
+        .shake-animation {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .spin-animation {
+            animation: spin 0.8s linear infinite;
         }
 
         /* Comprehensive Mobile Media Queries (Mobile layout & drawer configuration) */
@@ -1122,10 +1199,26 @@ DASHBOARD_HTML = """
 <body>
     <!-- Security Auth Overlay -->
     <div id="loginOverlay" class="login-overlay" style="display: none;">
-        <div class="card login-box">
+        <div class="card login-box fade-in-up">
             <h2 style="font-weight: 400; font-size: 1.4rem;">Facilitator Authentication</h2>
             <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.5rem;">Access requires dashboard facilitator password.</p>
-            <input type="password" id="passwordInput" class="login-input" placeholder="Enter password...">
+            
+            <div class="password-wrapper">
+                <input type="password" id="passwordInput" class="login-input" placeholder="Enter password..." onkeydown="if(event.key === 'Enter') checkAuth()">
+                <button onclick="togglePasswordVisibility()" class="password-toggle-btn" type="button" title="Toggle Password Visibility">
+                    <!-- Eye Open SVG Icon -->
+                    <svg id="eyeIconOpen" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                        <circle cx="12" cy="12" r="3"></circle>
+                    </svg>
+                    <!-- Eye Closed SVG Icon -->
+                    <svg id="eyeIconClosed" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                        <line x1="1" y1="1" x2="23" y2="23"></line>
+                    </svg>
+                </button>
+            </div>
+            
             <button onclick="checkAuth()" class="btn" style="width: 100%;">Authenticate</button>
             <div id="loginError" class="login-error"></div>
         </div>
@@ -1376,9 +1469,9 @@ DASHBOARD_HTML = """
                         </button>
                         <!-- Sorting Dropdown -->
                         <select id="learnerSortSelect" class="input-text btn-mobile-block" onchange="onLearnerSortChange()" style="width: 180px;">
-                            <option value="active">Last Active</option>
-                            <option value="alpha">Alphabetical</option>
-                            <option value="graduates">Graduates First</option>
+                            <option value="active">Order: Last Active</option>
+                            <option value="alpha">Order: Alphabetical</option>
+                            <option value="graduates">Order: Graduates First</option>
                         </select>
                         <input type="text" id="learnerSearchInput" class="input-text" placeholder="Search by ID, name, email, or state..." onkeyup="onLearnerSearch()" style="width: 320px;">
                     </div>
@@ -1469,23 +1562,64 @@ DASHBOARD_HTML = """
 
         function checkAuth() {
             const val = document.getElementById("passwordInput").value;
+            const loginCard = document.querySelector(".login-box");
+            
             if (val === expectedToken) {
                 localStorage.setItem("dashboard_auth_token", val);
-                document.getElementById("loginOverlay").style.none;
-                document.getElementById("dashboardContent").style.display = "flex"; 
-                initTheme();
-                initSidebarState();
-                populateDateDropdowns();
-                loadDashboardData();
-                loadActivityLog();
+                
+                // Success entry transitions
+                const overlay = document.getElementById("loginOverlay");
+                overlay.style.transition = "opacity 0.4s ease-out, transform 0.4s ease-out";
+                overlay.style.opacity = "0";
+                overlay.style.transform = "scale(0.95)";
+                
+                setTimeout(() => {
+                    overlay.style.display = "none";
+                    document.getElementById("dashboardContent").style.display = "flex"; 
+                    initTheme();
+                    initSidebarState();
+                    populateDateDropdowns();
+                    loadDashboardData();
+                    loadActivityLog();
+                }, 400);
             } else {
                 document.getElementById("loginError").innerText = "Invalid credentials. Access Denied.";
+                
+                // Shake validation error feedback trigger
+                if (loginCard) {
+                    loginCard.classList.remove("shake-animation");
+                    void loginCard.offsetWidth; // Trigger layout reflow to restart keyframe
+                    loginCard.classList.add("shake-animation");
+                }
+            }
+        }
+
+        function togglePasswordVisibility() {
+            const input = document.getElementById("passwordInput");
+            const openEye = document.getElementById("eyeIconOpen");
+            const closedEye = document.getElementById("eyeIconClosed");
+            
+            if (input.type === "password") {
+                input.type = "text";
+                openEye.style.display = "none";
+                closedEye.style.display = "inline";
+            } else {
+                input.type = "password";
+                openEye.style.display = "inline";
+                closedEye.style.display = "none";
             }
         }
 
         function logout() {
-            localStorage.removeItem("dashboard_auth_token");
-            location.reload();
+            const content = document.getElementById("dashboardContent");
+            content.style.transition = "opacity 0.3s ease-out, transform 0.3s ease-out";
+            content.style.opacity = "0";
+            content.style.transform = "scale(0.98)";
+            
+            setTimeout(() => {
+                localStorage.removeItem("dashboard_auth_token");
+                location.reload();
+            }, 300);
         }
 
         // Theme Toggle
@@ -1716,6 +1850,10 @@ DASHBOARD_HTML = """
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
+                        },
                         plugins: {
                             legend: { display: false }
                         },
@@ -1756,6 +1894,10 @@ DASHBOARD_HTML = """
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
+                        animation: {
+                            duration: 1000,
+                            easing: 'easeOutQuart'
+                        },
                         plugins: {
                             legend: {
                                 position: 'bottom',
@@ -1771,6 +1913,10 @@ DASHBOARD_HTML = """
 
         // Live Feed Loading
         async function loadActivityLog() {
+            const refreshBtn = document.querySelector(".btn-icon[title='Refresh'] svg");
+            if (refreshBtn) {
+                refreshBtn.classList.add("spin-animation");
+            }
             try {
                 const res = await fetch("/api/activity-log?token=" + expectedToken);
                 const data = await res.json();
@@ -1812,6 +1958,12 @@ DASHBOARD_HTML = """
                 });
             } catch (err) {
                 console.error("Error loading activity log:", err);
+            } finally {
+                if (refreshBtn) {
+                    setTimeout(() => {
+                        refreshBtn.classList.remove("spin-animation");
+                    }, 400); // Maintain spin loop minimum duration for visual flow
+                }
             }
         }
 
