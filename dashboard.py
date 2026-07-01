@@ -1344,7 +1344,7 @@ DASHBOARD_HTML = """
                 </div>
                 <div style="width: 100%; max-width: max-content;" class="btn-mobile-block">
                     <button id="sendReportBtn" onclick="triggerEmailReport()" class="btn btn-mobile-block" style="width: 100%;">
-                        Email report
+                        Send report
                     </button>
                 </div>
             </div>
