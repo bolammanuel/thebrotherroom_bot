@@ -1,6 +1,8 @@
 import os
 import logging
-from flask import Flask, jsonify, render_template_string, request
+import csv
+import io
+from flask import Flask, jsonify, render_template_string, request, make_response
 from db_manager import get_connection
 
 # Setup logging
@@ -523,6 +525,7 @@ DASHBOARD_HTML = """
             flex-direction: column;
             gap: 1.5rem;
             overflow-y: auto;
+            overflow-x: hidden; /* Avoid horizontal body scrolling completely */
             min-width: 0; /* Crucial to prevent Chart.js dimensions from blowing out */
         }
 
@@ -584,7 +587,7 @@ DASHBOARD_HTML = """
         /* KPI Grids */
         .kpi-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
             gap: 1.25rem;
         }
 
@@ -1166,7 +1169,7 @@ DASHBOARD_HTML = """
                 </div>
                 <div>
                     <button id="sendReportBtn" onclick="triggerEmailReport()" class="btn">
-                        Send report
+                        Email report
                     </button>
                 </div>
             </div>
@@ -1263,7 +1266,13 @@ DASHBOARD_HTML = """
                 <div class="card">
                     <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem; margin-bottom: 1rem;">
                         <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; margin: 0; color: var(--text-color);">Live updates feed</h3>
-                        <button onclick="loadActivityLog()" class="btn btn-secondary" style="padding: 0.35rem 0.85rem; font-size: 0.75rem;">Refresh</button>
+                        <!-- Icon-only Refresh Button -->
+                        <button onclick="loadActivityLog()" class="btn btn-secondary" style="padding: 0; width: 36px; height: 36px; display: inline-flex; align-items: center; justify-content: center; border-radius: var(--border-radius);" title="Refresh">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M23 4v6h-6"></path>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                        </button>
                     </div>
                     <div class="scrollable-feed" id="activityLogFeed">
                         <!-- Injected by JS -->
@@ -1275,7 +1284,16 @@ DASHBOARD_HTML = """
             <div id="sectionLearners" class="tab-content" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.75rem;">
                     <h3 style="font-size: 0.95rem; color: var(--text-color); letter-spacing: 0.5px; margin: 0; font-weight: 400;">Registered learners</h3>
-                    <input type="text" id="learnerSearchInput" class="input-text" placeholder="Search by ID, name, email, or state..." onkeyup="onLearnerSearch()" style="width: 320px;">
+                    <div style="display: flex; gap: 0.75rem; align-items: center; flex-wrap: wrap;">
+                        <!-- Download CSV Action Button -->
+                        <button onclick="downloadLearnersCSV()" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 38px;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                            </svg>
+                            <span>Download CSV</span>
+                        </button>
+                        <input type="text" id="learnerSearchInput" class="input-text" placeholder="Search by ID, name, email, or state..." onkeyup="onLearnerSearch()" style="width: 320px;">
+                    </div>
                 </div>
                 
                 <div class="table-container">
@@ -1625,7 +1643,7 @@ DASHBOARD_HTML = """
                     }
                 });
 
-                // Language Choices Doughnut Chart
+                // Language Choices Doughnut Chart (Legend at bottom prevents horizontal clipping)
                 const langCtx = document.getElementById('langChart').getContext('2d');
                 if (langChartInstance) {
                     langChartInstance.destroy();
@@ -1651,7 +1669,7 @@ DASHBOARD_HTML = """
                         maintainAspectRatio: false,
                         plugins: {
                             legend: {
-                                position: 'right',
+                                position: 'bottom',
                                 labels: { color: fontColor, font: { family: 'Inter', size: 11 } }
                             }
                         }
@@ -1763,6 +1781,12 @@ DASHBOARD_HTML = """
             currentSearchQuery = document.getElementById("learnerSearchInput").value;
             currentLearnersPage = 0;
             loadLearnersList();
+        }
+
+        // Trigger CSV download
+        function downloadLearnersCSV() {
+            const url = `/api/learners/export?token=${expectedToken}&search=${encodeURIComponent(currentSearchQuery)}`;
+            window.location.href = url;
         }
 
         // Pagination controls
@@ -2002,6 +2026,70 @@ def learners_api():
     limit = int(request.args.get("limit", 20))
     offset = int(request.args.get("offset", 0))
     return jsonify(get_learners_data(search, limit, offset))
+
+@app.route("/api/learners/export")
+def export_learners_csv():
+    token = request.args.get("token")
+    if token != ADMIN_TOKEN:
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    search_query = request.args.get("search")
+    
+    conn = get_connection()
+    cursor = conn.cursor()
+    try:
+        if search_query:
+            q = f"%{search_query}%"
+            cursor.execute("""
+                SELECT user_id, full_name, email, age, state, language_preference, 
+                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
+                FROM learners
+                WHERE CAST(user_id AS TEXT) LIKE %s 
+                   OR COALESCE(full_name, '') LIKE %s 
+                   OR COALESCE(email, '') LIKE %s 
+                   OR COALESCE(state, '') LIKE %s
+                ORDER BY last_activity DESC
+            """, (q, q, q, q))
+        else:
+            cursor.execute("""
+                SELECT user_id, full_name, email, age, state, language_preference, 
+                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
+                FROM learners
+                ORDER BY last_activity DESC
+            """)
+        
+        rows = cursor.fetchall()
+        
+        # Generate CSV
+        si = io.StringIO()
+        cw = csv.writer(si)
+        # Headers
+        cw.writerow(["User ID", "Name", "Email", "Age", "State", "Language", "Pre-test Score", "Post-test Score", "Current Module", "Current Lesson", "Last Active"])
+        
+        for r in rows:
+            cw.writerow([
+                r[0],
+                r[1] or "",
+                r[2] or "",
+                r[3] if r[3] is not None else "",
+                r[4] or "",
+                (r[5] or "en").upper(),
+                r[6] if r[6] >= 0 else "",
+                r[7] if r[7] >= 0 else "",
+                str(r[8]).replace("module_", "Module ") if r[8] else "",
+                str(r[9]).capitalize() if r[9] else "",
+                str(r[10]).split(".")[0] if r[10] else ""
+            ])
+            
+        response = make_response(si.getvalue())
+        response.headers["Content-Disposition"] = "attachment; filename=learners_register.csv"
+        response.headers["Content-Type"] = "text/csv"
+        return response
+    except Exception as e:
+        logger.error(f"Error exporting CSV: {e}")
+        return jsonify({"error": str(e)}), 500
+    finally:
+        conn.close()
 
 @app.route("/api/send-report", methods=["POST"])
 def send_report_api():
