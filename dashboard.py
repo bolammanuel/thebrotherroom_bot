@@ -1469,9 +1469,9 @@ DASHBOARD_HTML = """
                         </button>
                         <!-- Sorting Dropdown -->
                         <select id="learnerSortSelect" class="input-text btn-mobile-block" onchange="onLearnerSortChange()" style="width: 180px;">
-                            <option value="active">Order: Last Active</option>
-                            <option value="alpha">Order: Alphabetical</option>
-                            <option value="graduates">Order: Graduates First</option>
+                            <option value="active">Last Active</option>
+                            <option value="alpha">Alphabetical</option>
+                            <option value="graduates">Graduates First</option>
                         </select>
                         <input type="text" id="learnerSearchInput" class="input-text" placeholder="Search by ID, name, email, or state..." onkeyup="onLearnerSearch()" style="width: 320px;">
                     </div>
