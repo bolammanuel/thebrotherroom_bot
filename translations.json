@@ -1010,5 +1010,26 @@
     "ha": "❌ *An Hani Shiga*\n\nMungode da sha'awar ku! Sai dai, *The Brothers' Room* an tsara shi ne musamman a matsayin amintaccen fili don samari su tattauna kyakkyawar dabi'ar namiji, riƙe amana, da rigakafin cin zarafi na jinsi (GBV).\n\nSaboda wannan dalili, shiga kwas ɗin ya takaita ga maza kawai. Muna godiya da fahimtar ku!",
     "yo": "❌ *Ko le Wọle*\n\nO ṣeun fun ifẹ rẹ! Sibẹsibẹ, *The Brothers' Room* jẹ apẹrẹ pataki fun awọn ọdọ ọkunrin lati sọrọ nipa okunrin rere, gbigba ẹbi, ati dena Ijagba lori Eya (GBV).\n\nNitori eyi, awọn ọkunrin nikan ni o le wo ẹkọ yii. A dupẹ fun oye rẹ!",
     "ig": "❌ *A Machibidoro Nnweta*\n\nDaaalụ maka mmasị gị! Agbanyeghị, *The Brothers' Room* bụ nke emere karịsịa maka ụmụ nwoke na-eto eto iji tụgharịa uche ma kwurịta gbasara ezi omume nwoke na igbochi ime ihe ike dabere na nwoke na nwanyị (GBV).\n\nN'ihi nke a, ọ bụ naanị ụmụ nwoke nwere ike ịbanye na ya. Anyị na-ekele gị maka nghọta gị!"
+  },
+  "ask_pwd": {
+    "en": "Thank you. Finally, do you identify as a Person with a Disability (PWD)?",
+    "pcm": "Thank you. Finally, you be Person with Disability (PWD)?",
+    "ha": "Godiya. A karshe, shin kana da wata nakasa (PWD)?",
+    "yo": "O ṣeun. Nikẹhin, ṣe o jẹ Eniyan ti o ni Alaabo (PWD)?",
+    "ig": "Daalụ. N'ikpeazụ, ị bụ Onye nwere Nkwarụ (PWD)?"
+  },
+  "button_pwd_yes": {
+    "en": "Yes",
+    "pcm": "Yes",
+    "ha": "Ee",
+    "yo": "Bẹ́ẹ̀ ni",
+    "ig": "Ee"
+  },
+  "button_pwd_no": {
+    "en": "No",
+    "pcm": "No",
+    "ha": "A'a",
+    "yo": "Bẹ́ẹ̀ kọ́",
+    "ig": "Mba"
   }
 }

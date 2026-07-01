@@ -3105,6 +3105,43 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         await start(update, context)
         return
 
+    elif data in ["pwd_yes", "pwd_no"]:
+        await query.delete_message()
+        is_pwd_val = "Yes" if data == "pwd_yes" else "No"
+        from db_manager import update_pwd_status
+        update_pwd_status(user_id, is_pwd_val)
+        
+        # Complete onboarding: show welcome message and prompt Pre-Test
+        welcome_text = get_text("start_welcome", lang, course_title=get_localized_field(COURSE_TITLE, lang, "Young Men Against Gender Based Violence"), course_description=get_localized_field(COURSE_DESCRIPTION, lang, ""))
+        pretest_button_label = {
+            "en": "✍️ Take Pre-Test Quiz",
+            "pcm": "✍️ Start Pre-Test Quiz",
+            "ha": "✍️ Fara Jarrabawar Farko",
+            "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
+            "ig": "✍️ Malite Ule Mbụ"
+        }.get(lang, "✍️ Take Pre-Test Quiz")
+        
+        voice_enabled = get_voice_responses(user_id)
+        voice_label = {
+            "en": f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}",
+            "pcm": f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}",
+            "ha": f"Murya: {'A KUNNE 🔊' if voice_enabled else 'A KASHE 🔇'}",
+            "yo": f"Ohun: {'MÚ KÚN 🔊' if voice_enabled else 'MÚ KÚRÒ 🔇'}",
+            "ig": f"Olu: {'MERE 🔊' if voice_enabled else 'PAA 🔇'}"
+        }.get(lang, f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}")
+
+        keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")],
+            [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
+        ])
+        await send_reply(
+            update,
+            welcome_text,
+            reply_markup=keyboard,
+            parse_mode="Markdown"
+        )
+        return
+
     # Intercept pre-test callbacks
     if data == "pretest_start":
         await query.delete_message()
@@ -3621,35 +3658,16 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
         from db_manager import update_state
         update_state(user_id, state_val)
         
-        # Onboarding registration complete! Now show welcome message and prompt Pre-Test
-        welcome_text = get_text("start_welcome", lang, course_title=get_localized_field(COURSE_TITLE, lang, "Young Men Against Gender Based Violence"), course_description=get_localized_field(COURSE_DESCRIPTION, lang, ""))
-        pretest_button_label = {
-            "en": "✍️ Take Pre-Test Quiz",
-            "pcm": "✍️ Start Pre-Test Quiz",
-            "ha": "✍️ Fara Jarrabawar Farko",
-            "yo": "✍️ Bẹrẹ Idanwo Àkọ́kọ́",
-            "ig": "✍️ Malite Ule Mbụ"
-        }.get(lang, "✍️ Take Pre-Test Quiz")
-        
-        voice_enabled = get_voice_responses(user_id)
-        voice_label = {
-            "en": f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}",
-            "pcm": f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}",
-            "ha": f"Murya: {'A KUNNE 🔊' if voice_enabled else 'A KASHE 🔇'}",
-            "yo": f"Ohun: {'MÚ KÚN 🔊' if voice_enabled else 'MÚ KÚRÒ 🔇'}",
-            "ig": f"Olu: {'MERE 🔊' if voice_enabled else 'PAA 🔇'}"
-        }.get(lang, f"Voice: {'ON 🔊' if voice_enabled else 'OFF 🔇'}")
-
+        # Move to PWD status onboarding step
+        context.user_data["awaiting_pwd"] = True
+        ask_pwd_text = get_text("ask_pwd", lang)
         keyboard = InlineKeyboardMarkup([
-            [InlineKeyboardButton(pretest_button_label, callback_data="pretest_start")],
-            [InlineKeyboardButton(voice_label, callback_data="cmd_accessibility")]
+            [
+                InlineKeyboardButton(get_text("button_pwd_yes", lang), callback_data="pwd_yes"),
+                InlineKeyboardButton(get_text("button_pwd_no", lang), callback_data="pwd_no")
+            ]
         ])
-        await send_reply(
-            update,
-            welcome_text,
-            reply_markup=keyboard,
-            parse_mode="Markdown"
-        )
+        await send_reply(update, ask_pwd_text, reply_markup=keyboard, parse_mode="Markdown")
         return
 
     # Intercept private reflections

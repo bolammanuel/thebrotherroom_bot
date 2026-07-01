@@ -131,7 +131,8 @@ def init_db():
         "address": "TEXT DEFAULT NULL",
         "state": "TEXT DEFAULT NULL",
         "gender": "TEXT DEFAULT NULL",
-        "age": "INTEGER DEFAULT NULL"
+        "age": "INTEGER DEFAULT NULL",
+        "is_pwd": "TEXT DEFAULT NULL"
     }
     
     for col, col_def in new_cols.items():
@@ -147,6 +148,9 @@ def init_db():
         # Soft logging if index creation encounters table locks
         import logging
         logging.getLogger(__name__).warning(f"Performance index creation warning: {e}")
+    
+    # Backfill existing users with is_pwd = 'No' if null to prevent onboarding loop
+    cursor.execute("UPDATE learners SET is_pwd = 'No' WHERE is_pwd IS NULL")
     
     conn.commit()
     conn.close()
@@ -182,18 +186,18 @@ def enroll_learner(user_id, language='en', full_name=None):
     conn.close()
 
 def is_learner_registered(user_id):
-    """Check if learner has completed profile registration (name, email, state, age)."""
+    """Check if learner has completed profile registration (name, email, state, age, is_pwd)."""
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
-        SELECT full_name, email, state, age FROM learners WHERE user_id = %s
+        SELECT full_name, email, state, age, is_pwd FROM learners WHERE user_id = %s
     """, (user_id,))
     result = cursor.fetchone()
     conn.close()
     if not result:
         return False
-    full_name, email, state, age = result
-    return bool(full_name and email and state and age is not None)
+    full_name, email, state, age, is_pwd = result
+    return bool(full_name and email and state and age is not None and is_pwd is not None)
 
 def get_learner_progress(user_id):
     """Get learner's current progress (module, lesson, quiz status, language)."""
@@ -821,6 +825,20 @@ def get_learner_gender(user_id):
     result = cursor.fetchone()
     conn.close()
     return result[0] if result else None
+
+
+def update_pwd_status(user_id, is_pwd):
+    """Update learner's registered PWD status."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        UPDATE learners 
+        SET is_pwd = %s, last_activity = CURRENT_TIMESTAMP
+        WHERE user_id = %s
+    """, (is_pwd, user_id))
+    conn.commit()
+    conn.close()
+
 
 
 

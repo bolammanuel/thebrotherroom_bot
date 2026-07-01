@@ -176,6 +176,81 @@ def get_stats_data(start_date=None, end_date=None):
         cursor.execute("SELECT COUNT(*) FROM reflections WHERE timestamp >= %s", (seven_days_ago_str,))
         stats["reflections_week"] = cursor.fetchone()[0]
 
+        # 9. Gender Breakdown
+        if start_date or end_date:
+            cursor.execute(f"SELECT gender, COUNT(*) FROM learners {where_clause} GROUP BY gender", params)
+        else:
+            cursor.execute("SELECT gender, COUNT(*) FROM learners GROUP BY gender")
+        gender_counts = dict(cursor.fetchall())
+        gender_counts_cleaned = {"Male": 0, "Female": 0, "Unknown": 0}
+        for k, v in gender_counts.items():
+            if not k:
+                gender_counts_cleaned["Unknown"] += v
+            elif str(k).lower() == "male":
+                gender_counts_cleaned["Male"] += v
+            elif str(k).lower() == "female":
+                gender_counts_cleaned["Female"] += v
+            else:
+                gender_counts_cleaned["Unknown"] += v
+        stats["gender"] = gender_counts_cleaned
+
+        # 10. Age Distribution
+        if start_date or end_date:
+            cursor.execute(f"""
+                SELECT 
+                    CASE 
+                        WHEN age IS NULL THEN 'Unknown'
+                        WHEN age < 18 THEN 'Under 18'
+                        WHEN age >= 18 AND age <= 24 THEN '18-24'
+                        WHEN age >= 25 AND age <= 34 THEN '25-34'
+                        ELSE '35+'
+                    END,
+                    COUNT(*)
+                FROM learners
+                {where_clause}
+                GROUP BY 1
+            """, params)
+        else:
+            cursor.execute("""
+                SELECT 
+                    CASE 
+                        WHEN age IS NULL THEN 'Unknown'
+                        WHEN age < 18 THEN 'Under 18'
+                        WHEN age >= 18 AND age <= 24 THEN '18-24'
+                        WHEN age >= 25 AND age <= 34 THEN '25-34'
+                        ELSE '35+'
+                    END,
+                    COUNT(*)
+                FROM learners
+                GROUP BY 1
+            """)
+        age_counts = dict(cursor.fetchall())
+        stats["age_distribution"] = {
+            "Under 18": age_counts.get("Under 18", 0),
+            "18-24": age_counts.get("18-24", 0),
+            "25-34": age_counts.get("25-34", 0),
+            "35+": age_counts.get("35+", 0),
+            "Unknown": age_counts.get("Unknown", 0)
+        }
+
+        # 11. PWD Breakdown
+        if start_date or end_date:
+            cursor.execute(f"SELECT is_pwd, COUNT(*) FROM learners {where_clause} GROUP BY is_pwd", params)
+        else:
+            cursor.execute("SELECT is_pwd, COUNT(*) FROM learners GROUP BY is_pwd")
+        pwd_counts = dict(cursor.fetchall())
+        pwd_counts_cleaned = {"Yes": 0, "No": 0, "Unknown": 0}
+        for k, v in pwd_counts.items():
+            if not k:
+                pwd_counts_cleaned["Unknown"] += v
+            elif str(k).lower() == "yes":
+                pwd_counts_cleaned["Yes"] += v
+            elif str(k).lower() == "no":
+                pwd_counts_cleaned["No"] += v
+            else:
+                pwd_counts_cleaned["Unknown"] += v
+        stats["pwd_distribution"] = pwd_counts_cleaned
+
     except Exception as e:
         logger.error(f"Error fetching stats data: {e}")
         stats = {
@@ -191,7 +266,10 @@ def get_stats_data(start_date=None, end_date=None):
             "active_today": 0,
             "active_week": 0,
             "reflections_today": 0,
-            "reflections_week": 0
+            "reflections_week": 0,
+            "gender": {"Male": 0, "Female": 0, "Unknown": 0},
+            "age_distribution": {"Under 18": 0, "18-24": 0, "25-34": 0, "35+": 0, "Unknown": 0},
+            "pwd_distribution": {"Yes": 0, "No": 0, "Unknown": 0}
         }
     finally:
         conn.close()
@@ -356,7 +434,7 @@ def get_learners_data(search_query=None, limit=20, offset=0, order_by="active"):
             q = f"%{search_query}%"
             cursor.execute(f"""
                 SELECT user_id, full_name, email, age, state, language_preference, 
-                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
+                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, gender, is_pwd
                 FROM learners
                 WHERE CAST(user_id AS TEXT) LIKE %s 
                    OR COALESCE(full_name, '') LIKE %s 
@@ -368,7 +446,7 @@ def get_learners_data(search_query=None, limit=20, offset=0, order_by="active"):
         else:
             cursor.execute(f"""
                 SELECT user_id, full_name, email, age, state, language_preference, 
-                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
+                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, gender, is_pwd
                 FROM learners
                 {order_clause}
                 LIMIT %s OFFSET %s
@@ -381,6 +459,8 @@ def get_learners_data(search_query=None, limit=20, offset=0, order_by="active"):
                 "full_name": r[1] or "Anonymous",
                 "email": r[2] or "-",
                 "age": r[3] if r[3] is not None else "-",
+                "gender": (r[11] or "-").capitalize(),
+                "is_pwd": r[12] or "-",
                 "state": r[4] or "-",
                 "lang": (r[5] or "en").upper(),
                 "pre_test": r[6] if r[6] >= 0 else "-",
@@ -1207,6 +1287,55 @@ DASHBOARD_HTML = """
                 display: none !important;
             }
         }
+
+        .demographics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .btn-chart-download:active {
+            transform: scale(0.96);
+        }
+
+        @media print {
+            .sidebar, .top-navbar, .filter-bar, .scrollable-feed, .btn-icon, .btn-secondary, .btn-chart-download, #sendReportBtn, .pagination-container, .pagination-controls {
+                display: none !important;
+            }
+            .app-layout {
+                display: block !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .main-panel {
+                padding: 0 !important;
+                margin: 0 !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .card {
+                border: 1px solid #cccccc !important;
+                background: #ffffff !important;
+                color: #000000 !important;
+                page-break-inside: avoid;
+                margin-bottom: 1.5rem;
+            }
+            :root {
+                --bg-color: #ffffff !important;
+                --card-bg: #ffffff !important;
+                --text-color: #000000 !important;
+                --border-color: #cccccc !important;
+            }
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .main-grid, .demographics-grid {
+                display: grid !important;
+                grid-template-columns: 1fr !important;
+                gap: 1.5rem !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1355,7 +1484,15 @@ DASHBOARD_HTML = """
                         <button onclick="applyCustomDateFilters()" class="btn btn-mobile-block" style="padding: 0.35rem 0.85rem; font-size: 0.72rem; margin-left: 0.25rem;">Apply</button>
                     </div>
                 </div>
-                <div style="width: 100%; max-width: max-content;" class="btn-mobile-block">
+                <div style="display: flex; gap: 0.75rem; width: 100%; max-width: max-content;" class="btn-mobile-block">
+                    <button onclick="window.print()" class="btn btn-secondary btn-mobile-block" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 38px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="6 9 6 2 18 2 18 9"></polyline>
+                            <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+                            <rect x="6" y="14" width="12" height="8"></rect>
+                        </svg>
+                        <span>Print PDF</span>
+                    </button>
                     <button id="sendReportBtn" onclick="triggerEmailReport()" class="btn btn-mobile-block" style="width: 100%;">
                         Send report
                     </button>
@@ -1436,17 +1573,84 @@ DASHBOARD_HTML = """
 
                 <div class="main-grid" style="margin-bottom: 2rem;">
                     <div class="card">
-                        <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Module progression funnel</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Module progression funnel</h3>
+                            <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('funnelChart', 'module_funnel.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Active learner count per module</p>
                         <div class="chart-container">
                             <canvas id="funnelChart"></canvas>
                         </div>
                     </div>
                     <div class="card">
-                        <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Language choices</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Language choices</h3>
+                            <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('langChart', 'language_choices.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
                         <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Localization choices breakdown</p>
                         <div class="chart-container" style="height: 220px;">
                             <canvas id="langChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="font-size: 0.95rem; color: var(--text-color); margin-bottom: 0.75rem; letter-spacing: 0.5px; font-weight: 400;">Demographics & Accessibility</h3>
+                <div class="demographics-grid" style="margin-bottom: 2rem;">
+                    <!-- Gender Breakdown Card -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Gender breakdown</h3>
+                            <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('genderChart', 'gender_breakdown.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="genderChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Age Distribution Card -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Age distribution</h3>
+                            <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('ageChart', 'age_distribution.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="ageChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- PWD Status Card -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Disability status (PWD)</h3>
+                            <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('pwdChart', 'pwd_distribution.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="pwdChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -1498,6 +1702,8 @@ DASHBOARD_HTML = """
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Age</th>
+                                <th>Gender</th>
+                                <th>PWD Status</th>
                                 <th>State</th>
                                 <th>Language</th>
                                 <th>Pre-test</th>
@@ -1542,6 +1748,9 @@ DASHBOARD_HTML = """
         let currentEndDate = '';
         let funnelChartInstance = null;
         let langChartInstance = null;
+        let genderChartInstance = null;
+        let ageChartInstance = null;
+        let pwdChartInstance = null;
         let lastStatsData = null; // Stores stats to redraw charts on theme toggle
 
         // Learners pagination and sorting state
@@ -1919,6 +2128,83 @@ DASHBOARD_HTML = """
                         }
                     }
                 });
+
+                // Gender Chart
+                const genderCtx = document.getElementById('genderChart').getContext('2d');
+                if (genderChartInstance) genderChartInstance.destroy();
+                genderChartInstance = new Chart(genderCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(stats.gender || {}),
+                        datasets: [{
+                            data: Object.values(stats.gender || {}),
+                            backgroundColor: ['#2481cc', '#e66b15', '#7f91a4'],
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 1000, easing: 'easeOutQuart' },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: fontColor, font: { family: 'Inter', size: 11 } }
+                            }
+                        }
+                    }
+                });
+
+                // Age Chart
+                const ageCtx = document.getElementById('ageChart').getContext('2d');
+                if (ageChartInstance) ageChartInstance.destroy();
+                ageChartInstance = new Chart(ageCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: Object.keys(stats.age_distribution || {}),
+                        datasets: [{
+                            data: Object.values(stats.age_distribution || {}),
+                            backgroundColor: '#10b981',
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 1000, easing: 'easeOutQuart' },
+                        plugins: { legend: { display: false } },
+                        scales: {
+                            y: { grid: { color: gridColor }, ticks: { color: tickColor, precision: 0 } },
+                            x: { grid: { display: false }, ticks: { color: tickColor } }
+                        }
+                    }
+                });
+
+                // PWD Chart
+                const pwdCtx = document.getElementById('pwdChart').getContext('2d');
+                if (pwdChartInstance) pwdChartInstance.destroy();
+                pwdChartInstance = new Chart(pwdCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(stats.pwd_distribution || {}),
+                        datasets: [{
+                            data: Object.values(stats.pwd_distribution || {}),
+                            backgroundColor: ['#ef4444', '#10b981', '#7f91a4'],
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 1000, easing: 'easeOutQuart' },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: fontColor, font: { family: 'Inter', size: 11 } }
+                            }
+                        }
+                    }
+                });
             } catch (err) {
                 console.error("Error drawing charts:", err);
             }
@@ -1991,7 +2277,7 @@ DASHBOARD_HTML = """
                 tbody.innerHTML = "";
                 
                 if (!data.learners || data.learners.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No learners registered yet.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No learners registered yet.</td></tr>';
                     document.getElementById("learnerPaginationInfo").innerText = "Page 0 of 0";
                     document.getElementById("btnLearnerPrev").disabled = true;
                     document.getElementById("btnLearnerNext").disabled = true;
@@ -2005,6 +2291,8 @@ DASHBOARD_HTML = """
                         <td>${learner.full_name}</td>
                         <td>${learner.email}</td>
                         <td>${learner.age}</td>
+                        <td>${learner.gender}</td>
+                        <td>${learner.is_pwd}</td>
                         <td>${learner.state}</td>
                         <td style="font-size: 0.8rem;">${learner.lang}</td>
                         <td>${learner.pre_test}</td>
@@ -2027,6 +2315,26 @@ DASHBOARD_HTML = """
                 
             } catch (err) {
                 console.error("Error loading learners list:", err);
+            }
+        }
+
+        // Helper to download chart as image
+        function downloadChart(chartId, filename) {
+            let chartInstance = null;
+            if (chartId === 'funnelChart') chartInstance = funnelChartInstance;
+            else if (chartId === 'langChart') chartInstance = langChartInstance;
+            else if (chartId === 'genderChart') chartInstance = genderChartInstance;
+            else if (chartId === 'ageChart') chartInstance = ageChartInstance;
+            else if (chartId === 'pwdChart') chartInstance = pwdChartInstance;
+            
+            if (chartInstance) {
+                const url = chartInstance.toBase64Image();
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
             }
         }
 
@@ -2313,7 +2621,7 @@ def export_learners_csv():
             q = f"%{search_query}%"
             cursor.execute(f"""
                 SELECT user_id, full_name, email, age, state, language_preference, 
-                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
+                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, gender, is_pwd
                 FROM learners
                 WHERE CAST(user_id AS TEXT) LIKE %s 
                    OR COALESCE(full_name, '') LIKE %s 
@@ -2324,7 +2632,7 @@ def export_learners_csv():
         else:
             cursor.execute(f"""
                 SELECT user_id, full_name, email, age, state, language_preference, 
-                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity
+                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, gender, is_pwd
                 FROM learners
                 {order_clause}
             """)
@@ -2335,7 +2643,7 @@ def export_learners_csv():
         si = io.StringIO()
         cw = csv.writer(si)
         # Headers
-        cw.writerow(["User ID", "Name", "Email", "Age", "State", "Language", "Pre-test Score", "Post-test Score", "Current Module", "Current Lesson", "Last Active"])
+        cw.writerow(["User ID", "Name", "Email", "Age", "Gender", "PWD Status", "State", "Language", "Pre-test Score", "Post-test Score", "Current Module", "Current Lesson", "Last Active"])
         
         for r in rows:
             cw.writerow([
@@ -2343,6 +2651,8 @@ def export_learners_csv():
                 r[1] or "",
                 r[2] or "",
                 r[3] if r[3] is not None else "",
+                (r[11] or "").capitalize(),
+                r[12] or "",
                 r[4] or "",
                 (r[5] or "en").upper(),
                 r[6] if r[6] >= 0 else "",
