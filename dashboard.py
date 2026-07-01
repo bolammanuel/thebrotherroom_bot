@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 app = Flask(__name__)
 
 # Authentication token configuration
-ADMIN_TOKEN = os.getenv("ADMIN_DASHBOARD_PASSWORD", "admin123")
+ADMIN_TOKEN = os.getenv("ADMIN_DASHBOARD_PASSWORD", "admin123").strip().replace('"', '\\"').replace('\n', '').replace('\r', '')
 
 def format_lesson_id(lesson_id):
     """Helper to convert raw database lesson IDs (e.g., lesson_1_1) to pretty layout labels (e.g., Lesson 1)."""
@@ -2292,7 +2292,6 @@ DASHBOARD_HTML = """
             if (chartId === 'funnelChart') chartInstance = funnelChartInstance;
             else if (chartId === 'langChart') chartInstance = langChartInstance;
             else if (chartId === 'ageChart') chartInstance = ageChartInstance;
-            else if (chartId === 'stateChart') chartInstance = stateChartInstance;
             else if (chartId === 'pwdChart') chartInstance = pwdChartInstance;
             
             if (chartInstance) {
