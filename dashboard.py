@@ -2314,13 +2314,13 @@ DASHBOARD_HTML = """
                 
                 if (totalDropOffs > 0 && dropOffList[0].count > 0) {
                     bottleneckWidget.style.display = "block";
-                    // Take top 3 drop-off modules
-                    const topDropOffs = dropOffList.slice(0, 3).filter(x => x.count > 0);
+                    // Display all modules with drop-offs
+                    const topDropOffs = dropOffList.filter(x => x.count > 0);
                     
                     bottleneckListContainer.innerHTML = topDropOffs.map((item, idx) => {
                         const pct = Math.round((item.count / totalDropOffs) * 100);
                         const colors = ["#ef4444", "#f97316", "#f59e0b"]; // Red, Orange, Amber
-                        const barColor = colors[idx] || "#71717a";
+                        const barColor = colors[idx] || "#d97706"; // Amber-gold fallback for other modules
                         const barBg = isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)";
                         
                         return `
