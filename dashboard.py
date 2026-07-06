@@ -79,85 +79,47 @@ def get_stats_data(start_date=None, end_date=None):
             "Igbo": lang_counts.get("ig", 0)
         }
         
-        # 3. Module distribution funnel (Active vs Stalled)
+        # 3. Module Drop-off Distribution (Final stop points of non-graduates)
         if start_date or end_date:
             cursor.execute("""
-                SELECT current_module_id, last_activity, post_test_score 
+                SELECT current_module_id, COUNT(*) 
                 FROM learners 
-                WHERE current_lesson_id != 'start'
+                WHERE (post_test_score IS NULL OR post_test_score < 0)
+                  AND current_module_id IS NOT NULL AND current_module_id != ''
+                  AND current_lesson_id != 'start'
                   AND enrollment_date >= %s AND enrollment_date <= %s
+                GROUP BY current_module_id
             """, params)
         else:
             cursor.execute("""
-                SELECT current_module_id, last_activity, post_test_score 
+                SELECT current_module_id, COUNT(*) 
                 FROM learners 
-                WHERE current_lesson_id != 'start'
+                WHERE (post_test_score IS NULL OR post_test_score < 0)
+                  AND current_module_id IS NOT NULL AND current_module_id != ''
+                  AND current_lesson_id != 'start'
+                GROUP BY current_module_id
             """)
+        drop_off_counts = dict(cursor.fetchall())
         
-        rows = cursor.fetchall()
-        import datetime
-        now = datetime.datetime.now()
-        seven_days_ago = now - datetime.timedelta(days=7)
-        
-        # Initialize counts
-        active_by_module = {}
-        stalled_by_module = {}
-        for i in range(1, 12):
-            active_by_module[f"module_{i}"] = 0
-            stalled_by_module[f"module_{i}"] = 0
-            
-        for current_module_id, last_activity, post_test_score in rows:
-            if not current_module_id:
-                continue
-                
-            # Check if graduated
-            is_graduated = (post_test_score is not None and post_test_score >= 0)
-            if is_graduated:
-                continue
-                
-            # Parse last_activity
-            is_stalled = False
-            if last_activity:
-                try:
-                    if isinstance(last_activity, str):
-                        val = last_activity.split(".")[0]
-                        la_dt = datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S")
-                    else:
-                        la_dt = last_activity
-                        
-                    if la_dt < seven_days_ago:
-                        is_stalled = True
-                except Exception:
-                    is_stalled = True
-            else:
-                is_stalled = True
-                
-            if is_stalled:
-                stalled_by_module[current_module_id] = stalled_by_module.get(current_module_id, 0) + 1
-            else:
-                active_by_module[current_module_id] = active_by_module.get(current_module_id, 0) + 1
-                
         stats["module_progress"] = {}
-        stats["module_stalled"] = {}
         for i in range(1, 12):
             m_id = f"module_{i}"
-            stats["module_progress"][f"Module {i}"] = active_by_module.get(m_id, 0)
-            stats["module_stalled"][f"Module {i}"] = stalled_by_module.get(m_id, 0)
+            stats["module_progress"][f"Module {i}"] = drop_off_counts.get(m_id, 0)
             
         # 3.5 Content Bottleneck Recommendations
-        highest_stalled_module = None
-        highest_stalled_count = 0
-        total_stalled = 0
+        highest_drop_off_module = None
+        highest_drop_off_count = 0
+        total_non_graduates = 0
         
-        for m_id, count in stalled_by_module.items():
-            total_stalled += count
-            if count > highest_stalled_count:
-                highest_stalled_count = count
-                highest_stalled_module = m_id
+        for m_id, count in drop_off_counts.items():
+            total_non_graduates += count
+            if count > highest_drop_off_count:
+                highest_drop_off_count = count
+                highest_drop_off_module = m_id
                 
         recommendation = "No significant bottlenecks detected. All modules show balanced participant momentum!"
-        if highest_stalled_module and highest_stalled_count > 0:
-            m_num = highest_stalled_module.split("_")[1]
+        if highest_drop_off_module and highest_drop_off_count > 0:
+            m_num = highest_drop_off_module.split("_")[1]
             module_topics = {
                 "1": "Healthy Masculinity Intro",
                 "2": "Gender Roles & Expectations",
@@ -172,12 +134,12 @@ def get_stats_data(start_date=None, end_date=None):
                 "11": "Graduation & Certificate Wrap"
             }
             topic = module_topics.get(m_num, f"Module {m_num}")
-            pct = int((highest_stalled_count / total_stalled) * 100) if total_stalled > 0 else 0
+            pct = int((highest_drop_off_count / total_non_graduates) * 100) if total_non_graduates > 0 else 0
             
             recommendation = (
                 f"<strong>Module {m_num} ({topic})</strong> is your biggest bottleneck. "
-                f"It accounts for <strong>{highest_stalled_count} stalled learners ({pct}% of all drop-offs)</strong>. "
-                f"Consider simplifying lessons or refining reflection prompts for this module."
+                f"It accounts for <strong>{highest_drop_off_count} dropped-off learners ({pct}% of all incomplete participants)</strong> "
+                f"who stopped here and did not progress further. Consider simplifying lessons or refining reflection prompts for this module."
             )
             
         stats["bottleneck_recommendation"] = recommendation
@@ -2389,7 +2351,6 @@ DASHBOARD_HTML = """
                 const tickColor = isLight ? "#707579" : "#7f91a4";
                 const fontColor = isLight ? "#212121" : "#fff";
                 const progressData = stats.module_progress || {};
-                const stalledData = stats.module_stalled || {};
                 const languageData = stats.languages || {};
 
                 // Funnel Chart
@@ -2405,7 +2366,6 @@ DASHBOARD_HTML = """
                     return numA - numB;
                 });
                 const sortedFunnelValues = sortedFunnelKeys.map(k => progressData[k]);
-                const sortedStalledValues = sortedFunnelKeys.map(k => stalledData[k] || 0);
 
                 funnelChartInstance = new Chart(funnelCtx, {
                     type: 'bar',
@@ -2413,17 +2373,9 @@ DASHBOARD_HTML = """
                         labels: sortedFunnelKeys,
                         datasets: [
                             {
-                                label: 'Active Progress',
+                                label: 'Dropped-Off Learners',
                                 data: sortedFunnelValues,
-                                backgroundColor: isLight ? 'rgba(44, 145, 70, 0.75)' : 'rgba(158, 255, 0, 0.75)',
-                                borderColor: isLight ? '#2c9146' : '#9eff00',
-                                borderWidth: 1,
-                                borderRadius: 2,
-                            },
-                            {
-                                label: 'Stalled / Dropped Off (7+ days inactive)',
-                                data: sortedStalledValues,
-                                backgroundColor: isLight ? 'rgba(249, 115, 22, 0.65)' : 'rgba(249, 115, 22, 0.8)',
+                                backgroundColor: isLight ? 'rgba(249, 115, 22, 0.75)' : 'rgba(249, 115, 22, 0.85)',
                                 borderColor: '#f97316',
                                 borderWidth: 1,
                                 borderRadius: 2,
@@ -2438,16 +2390,14 @@ DASHBOARD_HTML = """
                             easing: 'easeOutQuart'
                         },
                         plugins: {
-                            legend: { display: true, position: 'bottom', labels: { color: fontColor } }
+                            legend: { display: false }
                         },
                         scales: {
                             y: {
-                                stacked: true,
                                 grid: { color: gridColor },
                                 ticks: { color: tickColor, precision: 0 }
                             },
                             x: {
-                                stacked: true,
                                 grid: { display: false },
                                 ticks: { color: tickColor }
                             }
