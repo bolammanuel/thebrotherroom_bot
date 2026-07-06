@@ -4173,7 +4173,7 @@ def waitlist_api():
         from db_manager import get_connection
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes ORDER BY timestamp DESC")
+        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes WHERE platform = 'WhatsApp' ORDER BY timestamp DESC")
         rows = cursor.fetchall()
         conn.close()
         
@@ -4200,7 +4200,7 @@ def export_waitlist_csv():
         from db_manager import get_connection
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes ORDER BY timestamp DESC")
+        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes WHERE platform = 'WhatsApp' ORDER BY timestamp DESC")
         rows = cursor.fetchall()
         conn.close()
         
