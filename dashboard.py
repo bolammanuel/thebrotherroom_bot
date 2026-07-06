@@ -1660,19 +1660,19 @@ DASHBOARD_HTML = """
 
                 <!-- Course Bottleneck & Drop-Off Alert Widget -->
                 <div id="bottleneckWidget" style="margin-bottom: 2rem; background: var(--card-bg); border: 1px solid rgba(249, 115, 22, 0.15); border-left: 4px solid var(--accent-orange, #f97316); border-radius: var(--border-radius); padding: 1.5rem; display: none;">
-                    <div style="display: flex; align-items: flex-start; gap: 1rem;">
-                        <div style="color: var(--accent-orange, #f97316); display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-top: 2px;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .4 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
-                                <line x1="9" y1="18" x2="15" y2="18"></line>
-                                <line x1="10" y1="22" x2="14" y2="22"></line>
-                            </svg>
+                    <div style="display: flex; flex-direction: column; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="color: var(--accent-orange, #f97316); display: flex; align-items: center; justify-content: center; width: 24px; height: 24px;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                                    <line x1="12" y1="9" x2="12" y2="13"></line>
+                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                                </svg>
+                            </div>
+                            <h4 style="margin: 0; font-size: 0.95rem; font-weight: 600; color: var(--text-color);">Curriculum Drop-Off Bottlenecks (Top Stop Points)</h4>
                         </div>
-                        <div>
-                            <h4 style="margin: 0 0 0.25rem 0; font-size: 0.9rem; font-weight: 600; color: var(--text-color);">Facilitator Insight & Course Bottleneck Analysis</h4>
-                            <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;" id="bottleneckText">
-                                Loading course progression insights...
-                            </p>
+                        <div id="bottleneckListContainer" style="display: flex; flex-direction: column; gap: 1rem;">
+                            <!-- Dynamic progress bars injected by JS -->
                         </div>
                     </div>
                 </div>
@@ -2281,12 +2281,60 @@ DASHBOARD_HTML = """
                 document.getElementById("kpiAvgScore").innerHTML = (stats.average_post_test !== undefined ? stats.average_post_test : 0.0) + ' <span style="font-size: 1rem; color: var(--text-muted);">/ 50</span>';
                 document.getElementById("kpiAiQueries").innerText = stats.total_ai_queries !== undefined ? stats.total_ai_queries : 0;
 
-                // Populate Course Bottleneck Recommendation
+                // Populate Course Bottleneck Recommendation (Progress Bars list)
                 const bottleneckWidget = document.getElementById("bottleneckWidget");
-                const bottleneckText = document.getElementById("bottleneckText");
-                if (stats.bottleneck_recommendation) {
-                    bottleneckText.innerHTML = stats.bottleneck_recommendation;
+                const bottleneckListContainer = document.getElementById("bottleneckListContainer");
+                
+                const progressData = stats.module_progress || {};
+                const isLight = document.body.classList.contains("light-theme");
+                
+                const moduleTopics = {
+                    "Module 1": "Healthy Masculinity Intro",
+                    "Module 2": "Gender Roles & Expectations",
+                    "Module 3": "Violence & Power Dynamics",
+                    "Module 4": "Emotional Expression",
+                    "Module 5": "Healthy Relationships & Consent",
+                    "Module 6": "Peer Accountability",
+                    "Module 7": "Community GBV Prevention",
+                    "Module 8": "Self-Reflection & Action Plan",
+                    "Module 9": "Mirror Moments Reflections",
+                    "Module 10": "Pledge & Commitment",
+                    "Module 11": "Graduation & Certificate Wrap"
+                };
+                
+                let dropOffList = [];
+                let totalDropOffs = 0;
+                for (const [key, val] of Object.entries(progressData)) {
+                    dropOffList.push({ name: key, count: val, topic: moduleTopics[key] || key });
+                    totalDropOffs += val;
+                }
+                
+                // Sort descending
+                dropOffList.sort((a, b) => b.count - a.count);
+                
+                if (totalDropOffs > 0 && dropOffList[0].count > 0) {
                     bottleneckWidget.style.display = "block";
+                    // Take top 3 drop-off modules
+                    const topDropOffs = dropOffList.slice(0, 3).filter(x => x.count > 0);
+                    
+                    bottleneckListContainer.innerHTML = topDropOffs.map((item, idx) => {
+                        const pct = Math.round((item.count / totalDropOffs) * 100);
+                        const colors = ["#ef4444", "#f97316", "#f59e0b"]; // Red, Orange, Amber
+                        const barColor = colors[idx] || "#71717a";
+                        const barBg = isLight ? "rgba(0,0,0,0.05)" : "rgba(255,255,255,0.05)";
+                        
+                        return `
+                            <div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.35rem; font-size: 0.8rem;">
+                                    <span style="font-weight: 500; color: var(--text-color);">${item.name} (${item.topic})</span>
+                                    <span style="color: var(--text-muted); font-weight: 600; font-variant-numeric: tabular-nums;">${item.count} dropped off (${pct}%)</span>
+                                </div>
+                                <div style="width: 100%; height: 8px; background: ${barBg}; border-radius: 99px; overflow: hidden;">
+                                    <div style="width: ${pct}%; height: 100%; background: ${barColor}; border-radius: 99px;"></div>
+                                </div>
+                            </div>
+                        `;
+                    }).join("");
                 } else {
                     bottleneckWidget.style.display = "none";
                 }
