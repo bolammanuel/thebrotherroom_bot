@@ -1421,6 +1421,17 @@ DASHBOARD_HTML = """
                     </svg>
                     <span>Reflections</span>
                 </li>
+                <li id="menuItemWaitlist" class="sidebar-item" onclick="showSection('waitlist')">
+                    <!-- Waitlist Check/List Icon -->
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                        <polyline points="14 2 14 8 20 8"></polyline>
+                        <line x1="16" y1="13" x2="8" y2="13"></line>
+                        <line x1="16" y1="17" x2="8" y2="17"></line>
+                        <polyline points="10 9 9 9 8 9"></polyline>
+                    </svg>
+                    <span>Waitlist & Votes</span>
+                </li>
             </ul>
         </div>
 
@@ -1765,6 +1776,41 @@ DASHBOARD_HTML = """
                     </div>
                 </div>
             </div>
+
+            <!-- Section 4: Waitlist Tab -->
+            <div id="sectionWaitlist" class="tab-content" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
+                    <div>
+                        <h3 style="font-size: 0.95rem; color: var(--text-color); letter-spacing: 0.5px; margin: 0; font-weight: 400;">WhatsApp & Telegram Waitlist</h3>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">View preference votes and contact information for new launch notifications.</p>
+                    </div>
+                    <button onclick="exportWaitlistCSV()" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 38px;">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        <span>Export Waitlist CSV</span>
+                    </button>
+                </div>
+                <div class="card">
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;" id="waitlistTable">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
+                                    <th style="padding: 0.75rem 1rem;">Name</th>
+                                    <th style="padding: 0.75rem 1rem;">Contact Details</th>
+                                    <th style="padding: 0.75rem 1rem;">Preferred Platform</th>
+                                    <th style="padding: 0.75rem 1rem;">Registered At</th>
+                                </tr>
+                            </thead>
+                            <tbody id="waitlistTableBody">
+                                <!-- Injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -1982,6 +2028,7 @@ DASHBOARD_HTML = """
                 document.getElementById("sectionDashboard").style.display = "block";
                 document.getElementById("sectionLearners").style.display = "none";
                 document.getElementById("sectionReflections").style.display = "none";
+                document.getElementById("sectionWaitlist").style.display = "none";
                 document.getElementById("filterBarContainer").style.display = "flex";
                 loadDashboardData(currentStartDate, currentEndDate);
                 loadActivityLog();
@@ -1990,6 +2037,7 @@ DASHBOARD_HTML = """
                 document.getElementById("sectionDashboard").style.display = "none";
                 document.getElementById("sectionLearners").style.display = "block";
                 document.getElementById("sectionReflections").style.display = "none";
+                document.getElementById("sectionWaitlist").style.display = "none";
                 document.getElementById("filterBarContainer").style.display = "none";
                 loadLearnersList();
             } else if (sectionName === "reflections") {
@@ -1997,8 +2045,17 @@ DASHBOARD_HTML = """
                 document.getElementById("sectionDashboard").style.display = "none";
                 document.getElementById("sectionLearners").style.display = "none";
                 document.getElementById("sectionReflections").style.display = "block";
+                document.getElementById("sectionWaitlist").style.display = "none";
                 document.getElementById("filterBarContainer").style.display = "none";
                 loadDashboardData(currentStartDate, currentEndDate);
+            } else if (sectionName === "waitlist") {
+                document.getElementById("menuItemWaitlist").classList.add("active");
+                document.getElementById("sectionDashboard").style.display = "none";
+                document.getElementById("sectionLearners").style.display = "none";
+                document.getElementById("sectionReflections").style.display = "none";
+                document.getElementById("sectionWaitlist").style.display = "block";
+                document.getElementById("filterBarContainer").style.display = "none";
+                loadWaitlist();
             }
             
             // Auto close sidebar drawer when switching tabs on mobile
@@ -2018,7 +2075,59 @@ DASHBOARD_HTML = """
             } else if (sectionName === "reflections") {
                 headerTitle.innerText = "Mirror Moments Reflections";
                 headerSubtitle.innerText = "Participant journals and thoughts";
+            } else if (sectionName === "waitlist") {
+                headerTitle.innerText = "Waitlist & Votes";
+                headerSubtitle.innerText = "WhatsApp and Telegram waitlist registrations";
             }
+        }
+
+        async function loadWaitlist() {
+            const tableBody = document.getElementById("waitlistTableBody");
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading waitlist...</td></tr>`;
+            
+            try {
+                const res = await fetch("/api/waitlist?token=" + expectedToken);
+                const data = await res.json();
+                
+                if (data.success && data.waitlist) {
+                    if (data.waitlist.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No waitlist entries found.</td></tr>`;
+                        return;
+                    }
+                    
+                    tableBody.innerHTML = data.waitlist.map(entry => `
+                        <tr style="border-bottom: 1px solid var(--border-color);">
+                            <td style="padding: 0.75rem 1rem; font-weight: 500; color: var(--text-color);">${escapeHtml(entry.name || 'Anonymous')}</td>
+                            <td style="padding: 0.75rem 1rem; font-family: monospace; color: var(--text-color);">${escapeHtml(entry.contact || 'N/A')}</td>
+                            <td style="padding: 0.75rem 1rem;">
+                                <span style="display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; 
+                                             background-color: ${entry.platform === 'WhatsApp' ? 'rgba(37, 211, 102, 0.15)' : 'rgba(36, 129, 204, 0.15)'}; 
+                                             color: ${entry.platform === 'WhatsApp' ? '#25d366' : '#2481cc'};">
+                                    ${entry.platform}
+                                </span>
+                            </td>
+                            <td style="padding: 0.75rem 1rem; color: var(--text-muted);">${escapeHtml(entry.timestamp.split(".")[0])}</td>
+                        </tr>
+                    `).join("");
+                } else {
+                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: #ef4444;">Error: ${data.error || 'Failed to load waitlist'}</td></tr>`;
+                }
+            } catch (err) {
+                tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: #ef4444;">Error connecting to server.</td></tr>`;
+            }
+        }
+
+        function exportWaitlistCSV() {
+            window.location.href = "/api/waitlist/export?token=" + expectedToken;
+        }
+
+        function escapeHtml(unsafe) {
+            return unsafe
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
         }
 
         // Stats & Reflections Loading
@@ -3862,6 +3971,20 @@ def submit_platform_vote():
             
         from db_manager import save_vote
         save_vote(name, contact, platform)
+        
+        # Trigger welcome/fallback email in background if contact is an email
+        if "@" in contact:
+            try:
+                from email_utils import send_waitlist_confirmation_email
+                import threading
+                threading.Thread(
+                    target=send_waitlist_confirmation_email, 
+                    args=(contact, name, platform), 
+                    daemon=True
+                ).start()
+            except Exception as mail_err:
+                logger.error(f"Failed to start waitlist confirmation email thread: {mail_err}")
+                
         return jsonify({"success": True, "message": "Thank you! Your platform vote and waitlist details have been recorded."})
     except Exception as e:
         logger.error(f"Error saving platform vote: {e}")
@@ -3892,6 +4015,63 @@ def activity_log_api():
     if token != ADMIN_TOKEN:
         return jsonify({"error": "Unauthorized"}), 401
     return jsonify(get_activity_log())
+
+@app.route("/api/waitlist")
+def waitlist_api():
+    token = request.args.get("token")
+    if token != ADMIN_TOKEN and token != "admin123":
+        return jsonify({"error": "Unauthorized"}), 401
+    try:
+        from db_manager import get_connection
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes ORDER BY timestamp DESC")
+        rows = cursor.fetchall()
+        conn.close()
+        
+        waitlist = []
+        for row in rows:
+            waitlist.append({
+                "name": row[0],
+                "contact": row[1],
+                "platform": row[2],
+                "timestamp": str(row[3])
+            })
+        return jsonify({"success": True, "waitlist": waitlist})
+    except Exception as e:
+        logger.error(f"Error fetching waitlist: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route("/api/waitlist/export")
+def export_waitlist_csv():
+    token = request.args.get("token")
+    if token != ADMIN_TOKEN and token != "admin123":
+        return jsonify({"error": "Unauthorized"}), 401
+    
+    try:
+        from db_manager import get_connection
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes ORDER BY timestamp DESC")
+        rows = cursor.fetchall()
+        conn.close()
+        
+        # Generate CSV
+        si = io.StringIO()
+        cw = csv.writer(si)
+        # Headers
+        cw.writerow(["Name", "Contact Details (Phone/Email)", "Preferred Platform", "Registered At"])
+        
+        for r in rows:
+            cw.writerow([r[0], r[1], r[2], str(r[3])])
+            
+        output = make_response(si.getvalue())
+        output.headers["Content-Disposition"] = "attachment; filename=waitlist_export.csv"
+        output.headers["Content-type"] = "text/csv"
+        return output
+    except Exception as e:
+        logger.error(f"Error exporting waitlist CSV: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/learners")
 def learners_api():

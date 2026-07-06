@@ -208,3 +208,80 @@ def send_monthly_status_email(admin_email, start_date=None, end_date=None, raise
             raise e
         return False
 
+def send_waitlist_confirmation_email(recipient_email, learner_name, platform):
+    """Send an automated waitlist confirmation and welcome/fallback email to the learner."""
+    smtp_host = os.getenv("SMTP_HOST")
+    smtp_port = os.getenv("SMTP_PORT", "587")
+    smtp_user = os.getenv("SMTP_USER")
+    smtp_password = os.getenv("SMTP_PASSWORD")
+    smtp_sender = os.getenv("SMTP_SENDER", smtp_user)
+
+    if not smtp_host or not smtp_user or not smtp_password:
+        logger.warning(
+            "SMTP credentials not fully configured (SMTP_HOST, SMTP_USER, SMTP_PASSWORD missing). "
+            "Skipping waitlist confirmation email."
+        )
+        return False
+
+    try:
+        msg = MIMEMultipart()
+        msg['From'] = smtp_sender
+        msg['To'] = recipient_email
+        msg['Subject'] = f"The Brothers' Room - Welcome to the {platform} Waitlist!"
+
+        if platform == "WhatsApp":
+            platform_msg = f"""
+            <p>We are currently building our WhatsApp channel integration to make learning as accessible as possible. We will notify you here the very moment it goes live!</p>
+            <p>In the meantime, <strong>if you don't want to wait</strong>, our fully-functional interactive course is already live and running on Telegram! You can start learning right now by clicking the link below:</p>
+            <p style="text-align: center; margin: 25px 0;">
+                <a href="https://t.me/youthhubafrica_bot" style="background-color: #2c9146; color: #ffffff; padding: 12px 24px; border-radius: 99px; text-decoration: none; font-weight: bold; display: inline-block;">Start Course on Telegram</a>
+            </p>
+            """
+        else:
+            platform_msg = """
+            <p>Our fully-functional interactive course is live and running on Telegram! You can start learning right now by clicking the link below:</p>
+            <p style="text-align: center; margin: 25px 0;">
+                <a href="https://t.me/youthhubafrica_bot" style="background-color: #2c9146; color: #ffffff; padding: 12px 24px; border-radius: 99px; text-decoration: none; font-weight: bold; display: inline-block;">Start Course on Telegram</a>
+            </p>
+            """
+
+        body = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #dddddd; border-radius: 8px;">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <h2 style="color: #0F2043; margin-bottom: 5px; letter-spacing: 2px; font-weight: bold;">THE BROTHERS' ROOM</h2>
+                <hr style="border: 0; border-top: 2px solid #2c9146; width: 150px; margin: 0 auto;">
+            </div>
+            
+            <p>Hello <strong>{learner_name or "Brother"}</strong>,</p>
+            
+            <p>Thank you for joining the waitlist and casting your platform preference vote for <strong>The Brothers' Room</strong>, a positive masculinity and Gender-Based Violence prevention space.</p>
+            
+            {platform_msg}
+            
+            <p>Thank you for choosing to stand against GBV and lead by example in your community.</p>
+            
+            <br>
+            <p style="margin-bottom: 0;">Best regards,</p>
+            <p style="margin-top: 5px;"><strong>The Brothers' Room Team</strong></p>
+        </body>
+        </html>
+        """
+        msg.attach(MIMEText(body, 'html'))
+
+        # Send email
+        if smtp_port == "465":
+            server = smtplib.SMTP_SSL(smtp_host, int(smtp_port), timeout=15)
+        else:
+            server = smtplib.SMTP(smtp_host, int(smtp_port), timeout=15)
+            server.starttls()
+            
+        server.login(smtp_user, smtp_password)
+        server.sendmail(smtp_user, recipient_email, msg.as_string())
+        server.quit()
+        logger.info(f"Waitlist confirmation email successfully sent to {recipient_email}")
+        return True
+    except Exception as e:
+        logger.error(f"Error sending waitlist email to {recipient_email}: {e}")
+        return False
+
