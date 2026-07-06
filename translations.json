@@ -772,11 +772,11 @@
     "ig": "Soro na Telegram"
   },
   "share_message": {
-    "en": "I just completed the 'Young Men Against Gender Based Violence' (The Brothers' Room) course and earned my Certificate of Completion! 🎓 Join the movement for healthy masculinity here: https://t.me/thebrotherroom_bot",
-    "pcm": "I just finish 'Young Men Against Gender Based Violence' (The Brothers' Room) course and I get my Certificate of Completion! 🎓 Join us brothers make we stand against GBV: https://t.me/thebrotherroom_bot",
-    "ha": "Na kammala karatun 'Young Men Against Gender Based Violence' (The Brothers' Room) kuma na sami Takardar Shaidata! 🎓 Shiga cikin wannan yaki: https://t.me/thebrotherroom_bot",
-    "yo": "Mo ṣẹṣẹ pari ẹkọ 'Young Men Against Gender Based Violence' (The Brothers' Room) ati gba Iwe-ẹri Ipari mi! 🎓 Darapọ mọ wa: https://t.me/thebrotherroom_bot",
-    "ig": "M gachasịrị akwụkwọ 'Young Men Against Gender Based Violence' (The Brothers' Room) wee nweta Asambodo Mmezu m! 🎓 Soro anyị na nke a: https://t.me/thebrotherroom_bot"
+    "en": "I just completed the 'Young Men Against Gender Based Violence' (The Brothers' Room) course and earned my Certificate of Completion! 🎓 Join the movement for healthy masculinity here: https://t.me/youthhubafrica_bot",
+    "pcm": "I just finish 'Young Men Against Gender Based Violence' (The Brothers' Room) course and I get my Certificate of Completion! 🎓 Join us brothers make we stand against GBV: https://t.me/youthhubafrica_bot",
+    "ha": "Na kammala karatun 'Young Men Against Gender Based Violence' (The Brothers' Room) kuma na sami Takardar Shaidata! 🎓 Shiga cikin wannan yaki: https://t.me/youthhubafrica_bot",
+    "yo": "Mo ṣẹṣẹ pari ẹkọ 'Young Men Against Gender Based Violence' (The Brothers' Room) ati gba Iwe-ẹri Ipari mi! 🎓 Darapọ mọ wa: https://t.me/youthhubafrica_bot",
+    "ig": "M gachasịrị akwụkwọ 'Young Men Against Gender Based Violence' (The Brothers' Room) wee nweta Asambodo Mmezu m! 🎓 Soro anyị na nke a: https://t.me/youthhubafrica_bot"
   },
   "certificate_share_tip": {
     "en": "\n\n💡 *Tip:* Save this certificate image to your phone's gallery to post it directly to LinkedIn, Facebook, or Instagram!",
@@ -814,11 +814,11 @@
     "ig": "Echekwala ntụgharị uche gị na nzuzo! 📝\n\nỊ ga-achọ ịkọrọ ụmụnne gị ndị ọzọ ihe ị mụtara ka ha nwee mmasị?"
   },
   "reflection_share_message": {
-    "en": "My reflection for Module '{module_title}': \"{takeaway}\"\n\nJoin the 'Young Men Against Gender Based Violence' movement: https://t.me/thebrotherroom_bot",
-    "pcm": "Wetin I learn for Module '{module_title}': \"{takeaway}\"\n\nJoin the 'Young Men Against Gender Based Violence' movement: https://t.me/thebrotherroom_bot",
-    "ha": "Tunanina a kan Modul '{module_title}': \"{takeaway}\"\n\nShiga cikin 'Young Men Against Gender Based Violence': https://t.me/thebrotherroom_bot",
-    "yo": "Iṣaro mi fun Modulu '{module_title}': \"{takeaway}\"\n\nDarapọ mọ 'Young Men Against Gender Based Violence': https://t.me/thebrotherroom_bot",
-    "ig": "Ntụgharị uche m maka Modul '{module_title}': \"{takeaway}\"\n\nSoro anyị na 'Young Men Against Gender Based Violence': https://t.me/thebrotherroom_bot"
+    "en": "My reflection for Module '{module_title}': \"{takeaway}\"\n\nJoin the 'Young Men Against Gender Based Violence' movement: https://t.me/youthhubafrica_bot",
+    "pcm": "Wetin I learn for Module '{module_title}': \"{takeaway}\"\n\nJoin the 'Young Men Against Gender Based Violence' movement: https://t.me/youthhubafrica_bot",
+    "ha": "Tunanina a kan Modul '{module_title}': \"{takeaway}\"\n\nShiga cikin 'Young Men Against Gender Based Violence': https://t.me/youthhubafrica_bot",
+    "yo": "Iṣaro mi fun Modulu '{module_title}': \"{takeaway}\"\n\nDarapọ mọ 'Young Men Against Gender Based Violence': https://t.me/youthhubafrica_bot",
+    "ig": "Ntụgharị uche m maka Modul '{module_title}': \"{takeaway}\"\n\nSoro anyị na 'Young Men Against Gender Based Violence': https://t.me/youthhubafrica_bot"
   },
   "continue_next_lesson": {
     "en": "Continue to Next Lesson ➡️",
@@ -914,11 +914,11 @@
     }
   },
   "quote_card_share_message": {
-    "en": "I just completed Module {module_num} of The Brothers' Room course! Here is a key lesson: \"{quote}\"\n\nJoin the movement for healthy masculinity here: https://t.me/thebrotherroom_bot",
-    "pcm": "I just finish Module {module_num} for The Brothers' Room course! See this correct lesson: \"{quote}\"\n\nJoin the movement for healthy masculinity here: https://t.me/thebrotherroom_bot",
-    "ha": "Na kammala Modul {module_num} na darasin The Brothers' Room! Ga wani muhimmin darasi: \"{quote}\"\n\nShiga cikin wannan shiri domin inganta rayuwar maza a nan: https://t.me/thebrotherroom_bot",
-    "yo": "Mo ṣẹṣẹ pari Modulu {module_num} ti ẹkọ The Brothers' Room! Eyi ni ẹkọ pataki kan: \"{quote}\"\n\nDarapọ mọ ẹgbẹ fun idagbasoke awọn ọkunrin nibi: https://t.me/thebrotherroom_bot",
-    "ig": "Agụchala m Modul {module_num} na The Brothers' Room! Nke a bụ ihe ọmụmụ dị mkpa: \"{quote}\"\n\nSoro anyị n'ije maka ịkwado ụmụ nwoke ebe a: https://t.me/thebrotherroom_bot"
+    "en": "I just completed Module {module_num} of The Brothers' Room course! Here is a key lesson: \"{quote}\"\n\nJoin the movement for healthy masculinity here: https://t.me/youthhubafrica_bot",
+    "pcm": "I just finish Module {module_num} for The Brothers' Room course! See this correct lesson: \"{quote}\"\n\nJoin the movement for healthy masculinity here: https://t.me/youthhubafrica_bot",
+    "ha": "Na kammala Modul {module_num} na darasin The Brothers' Room! Ga wani muhimmin darasi: \"{quote}\"\n\nShiga cikin wannan shiri domin inganta rayuwar maza a nan: https://t.me/youthhubafrica_bot",
+    "yo": "Mo ṣẹṣẹ pari Modulu {module_num} ti ẹkọ The Brothers' Room! Eyi ni ẹkọ pataki kan: \"{quote}\"\n\nDarapọ mọ ẹgbẹ fun idagbasoke awọn ọkunrin nibi: https://t.me/youthhubafrica_bot",
+    "ig": "Agụchala m Modul {module_num} na The Brothers' Room! Nke a bụ ihe ọmụmụ dị mkpa: \"{quote}\"\n\nSoro anyị n'ije maka ịkwado ụmụ nwoke ebe a: https://t.me/youthhubafrica_bot"
   },
   "ask_voice_preference": {
     "en": "Accessibility: Would you like to enable the Voice Version? 🔊\n\nIf enabled, the bot will send audio voice notes alongside all text lessons. This is helpful if you have difficulty reading, are visually impaired, or prefer listening.",
@@ -1031,5 +1031,12 @@
     "ha": "A'a",
     "yo": "Bẹ́ẹ̀ kọ́",
     "ig": "Mba"
+  },
+  "midweek_check": {
+    "en": "Hey brother! Just checking in for our Mid-Week reflection. How has your week been? Remember, every small step you take is building a healthier community. Whenever you are ready to continue your learning journey, just click Next below!",
+    "pcm": "How far brother! We dey do our Mid-Week check-in. How your week dey run? Remember say every small step wey you take dey build better community. If you ready to continue, just click Next make we go!",
+    "ha": "Sannu brother! Lokacin duba na tsakiyar mako ne. Yaya mako yake tafiya? Ka tuna, kowane ƙaramin mataki da ka ɗauka yana taimakawa al'umma. Danna Gida a ƙasa don ci gaba lokacin da kake shirye.",
+    "yo": "Hey brother! Eyi ni sise ayewo aarin ose wa. Bawo ni ose re se n lo? Ranti pe, gbogbo igbesẹ kekere ti o ba gbe n kọ agbegbe to ni ilera. Tẹ Atẹle ni isalẹ lati tẹsiwaju!",
+    "ig": "Kedu nwanne m! Oge maka ncheta etiti izu anyị erugo. Kedu ka izu gị si na-aga? Cheta na, obere nzọụkwụ ọ bụla ị na-eme na-ewu obodo dị mma. Pịa Ọzọ n'okpuru ebe a ka ị gaa n'ihu!"
   }
 }

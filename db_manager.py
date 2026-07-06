@@ -108,6 +108,28 @@ def init_db():
         )
     """)
     
+    # Create platform_votes table for waitlist choices
+    if conn.is_sqlite:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS platform_votes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT,
+                contact TEXT,
+                platform TEXT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+    else:
+        cursor.execute("""
+            CREATE TABLE IF NOT EXISTS platform_votes (
+                id SERIAL PRIMARY KEY,
+                name TEXT,
+                contact TEXT,
+                platform TEXT,
+                timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        """)
+    
     # Run dynamic column migrations if columns do not exist
     if conn.is_sqlite:
         cursor.execute("PRAGMA table_info(learners)")
@@ -528,14 +550,14 @@ def get_engagement_leaderboard():
     return leaderboard
 
 def get_inactive_learners():
-    """Retrieve enrolled learners who have been inactive for more than 4 days and have not completed the course."""
+    """Retrieve enrolled learners who have been inactive for more than 2 days and have not completed the course."""
     conn = get_connection()
     cursor = conn.cursor()
     
     if conn.is_sqlite:
-        date_check = "datetime('now', '-4 days')"
+        date_check = "datetime('now', '-2 days')"
     else:
-        date_check = "CURRENT_TIMESTAMP - INTERVAL '4 days'"
+        date_check = "CURRENT_TIMESTAMP - INTERVAL '2 days'"
         
     cursor.execute(f"""
         SELECT user_id, current_module_id, current_lesson_id, language_preference
@@ -836,6 +858,105 @@ def update_pwd_status(user_id, is_pwd):
         SET is_pwd = %s, last_activity = CURRENT_TIMESTAMP
         WHERE user_id = %s
     """, (is_pwd, user_id))
+    conn.commit()
+    conn.close()
+
+
+def save_vote(name, contact, platform):
+    """Save learner's platform preference vote."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        INSERT INTO platform_votes (name, contact, platform)
+        VALUES (%s, %s, %s)
+    """, (name, contact, platform))
+    conn.commit()
+    conn.close()
+
+
+def get_vote_stats():
+    """Retrieve counts for each platform vote."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT platform, COUNT(*) FROM platform_votes GROUP BY platform")
+    results = dict(cursor.fetchall())
+    conn.close()
+    return {
+        "Telegram": results.get("Telegram", 0),
+        "WhatsApp": results.get("WhatsApp", 0)
+    }
+
+
+def get_due_midweek_checks():
+    """Retrieve users whose Wednesday 'Midweek Check' is due."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("""
+        SELECT r.user_id, l.language_preference, l.last_activity
+        FROM reminders r
+        JOIN learners l ON r.user_id = l.user_id
+        WHERE r.reminder_type = 'midweek_check' AND r.next_send_time <= CURRENT_TIMESTAMP AND l.post_test_score = -1
+    """)
+    results = cursor.fetchall()
+    conn.close()
+    return results
+
+
+def init_midweek_checks():
+    """Ensure every active learner has a scheduled Wednesday midweek check."""
+    import datetime
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    # Get all active learners (not graduated)
+    cursor.execute("SELECT user_id FROM learners WHERE post_test_score = -1")
+    users = [r[0] for r in cursor.fetchall()]
+    
+    # Calculate next Wednesday 10:00 AM
+    now = datetime.datetime.now()
+    days_until_wednesday = (2 - now.weekday()) % 7
+    if days_until_wednesday == 0 and now.hour >= 10:
+        days_until_wednesday = 7
+    next_wednesday = now + datetime.timedelta(days=days_until_wednesday)
+    next_wednesday_10am = datetime.datetime(next_wednesday.year, next_wednesday.month, next_wednesday.day, 10, 0, 0)
+    
+    # Format timestamp for SQL depending on DB type
+    ts_str = next_wednesday_10am.strftime("%Y-%m-%d %H:%M:%S")
+        
+    for user_id in users:
+        # Check if already exists
+        cursor.execute("SELECT user_id FROM reminders WHERE user_id = %s AND reminder_type = 'midweek_check'", (user_id,))
+        if not cursor.fetchone():
+            cursor.execute("""
+                INSERT INTO reminders (user_id, reminder_type, pledge_text, reminders_sent, next_send_time)
+                VALUES (%s, 'midweek_check', NULL, 0, %s)
+            """, (user_id, ts_str))
+            
+    conn.commit()
+    conn.close()
+
+
+def update_midweek_check_sent(user_id):
+    """Reschedule the Wednesday check to next Wednesday at 10 AM."""
+    import datetime
+    conn = get_connection()
+    cursor = conn.cursor()
+    
+    now = datetime.datetime.now()
+    days_until_wednesday = (2 - now.weekday()) % 7
+    if days_until_wednesday == 0 and now.hour >= 10:
+        days_until_wednesday = 7
+    next_wednesday = now + datetime.timedelta(days=days_until_wednesday)
+    next_wednesday_10am = datetime.datetime(next_wednesday.year, next_wednesday.month, next_wednesday.day, 10, 0, 0)
+    
+    ts_str = next_wednesday_10am.strftime("%Y-%m-%d %H:%M:%S")
+    
+    cursor.execute("""
+        UPDATE reminders 
+        SET next_send_time = %s, reminders_sent = reminders_sent + 1
+        WHERE user_id = %s AND reminder_type = 'midweek_check'
+    """, (ts_str, user_id))
+    
     conn.commit()
     conn.close()
 

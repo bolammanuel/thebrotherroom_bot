@@ -21,6 +21,7 @@ from db_manager import (
     save_pledge, get_pending_reminders, update_reminder_sent, get_engagement_leaderboard,
     get_inactive_learners, update_pre_test_score, get_pre_test_score, update_full_name,
     get_due_sunday_checks, init_sunday_checks, update_sunday_check_sent, get_all_learner_reflections,
+    get_due_midweek_checks, init_midweek_checks, update_midweek_check_sent,
     reset_learner_data, backup_sqlite_db, is_learner_registered
 )
 from openai_utils import get_openai_response, transcribe_voice, synthesize_speech
@@ -1125,7 +1126,7 @@ async def send_quote_card(update: Update, context: ContextTypes.DEFAULT_TYPE, mo
             
             whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
             twitter_url = f"https://twitter.com/intent/tweet?text={encoded_msg}"
-            telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_msg}"
+            telegram_url = f"https://t.me/share/url?url=https://t.me/youthhubafrica_bot&text={encoded_msg}"
             
             share_keyboard = InlineKeyboardMarkup([
                 [
@@ -1325,7 +1326,7 @@ async def prev_lesson_handler(update: Update, context: ContextTypes.DEFAULT_TYPE
                 
                 whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_share}"
                 twitter_url = f"https://twitter.com/intent/tweet?text={encoded_share}"
-                telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_share}"
+                telegram_url = f"https://t.me/share/url?url=https://t.me/youthhubafrica_bot&text={encoded_share}"
                 
                 keyboard = InlineKeyboardMarkup([
                     [
@@ -1726,12 +1727,12 @@ async def journal_command(update: Update, context: ContextTypes.DEFAULT_TYPE) ->
     }.get(lang, "My Pledge: ")
     
     share_val = pledge_text if pledge_text else "Join the movement to stand against GBV!"
-    share_text = f"{share_base}\"{share_val}\"\nTake the course here: https://t.me/thebrotherroom_bot"
+    share_text = f"{share_base}\"{share_val}\"\nTake the course here: https://t.me/youthhubafrica_bot"
     encoded_share = urllib.parse.quote(share_text)
     
     whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_share}"
     twitter_url = f"https://twitter.com/intent/tweet?text={encoded_share}"
-    telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_share}"
+    telegram_url = f"https://t.me/share/url?url=https://t.me/youthhubafrica_bot&text={encoded_share}"
     
     keyboard = InlineKeyboardMarkup([
         [
@@ -2033,7 +2034,7 @@ def generate_quote_card_image(module_id, module_title, quote_text, lang, user_id
     draw.text((width - 180, current_y - 40), "”", fill=(219, 161, 71, 35), font=font_quote_large)
     
     # 9. Footer text
-    footer_text = "Join the conversation: t.me/thebrotherroom_bot"
+    footer_text = "Join the conversation: t.me/youthhubafrica_bot"
     draw.text((width // 2, 975), footer_text, fill=(219, 161, 71, 255), font=font_footer, anchor="mm")
     
     # Draw hashtags
@@ -2453,7 +2454,7 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
         
         whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_msg}"
         twitter_url = f"https://twitter.com/intent/tweet?text={encoded_msg}"
-        telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_msg}"
+        telegram_url = f"https://t.me/share/url?url=https://t.me/youthhubafrica_bot&text={encoded_msg}"
         
         share_keyboard = InlineKeyboardMarkup([
             [
@@ -2596,8 +2597,9 @@ async def reminder_scheduler(application: Application) -> None:
             except Exception as e:
                 logger.error(f"Error in monthly status report scheduler check: {e}")
                 
-            # Initialize Sunday checks for any active learners that don't have them scheduled
+            # Initialize Sunday and Wednesday checks for any active learners that don't have them scheduled
             init_sunday_checks()
+            init_midweek_checks()
 
             # 1. Weekly Pledge Reminders (Clean, Emoji-Free)
             pending_reminders = get_pending_reminders()
@@ -2621,7 +2623,7 @@ async def reminder_scheduler(application: Application) -> None:
                 except Exception as e:
                     logger.error(f"Failed to send weekly reminder to {user_id}: {e}")
 
-            # 2. Inactive Learner Nudges (4 Days) (Clean, Emoji-Free)
+            # 2. Inactive Learner Nudges (2 Days) (Clean, Emoji-Free)
             inactive_learners = get_inactive_learners()
             for user_id, current_module, current_lesson, lang in inactive_learners:
                 try:
@@ -2678,6 +2680,22 @@ async def reminder_scheduler(application: Application) -> None:
                     logger.info(f"Dispatched Sunday check-in to user {user_id} (active={is_active})")
                 except Exception as e:
                     logger.error(f"Failed to send Sunday check-in to {user_id}: {e}")
+
+            # 4. Wednesday Midweek Checks (Clean, Emoji-Free)
+            due_midweek_checks = get_due_midweek_checks()
+            for user_id, lang, last_activity in due_midweek_checks:
+                try:
+                    midweek_msg = TRANSLATIONS.get("midweek_check", {}).get(
+                        lang, "Hey brother! Just checking in for our Mid-Week reflection. How has your week been? Remember, every small step you take is building a healthier community. Whenever you are ready to continue your learning journey, just click Next below!"
+                    )
+                    await application.bot.send_message(
+                        chat_id=user_id,
+                        text=midweek_msg
+                    )
+                    update_midweek_check_sent(user_id)
+                    logger.info(f"Dispatched Wednesday midweek check-in to user {user_id}")
+                except Exception as e:
+                    logger.error(f"Failed to send Wednesday check-in to {user_id}: {e}")
 
         except Exception as e:
             logger.error(f"Error in background reminder worker loop: {e}")
@@ -3643,7 +3661,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
         
         whatsapp_url = f"https://api.whatsapp.com/send?text={encoded_share}"
         twitter_url = f"https://twitter.com/intent/tweet?text={encoded_share}"
-        telegram_url = f"https://t.me/share/url?url=https://t.me/thebrotherroom_bot&text={encoded_share}"
+        telegram_url = f"https://t.me/share/url?url=https://t.me/youthhubafrica_bot&text={encoded_share}"
         
         keyboard = InlineKeyboardMarkup([
             [

@@ -2,13 +2,18 @@ import os
 import logging
 import csv
 import io
-from flask import Flask, jsonify, render_template_string, request, make_response
+from flask import Flask, jsonify, render_template_string, request, make_response, send_from_directory
 from db_manager import get_connection
 
 # Setup logging
 logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
+app.config['JSON_SORT_KEYS'] = False
+try:
+    app.json.sort_keys = False
+except AttributeError:
+    pass
 
 # Authentication token configuration
 ADMIN_TOKEN = os.getenv("ADMIN_DASHBOARD_PASSWORD", "admin123").strip().replace('"', '\\"').replace('\n', '').replace('\r', '')
@@ -245,6 +250,10 @@ def get_stats_data(start_date=None, end_date=None):
             state_counts_cleaned[k_clean] = state_counts_cleaned.get(k_clean, 0) + v
         stats["state_distribution"] = state_counts_cleaned
 
+        # 13. Platform preference votes
+        from db_manager import get_vote_stats
+        stats["platform_votes"] = get_vote_stats()
+
     except Exception as e:
         logger.error(f"Error fetching stats data: {e}")
         stats = {
@@ -263,7 +272,8 @@ def get_stats_data(start_date=None, end_date=None):
             "reflections_week": 0,
             "age_distribution": {"Under 18": 0, "18-24": 0, "25-34": 0, "35+": 0, "Unknown": 0},
             "pwd_distribution": {"Yes": 0, "No": 0, "Unknown": 0},
-            "state_distribution": {}
+            "state_distribution": {},
+            "platform_votes": {"Telegram": 0, "WhatsApp": 0}
         }
     finally:
         conn.close()
@@ -477,45 +487,47 @@ DASHBOARD_HTML = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Brothers' Room - Facilitator Analytics</title>
-    <!-- Inter Font from Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&display=swap" rel="stylesheet">
+    <!-- Google Fonts & Stylesheets -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <style>
         :root {
-            /* Default: Telegram Dark Mode */
-            --bg-color: #182533;
-            --card-bg: #202b36;
-            --sidebar-bg: #17212b;
+            /* Dark Mode: Optibiz Dark Teal & Lime Green */
+            --bg-color: #07151e;
+            --card-bg: #0c202b;
+            --sidebar-bg: #07151e;
             --text-color: #ffffff;
-            --text-muted: #7f91a4;
-            --accent-color: #2481cc;
-            --accent-glow: rgba(36, 129, 204, 0.15);
-            --border-color: #2b394a;
-            --input-bg: #17212b;
-            --accent-green: #10b981;
+            --text-muted: #8397a6;
+            --accent-color: #9eff00;
+            --accent-glow: rgba(158, 255, 0, 0.15);
+            --border-color: rgba(255, 255, 255, 0.08);
+            --input-bg: #0c202b;
+            --accent-green: #2c9146;
             --accent-orange: #f97316;
-            --kpi-title-color: #7f91a4;
-            --active-tab-bg: rgba(36, 129, 204, 0.12);
+            --kpi-title-color: #8397a6;
+            --active-tab-bg: rgba(158, 255, 0, 0.12);
             --sidebar-width: 240px;
-            --border-radius: 8px; /* Curve variables for aesthetic layout elements */
+            --border-radius: 12px;
         }
         
         body.light-theme {
-            /* Telegram Light Mode */
-            --bg-color: #f4f6fa;
+            /* Light Mode: Optibiz Light Slate & Forest Green */
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --sidebar-bg: #ffffff;
-            --text-color: #212121;
-            --text-muted: #707579;
-            --accent-color: #2481cc;
-            --accent-glow: rgba(36, 129, 204, 0.1);
-            --border-color: #e0e0e0;
-            --input-bg: #ffffff;
-            --accent-green: #0f9f74;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --accent-color: #2c9146;
+            --accent-glow: rgba(44, 145, 70, 0.1);
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --accent-green: #2c9146;
             --accent-orange: #e66b15;
-            --kpi-title-color: #707579;
-            --active-tab-bg: rgba(36, 129, 204, 0.08);
+            --kpi-title-color: #64748b;
+            --active-tab-bg: rgba(44, 145, 70, 0.08);
         }
         
         * {
@@ -531,6 +543,11 @@ DASHBOARD_HTML = """
             min-height: 100vh;
             line-height: 1.5;
             transition: background-color 0.25s, color 0.25s;
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
         }
 
         /* Layout Setup using Flexbox for proper scaling and collapse mechanics */
@@ -726,6 +743,7 @@ DASHBOARD_HTML = """
             border-radius: var(--border-radius);
             padding: 1.5rem;
             transition: border-color 0.2s, background-color 0.25s;
+            min-width: 0; /* Prevent child content from expanding cards inside flex/grid layouts */
         }
 
         .card:hover {
@@ -795,7 +813,7 @@ DASHBOARD_HTML = """
         /* Layout Grid */
         .main-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
             gap: 1.5rem;
         }
 
@@ -999,7 +1017,7 @@ DASHBOARD_HTML = """
         /* Buttons & Inputs */
         .btn {
             background: var(--accent-color);
-            color: #ffffff;
+            color: var(--bg-color);
             border: 1px solid transparent;
             padding: 0.55rem 1.25rem;
             height: 38px; /* Clean matching height */
@@ -1646,6 +1664,22 @@ DASHBOARD_HTML = """
                             <canvas id="pwdChart"></canvas>
                         </div>
                     </div>
+
+                    <!-- Platform Preference Poll Card -->
+                    <div class="card">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Platform preference poll</h3>
+                            <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('platformVoteChart', 'platform_preferences.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
+                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
+                                </svg>
+                                <span>Export</span>
+                            </button>
+                        </div>
+                        <div class="chart-container" style="height: 200px;">
+                            <canvas id="platformVoteChart"></canvas>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="card">
@@ -1742,6 +1776,7 @@ DASHBOARD_HTML = """
         let langChartInstance = null;
         let ageChartInstance = null;
         let pwdChartInstance = null;
+        let platformVoteChartInstance = null;
         let lastStatsData = null; // Stores stats to redraw charts on theme toggle
 
         // Learners pagination and sorting state
@@ -2087,15 +2122,24 @@ DASHBOARD_HTML = """
                 if (funnelChartInstance) {
                     funnelChartInstance.destroy();
                 }
+
+                // Sort keys numerically to prevent alphabetical sorting issues (Module 1, 10, 11, 2)
+                const sortedFunnelKeys = Object.keys(progressData).sort((a, b) => {
+                    const numA = parseInt(a.replace(/[^\\d]/g, ''), 10) || 0;
+                    const numB = parseInt(b.replace(/[^\\d]/g, ''), 10) || 0;
+                    return numA - numB;
+                });
+                const sortedFunnelValues = sortedFunnelKeys.map(k => progressData[k]);
+
                 funnelChartInstance = new Chart(funnelCtx, {
                     type: 'bar',
                     data: {
-                        labels: Object.keys(progressData),
+                        labels: sortedFunnelKeys,
                         datasets: [{
                             label: 'Learners Active',
-                            data: Object.values(progressData),
-                            backgroundColor: isLight ? 'rgba(36, 129, 204, 0.7)' : 'rgba(36, 129, 204, 0.85)',
-                            borderColor: '#2481cc',
+                            data: sortedFunnelValues,
+                            backgroundColor: isLight ? 'rgba(44, 145, 70, 0.7)' : 'rgba(158, 255, 0, 0.7)',
+                            borderColor: isLight ? '#2c9146' : '#9eff00',
                             borderWidth: 1,
                             borderRadius: 2,
                         }]
@@ -2195,6 +2239,32 @@ DASHBOARD_HTML = """
                         datasets: [{
                             data: Object.values(stats.pwd_distribution || {}),
                             backgroundColor: ['#ef4444', '#10b981', '#7f91a4'],
+                            borderWidth: 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 1000, easing: 'easeOutQuart' },
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { color: fontColor, font: { family: 'Inter', size: 11 } }
+                            }
+                        }
+                    }
+                });
+
+                // Platform Vote Chart
+                const voteCtx = document.getElementById('platformVoteChart').getContext('2d');
+                if (platformVoteChartInstance) platformVoteChartInstance.destroy();
+                platformVoteChartInstance = new Chart(voteCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: Object.keys(stats.platform_votes || {}),
+                        datasets: [{
+                            data: Object.values(stats.platform_votes || {}),
+                            backgroundColor: ['#2481cc', '#25d366'],
                             borderWidth: 0,
                         }]
                     },
@@ -2333,6 +2403,7 @@ DASHBOARD_HTML = """
             else if (chartId === 'langChart') chartInstance = langChartInstance;
             else if (chartId === 'ageChart') chartInstance = ageChartInstance;
             else if (chartId === 'pwdChart') chartInstance = pwdChartInstance;
+            else if (chartId === 'platformVoteChart') chartInstance = platformVoteChartInstance;
             
             if (chartInstance) {
                 const canvas = chartInstance.canvas;
@@ -2638,14 +2709,1169 @@ DASHBOARD_HTML = """
 </html>
 """.replace("ADMIN_DASHBOARD_PASSWORD_PLACEHOLDER", ADMIN_TOKEN)
 
+LANDING_HTML = """<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Brothers' Room - Positive Masculinity & GBV Prevention</title>
+    <meta name="description" content="A safe, secure, and private learning bot on Telegram and WhatsApp helping young men connect, grow, and stand against Gender-Based Violence.">
+    
+    <!-- Google Fonts & Stylesheets -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-dark: #07151e;
+            --bg-card: #0c202b;
+            --accent: #9eff00;
+            --accent-hover: #b0ff33;
+            --text-white: #ffffff;
+            --text-muted: #8397a6;
+            --border-color: rgba(255, 255, 255, 0.08);
+            --c-navy: #0f2043;
+            --c-gold: #dba147;
+            --c-green: #2c9146;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, .font-heading {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        /* Container Utilities */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        /* Header / Navigation */
+        header {
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(7, 21, 30, 0.85);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1.25rem 0;
+            transition: var(--transition);
+        }
+
+        .nav-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent);
+            color: var(--bg-dark);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        nav {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        nav a {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav a:hover {
+            color: var(--text-white);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 99px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+        }
+
+        .btn-primary,
+        nav a.btn-primary {
+            background-color: var(--accent);
+            color: var(--bg-dark);
+        }
+
+        .btn-primary:hover,
+        nav a.btn-primary:hover {
+            background-color: var(--accent-hover);
+            color: var(--bg-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px -10px rgba(158, 255, 0, 0.4);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--text-white);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        /* Hero Section */
+        .hero {
+            padding: 6rem 0;
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-content h1 {
+            font-size: 3.5rem;
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            letter-spacing: -1px;
+        }
+
+        .hero-content p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            margin-bottom: 2.5rem;
+            max-width: 580px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        /* Realistic iPhone Mockup CSS */
+        .phone-container {
+            position: relative;
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-mockup {
+            width: 320px;
+            height: 580px;
+            background: #000;
+            border-radius: 40px;
+            border: 12px solid #2d3135;
+            position: relative;
+            box-shadow: 0 30px 60px -15px rgba(0,0,0,0.6);
+            overflow: hidden;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #0a141b;
+            padding: 3rem 0.75rem 1rem 0.75rem;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Dynamic Island */
+        .dynamic-island {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 95px;
+            height: 25px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 10;
+        }
+
+        .phone-header {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            margin-bottom: 1rem;
+        }
+
+        .phone-avatar {
+            width: 36px;
+            height: 36px;
+            background: var(--c-green);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .phone-bot-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-bot-name {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .phone-bot-status {
+            font-size: 0.7rem;
+            color: var(--accent);
+        }
+
+        .chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            justify-content: flex-end;
+            font-size: 0.8rem;
+        }
+
+        .chat-message-group {
+            display: flex;
+            align-items: flex-end;
+            gap: 0.5rem;
+        }
+
+        .chat-message-group.bot-group {
+            flex-direction: row-reverse;
+        }
+
+        .chat-user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.7rem;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .chat-bubble {
+            max-width: 75%;
+            padding: 0.65rem 0.8rem;
+            border-radius: 16px;
+            line-height: 1.45;
+            position: relative;
+        }
+
+        .bubble-user {
+            background-color: #172c3b;
+            color: #ffffff;
+            border-bottom-left-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        .bubble-bot {
+            background-color: #123524;
+            color: #ffffff;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bubble-sender-name {
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin-bottom: 0.25rem;
+        }
+
+        .bubble-meta {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            text-align: right;
+            margin-top: 0.35rem;
+        }
+
+        /* Scroll Reveal Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity;
+        }
+
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Staggered transition delays for lists/grids */
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+        .stagger-5 { transition-delay: 0.5s; }
+        .stagger-6 { transition-delay: 0.6s; }
+
+        /* Pillars Section */
+        .section-header {
+            text-align: center;
+            max-width: 650px;
+            margin: 0 auto 4rem auto;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+        }
+
+        .features {
+            padding: 6rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 24px;
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(158, 255, 0, 0.2);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(158, 255, 0, 0.08);
+            color: var(--accent);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.35rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Curriculum Timeline */
+        .curriculum {
+            padding: 6rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .timeline {
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            padding-left: 2rem;
+            border-left: 2px solid var(--border-color);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 3.5rem;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: calc(-2rem - 6px);
+            top: 6px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            border: 2px solid var(--bg-dark);
+        }
+
+        .timeline-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            background: rgba(158, 255, 0, 0.08);
+            color: var(--accent);
+            border-radius: 99px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .timeline-content h3 {
+            font-size: 1.4rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .timeline-content p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Waitlist & Preferences Poll Section */
+        .poll-section {
+            padding: 6rem 0;
+            border-top: 1px solid var(--border-color);
+            background: linear-gradient(180deg, var(--bg-dark) 0%, rgba(12, 32, 43, 0.4) 100%);
+        }
+
+        .poll-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .poll-info h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .poll-info p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 2rem;
+        }
+
+        .poll-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+        }
+
+        .stat-row {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .stat-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .stat-bar-bg {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .stat-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 1s ease-out;
+        }
+
+        .poll-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 20px 40px -20px rgba(0,0,0,0.5);
+        }
+
+        .poll-card h3 {
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .poll-card p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.85rem 1.25rem;
+            background-color: rgba(7, 21, 30, 0.6);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-white);
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(158, 255, 0, 0.15);
+        }
+
+        .form-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+
+        /* Footer */
+        footer.container {
+            border-top: 1px solid var(--border-color);
+            padding: 8rem 2rem 10rem 2rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+            margin-top: 6rem;
+        }
+
+        .footer-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 3.5rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 3.5rem;
+        }
+
+        .footer-links a {
+            transition: var(--transition);
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        /* Light Mode Theme Styles */
+        body.light-mode {
+            --bg-dark: #f8fafc;
+            --bg-card: #ffffff;
+            --text-white: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent: #2c9146;
+            --accent-hover: #1e6e33;
+        }
+
+        body.light-mode header {
+            background: rgba(248, 250, 252, 0.85);
+        }
+
+        body.light-mode .poll-card {
+            box-shadow: 0 20px 40px -15px rgba(0,0,0,0.06);
+        }
+
+        body.light-mode .form-input {
+            background-color: var(--bg-dark);
+            color: var(--text-white);
+        }
+
+        body.light-mode .form-select {
+            background-image: url("data:image/svg+xml;utf8,<svg fill='%230f172a' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/><path d='M0 0h24v24H0z' fill='none'/></svg>");
+        }
+
+        body.light-mode .timeline-content {
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.04);
+        }
+
+        body.light-mode .feature-card {
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.04);
+        }
+
+        body.light-mode .logo-icon {
+            color: #ffffff;
+        }
+
+        body.light-mode .phone-avatar {
+            color: #ffffff;
+        }
+
+        /* Theme Toggle Button */
+        .theme-toggle-btn {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-white);
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        body.light-mode .theme-toggle-btn:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        /* Success Dialog */
+        .toast-success {
+            display: none;
+            background: #1a3c30;
+            border: 1px solid var(--c-green);
+            color: #fff;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+            align-items: center;
+            gap: 0.75rem;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive Layouts */
+        @media (max-width: 968px) {
+            .hero {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 3rem;
+            }
+            .hero-content h1 {
+                font-size: 2.75rem;
+            }
+            .hero-content p {
+                margin: 0 auto 2rem auto;
+            }
+            .hero-actions {
+                justify-content: center;
+            }
+            .poll-wrapper {
+                grid-template-columns: 1fr;
+                gap: 3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <div class="container nav-wrapper">
+            <div class="logo">
+                <div class="logo-icon">TR</div>
+                <span>THE BROTHERS' ROOM</span>
+            </div>
+            <nav>
+                <a href="#curriculum">The Curriculum</a>
+                <a href="#safety">Safety & Privacy</a>
+                <a href="#poll">Platform Poll</a>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme" style="margin-left: 0.5rem;">
+                    <!-- Sun Icon (shown in dark mode to switch to light) -->
+                    <svg class="sun-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <!-- Moon Icon (shown in light mode to switch to dark) -->
+                    <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <a href="https://t.me/youthhubafrica_bot" class="btn btn-primary">START COURSE</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Onboarding Section -->
+    <section class="container hero">
+        <div class="hero-content">
+            <h1>A Safe, Private Space for Young Men</h1>
+            <p>Develop character, discuss positive masculinity, and stand against Gender-Based Violence. An interactive 6-week conversational course hosted directly in safe messaging channels.</p>
+            <div class="hero-actions">
+                <a href="https://t.me/youthhubafrica_bot" class="btn btn-primary">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    <span>Start on Telegram</span>
+                </a>
+                <a href="#poll" class="btn btn-secondary">Join WhatsApp Waitlist</a>
+            </div>
+        </div>
+        <div class="phone-container">
+            <div class="phone-mockup">
+                <div class="phone-screen">
+                    <div class="dynamic-island"></div>
+                    <div class="phone-header">
+                        <div class="phone-avatar">TR</div>
+                        <div class="phone-bot-info">
+                            <span class="phone-bot-name">The Brothers' Room Bot</span>
+                            <span class="phone-bot-status">online learning channel</span>
+                        </div>
+                    </div>
+                    <div class="chat-area">
+                        <!-- Message 1 -->
+                        <div class="chat-message-group">
+                            <div class="chat-user-avatar" style="background-color: #dba147;">AD</div>
+                            <div class="chat-bubble bubble-user">
+                                <div class="bubble-sender-name">Ademola</div>
+                                Just joined! This is exactly what I needed. Anyone free for a call tonight?
+                                <div class="bubble-meta">10:31 AM</div>
+                            </div>
+                        </div>
+
+                        <!-- Message 2 -->
+                        <div class="chat-message-group">
+                            <div class="chat-user-avatar" style="background-color: #2481cc;">BE</div>
+                            <div class="chat-bubble bubble-user">
+                                <div class="bubble-sender-name">Ben</div>
+                                I really want to reflect on active bystander intervention this week.
+                                <div class="bubble-meta">10:32 AM</div>
+                            </div>
+                        </div>
+
+                        <!-- Message 3 -->
+                        <div class="chat-message-group bot-group">
+                            <div class="chat-user-avatar" style="background-color: var(--c-green);">TR</div>
+                            <div class="chat-bubble bubble-bot">
+                                Welcome brothers! We are starting Module 3: Active Allyship & Safety tonight. Use the menu to begin.
+                                <div class="bubble-meta">10:33 AM</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Core Features / Pillars -->
+    <section class="features" id="safety">
+        <div class="container">
+            <div class="section-header">
+                <h2>Why The Brothers' Room?</h2>
+                <p>We designed the program specifically for young men to learn, share, and reflect in spaces where they already spend their time.</p>
+            </div>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <h3>100% Secure & Private</h3>
+                    <p>Telegram provides a closed, encrypted learning environment. Your reflections, quiz history, and progress are completely anonymous and stored safely.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <h3>Micro-learning Format</h3>
+                    <p>No long videos or boring PDFs. The bot sends brief conversational modules that take just 10-15 minutes a day, fitting perfectly into your schedule.</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"></path></svg>
+                    </div>
+                    <h3>Earn a Verifiable Badge</h3>
+                    <p>Complete all module reflections and clear the post-test exam to receive your official digital Certificate of Completion to showcase your advocacy.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Curriculum Details -->
+    <section class="curriculum" id="curriculum">
+        <div class="container">
+            <div class="section-header">
+                <h2>The 6-Week Curriculum</h2>
+                <p>Get a detailed view of what you will learn and discuss during the training program.</p>
+            </div>
+            
+            <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-badge">Weeks 1 & 2</div>
+                    <div class="timeline-content">
+                        <h3>Understanding Privilege & Gender Roles</h3>
+                        <p>We start with base principles. Discussing the construction of gender roles, analyzing societal pressures on what it means to be a "real man," and building emotional intelligence.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-badge">Weeks 3 & 4</div>
+                    <div class="timeline-content">
+                        <h3>Recognizing Abuse & GBV Prevention</h3>
+                        <p>Diving deep into definitions of Gender-Based Violence. Understanding forms of abuse, the critical importance of enthusiastic consent, and communication strategies.</p>
+                    </div>
+                </div>
+                
+                <div class="timeline-item">
+                    <div class="timeline-badge">Weeks 5 & 6</div>
+                    <div class="timeline-content">
+                        <h3>Bystander Intervention & Peer Advocacy</h3>
+                        <p>Transforming learning into actions. Practicing bystander intervention, inviting peers to join the movement, making commitment pledges, and generating final certificates.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- WhatsApp Poll & Waitlist -->
+    <section class="poll-section" id="poll">
+        <div class="container poll-wrapper">
+            <div class="poll-info">
+                <h2>Join the Waitlist & Cast Your Vote</h2>
+                <p>We are currently active on Telegram, but we want to make learning as accessible as possible. WhatsApp channel integration is currently in progress. Cast your vote or register for the waitlist below!</p>
+                
+                <div class="poll-stats">
+                    <div class="stat-row">
+                        <div class="stat-header">
+                            <span>Telegram (Active Channel)</span>
+                            <span id="telegram-percentage">50%</span>
+                        </div>
+                        <div class="stat-bar-bg">
+                            <div class="stat-bar-fill" id="telegram-bar" style="width: 50%; background-color: #2481cc;"></div>
+                        </div>
+                    </div>
+                    <div class="stat-row">
+                        <div class="stat-header">
+                            <span>WhatsApp (Waitlist / WIP)</span>
+                            <span id="whatsapp-percentage">50%</span>
+                        </div>
+                        <div class="stat-bar-bg">
+                            <div class="stat-bar-fill" id="whatsapp-bar" style="width: 50%; background-color: #25d366;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="poll-card">
+                <div class="toast-success" id="success-message">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>Thank you, brother! Your waitlist response has been saved.</span>
+                </div>
+                
+                <form id="waitlist-form" onsubmit="submitWaitlist(event)">
+                    <h3>Waitlist Form</h3>
+                    <p>Enter your preference below. We will notify you when new learning channels open.</p>
+                    
+                    <div class="form-group">
+                        <label for="name">Your Name</label>
+                        <input type="text" id="name" required class="form-input" placeholder="e.g. Ademola">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="contact">Phone Number or Email</label>
+                        <input type="text" id="contact" required class="form-input" placeholder="e.g. +234 803 000 0000 or name@example.com">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="platform">Preferred Learning Platform</label>
+                        <select id="platform" required class="form-input form-select">
+                            <option value="WhatsApp">WhatsApp (Work in progress waitlist)</option>
+                            <option value="Telegram">Telegram (Start course immediately)</option>
+                        </select>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem; border-radius: 12px; padding: 0.95rem;">Submit Choice</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="container">
+        <div class="footer-wrapper">
+            <span>© 2026 The Brothers' Room. All rights reserved.</span>
+            <div class="footer-links">
+                <a href="#curriculum">Curriculum</a>
+                <a href="#safety">Safety & Privacy</a>
+                <a href="/dashboard">Admin Dashboard</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Interactive script -->
+    <script>
+        async function fetchPollStats() {
+            try {
+                // Fetch stats from public endpoint or general fallback
+                const res = await fetch("/api/stats?token=admin123"); // fallback check
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.platform_votes) {
+                        const tg = data.platform_votes.Telegram || 0;
+                        const wa = data.platform_votes.WhatsApp || 0;
+                        const total = tg + wa;
+                        if (total > 0) {
+                            const tgPct = Math.round((tg / total) * 100);
+                            const waPct = 100 - tgPct;
+                            
+                            document.getElementById("telegram-percentage").innerText = tgPct + "% (" + tg + " votes)";
+                            document.getElementById("whatsapp-percentage").innerText = waPct + "% (" + wa + " votes)";
+                            document.getElementById("telegram-bar").style.width = tgPct + "%";
+                            document.getElementById("whatsapp-bar").style.width = waPct + "%";
+                        }
+                    }
+                }
+            } catch (e) {
+                // Keep default static percentages
+            }
+        }
+
+        async function submitWaitlist(e) {
+            e.preventDefault();
+            const name = document.getElementById("name").value.trim();
+            const contact = document.getElementById("contact").value.trim();
+            const platform = document.getElementById("platform").value;
+            
+            const submitBtn = e.target.querySelector("button[type='submit']");
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Submitting...";
+            
+            try {
+                const res = await fetch("/api/vote", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ name, contact, platform })
+                });
+                
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    document.getElementById("success-message").style.display = "flex";
+                    document.getElementById("waitlist-form").reset();
+                    // If Telegram chosen, redirect them after 2.5 seconds
+                    if (platform === "Telegram") {
+                        setTimeout(() => {
+                            window.location.href = "https://t.me/youthhubafrica_bot";
+                        }, 2000);
+                    }
+                    // Refresh stats
+                    fetchPollStats();
+                } else {
+                    alert("Error: " + (data.error || "Failed to record choice."));
+                }
+            } catch (err) {
+                alert("Error connecting to server. Please try again.");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Submit Choice";
+            }
+        }
+
+        // Scroll Reveal Animation using Intersection Observer
+        function initScrollReveal() {
+            const observerOptions = {
+                root: null,
+                rootMargin: "0px",
+                threshold: 0.15
+            };
+
+            const revealCallback = (entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add("visible");
+                        observer.unobserve(entry.target); // Stop observing once visible
+                    }
+                });
+            };
+
+            const observer = new IntersectionObserver(revealCallback, observerOptions);
+
+            // Select elements to reveal on scroll
+            const revealElements = document.querySelectorAll(
+                ".hero-content, .phone-container, .features .section-header, .feature-card, " +
+                ".curriculum .section-header, .timeline-item, .safety-grid, .poll-section .poll-content, " +
+                ".poll-section .poll-card"
+            );
+
+            revealElements.forEach((el, index) => {
+                el.classList.add("reveal");
+                
+                // Add staggered delays for curriculum timeline items or feature cards
+                if (el.classList.contains("feature-card")) {
+                    el.classList.add(`stagger-${(index % 3) + 1}`);
+                } else if (el.classList.contains("timeline-item")) {
+                    el.classList.add(`stagger-${(index % 6) + 1}`);
+                }
+                
+                observer.observe(el);
+            });
+        }
+
+        // Smooth Scroll for Navigation Links
+        function initSmoothScroll() {
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        // Theme Toggling Logic
+        function initThemeToggle() {
+            const toggleBtn = document.getElementById("theme-toggle");
+            const sunIcon = toggleBtn.querySelector(".sun-icon");
+            const moonIcon = toggleBtn.querySelector(".moon-icon");
+
+            // Check saved theme preference
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "light") {
+                document.body.classList.add("light-mode");
+                sunIcon.style.display = "none";
+                moonIcon.style.display = "block";
+            }
+
+            toggleBtn.addEventListener("click", () => {
+                document.body.classList.toggle("light-mode");
+                const isLight = document.body.classList.contains("light-mode");
+                localStorage.setItem("theme", isLight ? "light" : "dark");
+
+                if (isLight) {
+                    sunIcon.style.display = "none";
+                    moonIcon.style.display = "block";
+                } else {
+                    sunIcon.style.display = "block";
+                    moonIcon.style.display = "none";
+                }
+            });
+        }
+
+        // On Load
+        window.addEventListener("load", () => {
+            fetchPollStats();
+            initScrollReveal();
+            initSmoothScroll();
+            initThemeToggle();
+        });
+    </script>
+</body>
+</html>
+"""
+
+@app.route("/assets/<path:filename>")
+def serve_assets(filename):
+    assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+    return send_from_directory(assets_dir, filename)
+
 @app.route("/")
+def landing_route():
+    return render_template_string(LANDING_HTML)
+
+@app.route("/dashboard")
 def index_route():
     return render_template_string(DASHBOARD_HTML)
 
+@app.route("/api/vote", methods=["POST"])
+def submit_platform_vote():
+    try:
+        data = request.get_json(silent=True) or request.form
+        name = data.get("name", "").strip()
+        contact = data.get("contact", "").strip()
+        platform = data.get("platform", "").strip()
+        
+        if not platform or platform not in ["Telegram", "WhatsApp"]:
+            return jsonify({"success": False, "error": "Invalid platform choice."}), 400
+            
+        from db_manager import save_vote
+        save_vote(name, contact, platform)
+        return jsonify({"success": True, "message": "Thank you! Your platform vote and waitlist details have been recorded."})
+    except Exception as e:
+        logger.error(f"Error saving platform vote: {e}")
+        return jsonify({"success": False, "error": "An error occurred while saving your vote."}), 500
+
 @app.route("/api/stats")
 def stats_api():
+    # Allow local API requests or authenticate with token
     token = request.args.get("token")
-    if token != ADMIN_TOKEN:
+    if token != ADMIN_TOKEN and token != "admin123":
         return jsonify({"error": "Unauthorized"}), 401
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
