@@ -175,7 +175,7 @@ def get_stats_data(start_date=None, end_date=None):
             pct = int((highest_stalled_count / total_stalled) * 100) if total_stalled > 0 else 0
             
             recommendation = (
-                f"⚠️ <strong>Module {m_num} ({topic})</strong> is your biggest bottleneck. "
+                f"<strong>Module {m_num} ({topic})</strong> is your biggest bottleneck. "
                 f"It accounts for <strong>{highest_stalled_count} stalled learners ({pct}% of all drop-offs)</strong>. "
                 f"Consider simplifying lessons or refining reflection prompts for this module."
             )
@@ -1699,7 +1699,13 @@ DASHBOARD_HTML = """
                 <!-- Course Bottleneck & Drop-Off Alert Widget -->
                 <div id="bottleneckWidget" style="margin-bottom: 2rem; background: var(--card-bg); border: 1px solid rgba(249, 115, 22, 0.15); border-left: 4px solid var(--accent-orange, #f97316); border-radius: var(--border-radius); padding: 1.5rem; display: none;">
                     <div style="display: flex; align-items: flex-start; gap: 1rem;">
-                        <div style="color: var(--accent-orange, #f97316); font-size: 1.4rem; line-height: 1;">💡</div>
+                        <div style="color: var(--accent-orange, #f97316); display: flex; align-items: center; justify-content: center; width: 24px; height: 24px; margin-top: 2px;">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .4 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"></path>
+                                <line x1="9" y1="18" x2="15" y2="18"></line>
+                                <line x1="10" y1="22" x2="14" y2="22"></line>
+                            </svg>
+                        </div>
                         <div>
                             <h4 style="margin: 0 0 0.25rem 0; font-size: 0.9rem; font-weight: 600; color: var(--text-color);">Facilitator Insight & Course Bottleneck Analysis</h4>
                             <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;" id="bottleneckText">
