@@ -2991,6 +2991,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     
     user_id = query.from_user.id
     data = query.data
+    lang = get_language_preference(user_id) or "en"
     
     # Block restricted female users from clicking other buttons
     if data != "cmd_restart_reg" and await check_gender_blocked(update, context):
