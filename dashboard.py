@@ -79,28 +79,108 @@ def get_stats_data(start_date=None, end_date=None):
             "Igbo": lang_counts.get("ig", 0)
         }
         
-        # 3. Module distribution funnel
+        # 3. Module distribution funnel (Active vs Stalled)
         if start_date or end_date:
             cursor.execute("""
-                SELECT current_module_id, COUNT(*) 
+                SELECT current_module_id, last_activity, post_test_score 
                 FROM learners 
                 WHERE current_lesson_id != 'start'
                   AND enrollment_date >= %s AND enrollment_date <= %s
-                GROUP BY current_module_id
             """, params)
         else:
             cursor.execute("""
-                SELECT current_module_id, COUNT(*) 
+                SELECT current_module_id, last_activity, post_test_score 
                 FROM learners 
                 WHERE current_lesson_id != 'start'
-                GROUP BY current_module_id
             """)
-        module_counts = dict(cursor.fetchall())
         
+        rows = cursor.fetchall()
+        import datetime
+        now = datetime.datetime.now()
+        seven_days_ago = now - datetime.timedelta(days=7)
+        
+        # Initialize counts
+        active_by_module = {}
+        stalled_by_module = {}
+        for i in range(1, 12):
+            active_by_module[f"module_{i}"] = 0
+            stalled_by_module[f"module_{i}"] = 0
+            
+        for current_module_id, last_activity, post_test_score in rows:
+            if not current_module_id:
+                continue
+                
+            # Check if graduated
+            is_graduated = (post_test_score is not None and post_test_score >= 0)
+            if is_graduated:
+                continue
+                
+            # Parse last_activity
+            is_stalled = False
+            if last_activity:
+                try:
+                    if isinstance(last_activity, str):
+                        val = last_activity.split(".")[0]
+                        la_dt = datetime.datetime.strptime(val, "%Y-%m-%d %H:%M:%S")
+                    else:
+                        la_dt = last_activity
+                        
+                    if la_dt < seven_days_ago:
+                        is_stalled = True
+                except Exception:
+                    is_stalled = True
+            else:
+                is_stalled = True
+                
+            if is_stalled:
+                stalled_by_module[current_module_id] = stalled_by_module.get(current_module_id, 0) + 1
+            else:
+                active_by_module[current_module_id] = active_by_module.get(current_module_id, 0) + 1
+                
         stats["module_progress"] = {}
+        stats["module_stalled"] = {}
         for i in range(1, 12):
             m_id = f"module_{i}"
-            stats["module_progress"][f"Module {i}"] = module_counts.get(m_id, 0)
+            stats["module_progress"][f"Module {i}"] = active_by_module.get(m_id, 0)
+            stats["module_stalled"][f"Module {i}"] = stalled_by_module.get(m_id, 0)
+            
+        # 3.5 Content Bottleneck Recommendations
+        highest_stalled_module = None
+        highest_stalled_count = 0
+        total_stalled = 0
+        
+        for m_id, count in stalled_by_module.items():
+            total_stalled += count
+            if count > highest_stalled_count:
+                highest_stalled_count = count
+                highest_stalled_module = m_id
+                
+        recommendation = "No significant bottlenecks detected. All modules show balanced participant momentum!"
+        if highest_stalled_module and highest_stalled_count > 0:
+            m_num = highest_stalled_module.split("_")[1]
+            module_topics = {
+                "1": "Healthy Masculinity Intro",
+                "2": "Gender Roles & Expectations",
+                "3": "Violence & Power Dynamics",
+                "4": "Emotional Expression",
+                "5": "Healthy Relationships & Consent",
+                "6": "Peer Accountability",
+                "7": "Community GBV Prevention",
+                "8": "Self-Reflection & Action Plan",
+                "9": "Mirror Moments Reflections",
+                "10": "Pledge & Commitment",
+                "11": "Graduation & Certificate Wrap"
+            }
+            topic = module_topics.get(m_num, f"Module {m_num}")
+            pct = int((highest_stalled_count / total_stalled) * 100) if total_stalled > 0 else 0
+            
+            recommendation = (
+                f"⚠️ <strong>Module {m_num} ({topic})</strong> is your biggest bottleneck. "
+                f"It accounts for <strong>{highest_stalled_count} stalled learners ({pct}% of all drop-offs)</strong>. "
+                f"Consider simplifying lessons or refining reflection prompts for this module."
+            )
+            
+        stats["bottleneck_recommendation"] = recommendation
             
         # 4. Graduates (post_test_score >= 0)
         if start_date or end_date:
@@ -411,7 +491,9 @@ def get_learners_data(search_query=None, limit=20, offset=0, order_by="active"):
     learners = []
     total_count = 0
     try:
-        # Determine sorting criteria
+        # Determine sorting/filtering criteria
+        is_stalled_only = (order_by == "stalled")
+        
         if order_by == "alpha":
             order_clause = "ORDER BY COALESCE(full_name, '') ASC, last_activity DESC"
         elif order_by == "graduates":
@@ -419,45 +501,65 @@ def get_learners_data(search_query=None, limit=20, offset=0, order_by="active"):
         else:
             order_clause = "ORDER BY last_activity DESC"
 
-        # Get total count with search matching user_id, full_name, email, or state
+        # Get cutoff date for stalled (inactive >7 days) in SQL/database representation
+        import datetime
+        now = datetime.datetime.now()
+        seven_days_ago = now - datetime.timedelta(days=7)
+        seven_days_ago_str = seven_days_ago.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Build dynamic query
+        where_conditions = []
+        where_params = []
+        
         if search_query:
             q = f"%{search_query}%"
-            cursor.execute("""
-                SELECT COUNT(*) FROM learners 
-                WHERE CAST(user_id AS TEXT) LIKE %s 
-                   OR COALESCE(full_name, '') LIKE %s 
-                   OR COALESCE(email, '') LIKE %s 
-                   OR COALESCE(state, '') LIKE %s
-            """, (q, q, q, q))
-        else:
-            cursor.execute("SELECT COUNT(*) FROM learners")
+            where_conditions.append("(CAST(user_id AS TEXT) LIKE %s OR COALESCE(full_name, '') LIKE %s OR COALESCE(email, '') LIKE %s OR COALESCE(state, '') LIKE %s)")
+            where_params.extend([q, q, q, q])
+            
+        if is_stalled_only:
+            where_conditions.append("(post_test_score IS NULL OR post_test_score < 0) AND last_activity < %s")
+            where_params.append(seven_days_ago_str)
+            
+        where_clause = ""
+        if where_conditions:
+            where_clause = "WHERE " + " AND ".join(where_conditions)
+
+        # Get total count
+        cursor.execute(f"SELECT COUNT(*) FROM learners {where_clause}", where_params)
         total_count = cursor.fetchone()[0]
         
         # Get records with pagination and dynamic ordering
-        if search_query:
-            q = f"%{search_query}%"
-            cursor.execute(f"""
-                SELECT user_id, full_name, email, age, state, language_preference, 
-                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, is_pwd
-                FROM learners
-                WHERE CAST(user_id AS TEXT) LIKE %s 
-                   OR COALESCE(full_name, '') LIKE %s 
-                   OR COALESCE(email, '') LIKE %s 
-                   OR COALESCE(state, '') LIKE %s
-                {order_clause}
-                LIMIT %s OFFSET %s
-            """, (q, q, q, q, limit, offset))
-        else:
-            cursor.execute(f"""
-                SELECT user_id, full_name, email, age, state, language_preference, 
-                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, is_pwd
-                FROM learners
-                {order_clause}
-                LIMIT %s OFFSET %s
-            """, (limit, offset))
-            
+        query = f"""
+            SELECT user_id, full_name, email, age, state, language_preference, 
+                   pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, is_pwd
+            FROM learners
+            {where_clause}
+            {order_clause}
+            LIMIT %s OFFSET %s
+        """
+        cursor.execute(query, where_params + [limit, offset])
         rows = cursor.fetchall()
+        
         for r in rows:
+            # Determine active vs stalled status in Python representation
+            last_act = r[10]
+            is_stalled = False
+            if r[7] is not None and r[7] >= 0:
+                is_stalled = False
+            elif last_act:
+                try:
+                    if isinstance(last_act, str):
+                        la_val = last_act.split(".")[0]
+                        la_dt = datetime.datetime.strptime(la_val, "%Y-%m-%d %H:%M:%S")
+                    else:
+                        la_dt = last_act
+                    if la_dt < seven_days_ago:
+                        is_stalled = True
+                except Exception:
+                    is_stalled = True
+            else:
+                is_stalled = True
+
             learners.append({
                 "user_id": r[0],
                 "full_name": r[1] or "Anonymous",
@@ -470,7 +572,8 @@ def get_learners_data(search_query=None, limit=20, offset=0, order_by="active"):
                 "post_test": r[7] if r[7] >= 0 else "-",
                 "module": str(r[8]).replace("module_", "Module ") if r[8] else "-",
                 "lesson": format_lesson_id(r[9]) if r[9] else "-",
-                "last_active": str(r[10]).split(".")[0] if r[10] else "-"
+                "last_active": str(r[10]).split(".")[0] if r[10] else "-",
+                "is_stalled": is_stalled
             })
     except Exception as e:
         logger.error(f"Error fetching learners list: {e}")
@@ -1593,10 +1696,23 @@ DASHBOARD_HTML = """
                     </div>
                 </div>
 
+                <!-- Course Bottleneck & Drop-Off Alert Widget -->
+                <div class="card" id="bottleneckWidget" style="margin-bottom: 2rem; border-left: 4px solid var(--accent-orange, #f97316); background: rgba(249, 115, 22, 0.03); display: none;">
+                    <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                        <div style="color: var(--accent-orange, #f97316); font-size: 1.4rem; line-height: 1;">💡</div>
+                        <div>
+                            <h4 style="margin: 0 0 0.25rem 0; font-size: 0.9rem; font-weight: 600; color: var(--text-color);">Facilitator Insight & Course Bottleneck Analysis</h4>
+                            <p style="margin: 0; font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;" id="bottleneckText">
+                                Loading course progression insights...
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="main-grid" style="margin-bottom: 2rem;">
                     <div class="card">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Module progression funnel</h3>
+                            <h3 style="font-weight: 400; font-size: 0.95rem; letter-spacing: 0.5px; color: var(--text-muted);">Module progression & drop-off funnel</h3>
                             <button class="btn btn-secondary btn-chart-download" onclick="downloadChart('funnelChart', 'module_funnel.png')" style="padding: 0.25rem 0.5rem; height: 28px; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;" title="Export chart as image">
                                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"></path>
@@ -1604,7 +1720,7 @@ DASHBOARD_HTML = """
                                 <span>Export</span>
                             </button>
                         </div>
-                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Active learner count per module</p>
+                        <p style="font-size: 0.8rem; color: var(--text-muted); margin-bottom: 1rem;">Active vs. Stalled (inactive for 7+ days) learner segments per module</p>
                         <div class="chart-container">
                             <canvas id="funnelChart"></canvas>
                         </div>
@@ -1725,6 +1841,7 @@ DASHBOARD_HTML = """
                         <!-- Sorting Dropdown -->
                         <select id="learnerSortSelect" class="input-text btn-mobile-block" onchange="onLearnerSortChange()" style="width: 180px;">
                             <option value="active">Last Active</option>
+                            <option value="stalled">Stalled (Inactive 7+ Days)</option>
                             <option value="alpha">Alphabetical</option>
                             <option value="graduates">Graduates First</option>
                         </select>
@@ -1747,6 +1864,7 @@ DASHBOARD_HTML = """
                                 <th>Post-test</th>
                                 <th>Current progress</th>
                                 <th>Last active</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody id="learnersTableBody">
@@ -2163,6 +2281,16 @@ DASHBOARD_HTML = """
                 document.getElementById("kpiAvgScore").innerHTML = (stats.average_post_test !== undefined ? stats.average_post_test : 0.0) + ' <span style="font-size: 1rem; color: var(--text-muted);">/ 50</span>';
                 document.getElementById("kpiAiQueries").innerText = stats.total_ai_queries !== undefined ? stats.total_ai_queries : 0;
 
+                // Populate Course Bottleneck Recommendation
+                const bottleneckWidget = document.getElementById("bottleneckWidget");
+                const bottleneckText = document.getElementById("bottleneckText");
+                if (stats.bottleneck_recommendation) {
+                    bottleneckText.innerHTML = stats.bottleneck_recommendation;
+                    bottleneckWidget.style.display = "block";
+                } else {
+                    bottleneckWidget.style.display = "none";
+                }
+
                 // Populate Today's Readings
                 document.getElementById("kpiNewToday").innerText = stats.enrollments_today !== undefined ? stats.enrollments_today : 0;
                 document.getElementById("splitRegToday").innerText = stats.enrollments_today !== undefined ? stats.enrollments_today : 0;
@@ -2221,9 +2349,9 @@ DASHBOARD_HTML = """
                 const isLight = document.body.classList.contains("light-theme");
                 const gridColor = isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)";
                 const tickColor = isLight ? "#707579" : "#7f91a4";
-                const fontColor = isLight ? "#212121" : "#ffffff";
-
+                const fontColor = isLight ? "#212121" : "#fff";
                 const progressData = stats.module_progress || {};
+                const stalledData = stats.module_stalled || {};
                 const languageData = stats.languages || {};
 
                 // Funnel Chart
@@ -2239,19 +2367,30 @@ DASHBOARD_HTML = """
                     return numA - numB;
                 });
                 const sortedFunnelValues = sortedFunnelKeys.map(k => progressData[k]);
+                const sortedStalledValues = sortedFunnelKeys.map(k => stalledData[k] || 0);
 
                 funnelChartInstance = new Chart(funnelCtx, {
                     type: 'bar',
                     data: {
                         labels: sortedFunnelKeys,
-                        datasets: [{
-                            label: 'Learners Active',
-                            data: sortedFunnelValues,
-                            backgroundColor: isLight ? 'rgba(44, 145, 70, 0.7)' : 'rgba(158, 255, 0, 0.7)',
-                            borderColor: isLight ? '#2c9146' : '#9eff00',
-                            borderWidth: 1,
-                            borderRadius: 2,
-                        }]
+                        datasets: [
+                            {
+                                label: 'Active Progress',
+                                data: sortedFunnelValues,
+                                backgroundColor: isLight ? 'rgba(44, 145, 70, 0.75)' : 'rgba(158, 255, 0, 0.75)',
+                                borderColor: isLight ? '#2c9146' : '#9eff00',
+                                borderWidth: 1,
+                                borderRadius: 2,
+                            },
+                            {
+                                label: 'Stalled / Dropped Off (7+ days inactive)',
+                                data: sortedStalledValues,
+                                backgroundColor: isLight ? 'rgba(249, 115, 22, 0.65)' : 'rgba(249, 115, 22, 0.8)',
+                                borderColor: '#f97316',
+                                borderWidth: 1,
+                                borderRadius: 2,
+                            }
+                        ]
                     },
                     options: {
                         responsive: true,
@@ -2261,14 +2400,16 @@ DASHBOARD_HTML = """
                             easing: 'easeOutQuart'
                         },
                         plugins: {
-                            legend: { display: false }
+                            legend: { display: true, position: 'bottom', labels: { color: fontColor } }
                         },
                         scales: {
                             y: {
+                                stacked: true,
                                 grid: { color: gridColor },
                                 ticks: { color: tickColor, precision: 0 }
                             },
                             x: {
+                                stacked: true,
                                 grid: { display: false },
                                 ticks: { color: tickColor }
                             }
@@ -2465,7 +2606,7 @@ DASHBOARD_HTML = """
                 tbody.innerHTML = "";
                 
                 if (!data.learners || data.learners.length === 0) {
-                    tbody.innerHTML = '<tr><td colspan="11" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No learners registered yet.</td></tr>';
+                    tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding: 2.5rem; color: var(--text-muted);">No learners registered yet.</td></tr>';
                     document.getElementById("learnerPaginationInfo").innerText = "Page 0 of 0";
                     document.getElementById("btnLearnerPrev").disabled = true;
                     document.getElementById("btnLearnerNext").disabled = true;
@@ -2489,6 +2630,13 @@ DASHBOARD_HTML = """
                             <div style="font-size: 0.7rem; color: var(--text-muted);">${learner.lesson}</div>
                         </td>
                         <td style="font-size: 0.75rem; color: var(--text-muted);">${learner.last_active}</td>
+                        <td style="font-size: 0.75rem;">
+                            <span style="display: inline-block; padding: 0.2rem 0.5rem; border-radius: 4px; font-weight: 600; 
+                                         background-color: ${learner.post_test !== '-' ? 'rgba(44, 145, 70, 0.15)' : (learner.is_stalled ? 'rgba(249, 115, 22, 0.15)' : 'rgba(36, 129, 204, 0.15)')}; 
+                                         color: ${learner.post_test !== '-' ? '#2c9146' : (learner.is_stalled ? '#f97316' : '#2481cc')};">
+                                ${learner.post_test !== '-' ? 'Graduated' : (learner.is_stalled ? 'Stalled' : 'Active')}
+                            </span>
+                        </td>
                     `;
                     tbody.appendChild(tr);
                 });
@@ -4096,7 +4244,8 @@ def export_learners_csv():
     conn = get_connection()
     cursor = conn.cursor()
     try:
-        # Determine sorting criteria
+        is_stalled_only = (order_by == "stalled")
+        
         if order_by == "alpha":
             order_clause = "ORDER BY COALESCE(full_name, '') ASC, last_activity DESC"
         elif order_by == "graduates":
@@ -4104,48 +4253,79 @@ def export_learners_csv():
         else:
             order_clause = "ORDER BY last_activity DESC"
 
+        # Get cutoff date for stalled (inactive >7 days)
+        import datetime
+        now = datetime.datetime.now()
+        seven_days_ago = now - datetime.timedelta(days=7)
+        seven_days_ago_str = seven_days_ago.strftime("%Y-%m-%d %H:%M:%S")
+
+        # Build dynamic query
+        where_conditions = []
+        where_params = []
+        
         if search_query:
             q = f"%{search_query}%"
-            cursor.execute(f"""
-                SELECT user_id, full_name, email, age, state, language_preference, 
-                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, is_pwd
-                FROM learners
-                WHERE CAST(user_id AS TEXT) LIKE %s 
-                   OR COALESCE(full_name, '') LIKE %s 
-                   OR COALESCE(email, '') LIKE %s 
-                   OR COALESCE(state, '') LIKE %s
-                {order_clause}
-            """, (q, q, q, q))
-        else:
-            cursor.execute(f"""
-                SELECT user_id, full_name, email, age, state, language_preference, 
-                       pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, is_pwd
-                FROM learners
-                {order_clause}
-            """)
-        
+            where_conditions.append("(CAST(user_id AS TEXT) LIKE %s OR COALESCE(full_name, '') LIKE %s OR COALESCE(email, '') LIKE %s OR COALESCE(state, '') LIKE %s)")
+            where_params.extend([q, q, q, q])
+            
+        if is_stalled_only:
+            where_conditions.append("(post_test_score IS NULL OR post_test_score < 0) AND last_activity < %s")
+            where_params.append(seven_days_ago_str)
+            
+        where_clause = ""
+        if where_conditions:
+            where_clause = "WHERE " + " AND ".join(where_conditions)
+
+        query = f"""
+            SELECT user_id, full_name, email, age, state, language_preference, 
+                   pre_test_score, post_test_score, current_module_id, current_lesson_id, last_activity, is_pwd
+            FROM learners
+            {where_clause}
+            {order_clause}
+        """
+        cursor.execute(query, where_params)
         rows = cursor.fetchall()
         
         # Generate CSV
         si = io.StringIO()
         cw = csv.writer(si)
         # Headers
-        cw.writerow(["User ID", "Name", "Email", "Age", "PWD Status", "State", "Language", "Pre-test Score", "Post-test Score", "Current Module", "Current Lesson", "Last Active"])
+        cw.writerow(["User ID", "Name", "Email", "Age", "PWD Status", "State", "Language", "Pre-test Score", "Post-test Score", "Current Module", "Current Lesson", "Last Active", "Status"])
         
         for r in rows:
+            # Determine status
+            last_act = r[10]
+            status_str = "Active"
+            if r[7] is not None and r[7] >= 0:
+                status_str = "Graduated"
+            elif last_act:
+                try:
+                    if isinstance(last_act, str):
+                        la_val = last_act.split(".")[0]
+                        la_dt = datetime.datetime.strptime(la_val, "%Y-%m-%d %H:%M:%S")
+                    else:
+                        la_dt = last_act
+                    if la_dt < seven_days_ago:
+                        status_str = "Stalled (7+ Days Inactive)"
+                except Exception:
+                    status_str = "Stalled"
+            else:
+                status_str = "Stalled"
+
             cw.writerow([
                 r[0],
-                r[1] or "",
-                r[2] or "",
-                r[3] if r[3] is not None else "",
-                r[11] or "",
-                r[4] or "",
+                r[1] or "Anonymous",
+                r[2] or "-",
+                r[3] if r[3] is not None else "-",
+                r[11] or "-",
+                r[4] or "-",
                 (r[5] or "en").upper(),
-                r[6] if r[6] >= 0 else "",
-                r[7] if r[7] >= 0 else "",
-                str(r[8]).replace("module_", "Module ") if r[8] else "",
-                format_lesson_id(r[9]) if r[9] else "",
-                str(r[10]).split(".")[0] if r[10] else ""
+                r[6] if r[6] >= 0 else "-",
+                r[7] if r[7] >= 0 else "-",
+                str(r[8]).replace("module_", "Module ") if r[8] else "-",
+                format_lesson_id(r[9]) if r[9] else "-",
+                str(r[10]).split(".")[0] if r[10] else "-",
+                status_str
             ])
             
         response = make_response(si.getvalue())
