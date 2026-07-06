@@ -475,8 +475,8 @@ def get_learners_data(search_query=None, limit=20, offset=0, order_by="active"):
         
         if search_query:
             q = f"%{search_query}%"
-            where_conditions.append("(CAST(user_id AS TEXT) LIKE %s OR COALESCE(full_name, '') LIKE %s OR COALESCE(email, '') LIKE %s OR COALESCE(state, '') LIKE %s)")
-            where_params.extend([q, q, q, q])
+            where_conditions.append("(CAST(user_id AS TEXT) LIKE %s OR COALESCE(full_name, '') LIKE %s OR COALESCE(email, '') LIKE %s OR COALESCE(state, '') LIKE %s OR COALESCE(is_pwd, '') LIKE %s)")
+            where_params.extend([q, q, q, q, q])
             
         if is_stalled_only:
             where_conditions.append("(post_test_score IS NULL OR post_test_score < 0) AND last_activity < %s")
@@ -4318,8 +4318,8 @@ def export_learners_csv():
         
         if search_query:
             q = f"%{search_query}%"
-            where_conditions.append("(CAST(user_id AS TEXT) LIKE %s OR COALESCE(full_name, '') LIKE %s OR COALESCE(email, '') LIKE %s OR COALESCE(state, '') LIKE %s)")
-            where_params.extend([q, q, q, q])
+            where_conditions.append("(CAST(user_id AS TEXT) LIKE %s OR COALESCE(full_name, '') LIKE %s OR COALESCE(email, '') LIKE %s OR COALESCE(state, '') LIKE %s OR COALESCE(is_pwd, '') LIKE %s)")
+            where_params.extend([q, q, q, q, q])
             
         if is_stalled_only:
             where_conditions.append("(post_test_score IS NULL OR post_test_score < 0) AND last_activity < %s")
