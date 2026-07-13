@@ -3158,6 +3158,50 @@ LANDING_HTML = """<!DOCTYPE html>
             transform: translateY(-2px);
         }
 
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .menu-toggle-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 26px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            z-index: 101;
+        }
+
+        .menu-toggle-btn .bar {
+            width: 100%;
+            height: 2.5px;
+            background-color: var(--text-white);
+            border-radius: 2px;
+            transition: var(--transition);
+        }
+
+        /* Hamburger Animation */
+        .menu-toggle-btn.active .bar-1 {
+            transform: translateY(8px) rotate(45deg);
+        }
+
+        .menu-toggle-btn.active .bar-2 {
+            opacity: 0;
+        }
+
+        .menu-toggle-btn.active .bar-3 {
+            transform: translateY(-8px) rotate(-45deg);
+        }
+
+        body.menu-open {
+            overflow: hidden;
+        }
+
         /* Hero Section */
         .hero {
             padding: 6rem 0;
@@ -3593,7 +3637,7 @@ LANDING_HTML = """<!DOCTYPE html>
         /* Footer */
         footer.container {
             border-top: 1px solid var(--border-color);
-            padding: 8rem 2rem 10rem 2rem;
+            padding: 4rem 2rem 5rem 2rem;
             font-size: 0.95rem;
             color: var(--text-muted);
             margin-top: 6rem;
@@ -3729,6 +3773,67 @@ LANDING_HTML = """<!DOCTYPE html>
                 grid-template-columns: 1fr;
                 gap: 3rem;
             }
+
+            /* Responsive Navbar Styles */
+            .menu-toggle-btn {
+                display: flex;
+            }
+
+            nav {
+                position: fixed;
+                top: 0;
+                right: 0;
+                width: 100%;
+                height: 100dvh;
+                background-color: var(--bg-dark);
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
+                gap: 2.5rem;
+                padding: 2rem;
+                z-index: 99;
+                transform: translateX(100%);
+                opacity: 0;
+                transition: var(--transition);
+                pointer-events: none;
+            }
+
+            nav.active {
+                transform: translateX(0);
+                opacity: 1;
+                pointer-events: auto;
+            }
+
+            nav a {
+                font-size: 1.5rem;
+                font-weight: 600;
+                color: var(--text-white);
+            }
+
+            nav a.btn-primary {
+                font-size: 1.1rem;
+                width: 100%;
+                max-width: 280px;
+                padding: 1rem 2rem;
+                text-align: center;
+            }
+
+            /* Footer responsive styling */
+            footer.container {
+                padding: 3rem 1.5rem 4rem 1.5rem;
+                margin-top: 4rem;
+            }
+            .footer-wrapper {
+                flex-direction: column;
+                text-align: center;
+                gap: 2rem;
+            }
+            .footer-links {
+                justify-content: center;
+                gap: 2rem;
+                flex-wrap: wrap;
+            }
         }
     </style>
 </head>
@@ -3741,18 +3846,25 @@ LANDING_HTML = """<!DOCTYPE html>
                 <div class="logo-icon">TR</div>
                 <span>THE BROTHERS' ROOM</span>
             </div>
-            <nav>
-                <a href="#curriculum">The Curriculum</a>
-                <a href="#safety">Safety & Privacy</a>
-                <a href="#poll">Platform Poll</a>
-                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme" style="margin-left: 0.5rem;">
+            <div class="header-right">
+                <nav id="nav-menu">
+                    <a href="#curriculum">The Curriculum</a>
+                    <a href="#safety">Safety & Privacy</a>
+                    <a href="#poll">Platform Poll</a>
+                    <a href="https://t.me/youthhubafrica_bot" class="btn btn-primary">START COURSE</a>
+                </nav>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
                     <!-- Sun Icon (shown in dark mode to switch to light) -->
                     <svg class="sun-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <!-- Moon Icon (shown in light mode to switch to dark) -->
                     <svg class="moon-icon" viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" style="display: none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
-                <a href="https://t.me/youthhubafrica_bot" class="btn btn-primary">START COURSE</a>
-            </nav>
+                <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle Menu" aria-expanded="false">
+                    <span class="bar bar-1"></span>
+                    <span class="bar bar-2"></span>
+                    <span class="bar bar-3"></span>
+                </button>
+            </div>
         </div>
     </header>
 
@@ -4117,12 +4229,39 @@ LANDING_HTML = """<!DOCTYPE html>
             });
         }
 
+        // Mobile Navigation Toggle
+        function initMobileNav() {
+            const menuToggle = document.getElementById("menu-toggle");
+            const navMenu = document.getElementById("nav-menu");
+            const navLinks = navMenu.querySelectorAll("a");
+
+            if (menuToggle && navMenu) {
+                menuToggle.addEventListener("click", () => {
+                    const isExpanded = menuToggle.getAttribute("aria-expanded") === "true";
+                    menuToggle.setAttribute("aria-expanded", !isExpanded);
+                    menuToggle.classList.toggle("active");
+                    navMenu.classList.toggle("active");
+                    document.body.classList.toggle("menu-open");
+                });
+
+                navLinks.forEach(link => {
+                    link.addEventListener("click", () => {
+                        menuToggle.setAttribute("aria-expanded", "false");
+                        menuToggle.classList.remove("active");
+                        navMenu.classList.remove("active");
+                        document.body.classList.remove("menu-open");
+                    });
+                });
+            }
+        }
+
         // On Load
         window.addEventListener("load", () => {
             fetchPollStats();
             initScrollReveal();
             initSmoothScroll();
             initThemeToggle();
+            initMobileNav();
         });
     </script>
 </body>
