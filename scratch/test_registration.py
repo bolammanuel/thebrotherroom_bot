@@ -47,9 +47,13 @@ def test_registration_flow_helpers():
     
     # Update state
     db_manager.update_state(user_id, "Lagos")
+    assert not db_manager.is_learner_registered(user_id), "Should not be registered without is_pwd status"
+    
+    # Update PWD status
+    db_manager.update_pwd_status(user_id, "No")
     
     # Now registration should be complete
-    assert db_manager.is_learner_registered(user_id), "Should be fully registered now that name, email, state, and age are set"
+    assert db_manager.is_learner_registered(user_id), "Should be fully registered now that name, email, state, age, and PWD status are set"
     print("✅ Registration helper validation tests passed.")
     
     # Clean up test data
