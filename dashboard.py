@@ -552,6 +552,8 @@ DASHBOARD_HTML = """
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Brothers' Room - Facilitator Analytics</title>
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/youthhub_africa_logo.png">
     <!-- Google Fonts & Stylesheets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -3009,6 +3011,8 @@ LANDING_HTML = """<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Brothers' Room - Positive Masculinity & GBV Prevention</title>
     <meta name="description" content="A safe, secure, and private learning bot on Telegram and WhatsApp helping young men connect, grow, and stand against Gender-Based Violence.">
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/youthhub_africa_logo.png">
     
     <!-- Google Fonts & Stylesheets -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -4272,6 +4276,11 @@ LANDING_HTML = """<!DOCTYPE html>
 def serve_assets(filename):
     assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
     return send_from_directory(assets_dir, filename)
+
+@app.route("/favicon.ico")
+def favicon():
+    assets_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "assets")
+    return send_from_directory(assets_dir, "youthhub_africa_logo.png", mimetype="image/png")
 
 @app.route("/")
 def landing_route():
