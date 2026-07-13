@@ -3208,7 +3208,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
         /* Hero Section */
         .hero {
-            padding: 6rem 0;
+            padding: 6rem 2rem;
             display: grid;
             grid-template-columns: 1.2fr 0.8fr;
             gap: 4rem;
@@ -3847,7 +3847,6 @@ LANDING_HTML = """<!DOCTYPE html>
     <header>
         <div class="container nav-wrapper">
             <div class="logo">
-                <div class="logo-icon">TR</div>
                 <span>THE BROTHERS' ROOM</span>
             </div>
             <div class="header-right">
