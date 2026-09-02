@@ -3604,15 +3604,16 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .section-tag {
             display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 99px;
-            background: var(--brand-green-subtle);
             color: var(--brand-green);
-            font-size: 0.78rem;
-            font-weight: 600;
+            font-size: 0.85rem;
+            font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.5rem;
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
         }
 
         .features-left h2 {
@@ -3740,12 +3741,13 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .module-badge {
-            background: var(--brand-green-subtle);
             color: var(--brand-green);
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.2rem 0.6rem;
-            border-radius: 99px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0;
+            background: transparent;
+            border: none;
+            border-radius: 0;
         }
 
         .module-duration {
@@ -3898,24 +3900,21 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .platform-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 0.25rem 0.7rem;
-            border-radius: 99px;
-            margin-bottom: 1.1rem;
-            width: fit-content;
+            display: inline-block;
+            font-size: 0.85rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            padding: 0;
+            background: transparent !important;
+            border: none;
+            border-radius: 0;
         }
 
         .platform-badge.whatsapp {
-            background: rgba(37, 211, 102, 0.12);
-            color: #15803d;
+            color: var(--brand-green);
         }
 
         .platform-badge.telegram {
-            background: rgba(36, 129, 204, 0.12);
             color: var(--c-telegram);
         }
 
