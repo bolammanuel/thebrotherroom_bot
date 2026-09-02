@@ -3056,44 +3056,44 @@ LANDING_HTML = """<!DOCTYPE html>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            /* Default: Clean White High-Contrast Theme */
+            --bg-hero: #080f14;
             --bg-body: #f8fafc;
             --bg-card: #ffffff;
             --bg-surface: #f1f5f9;
+            --text-hero-primary: #ffffff;
+            --text-hero-secondary: #94a3b8;
             --text-primary: #0f172a;
             --text-secondary: #334155;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
+            --border-dark: rgba(255, 255, 255, 0.12);
             --brand-green: #16a34a;
             --brand-green-hover: #15803d;
             --brand-green-subtle: #dcfce7;
+            --accent-lime: #a3e635;
             --c-whatsapp: #25d366;
             --c-telegram: #2481cc;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
-            --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.1);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 12px 32px -4px rgba(15, 23, 42, 0.12);
             --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Dark Mode Theme Tokens */
         body.dark-mode {
+            --bg-hero: #03070a;
             --bg-body: #0b1319;
             --bg-card: #121d26;
             --bg-surface: #1a2734;
+            --text-hero-primary: #ffffff;
+            --text-hero-secondary: #94a3b8;
             --text-primary: #f8fafc;
             --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
             --border-color: rgba(255, 255, 255, 0.12);
-            --brand-green: #22c55e;
-            --brand-green-hover: #16a34a;
-            --brand-green-subtle: rgba(34, 197, 94, 0.15);
-            --shadow-sm: none;
-            --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
-            --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
         }
 
         * {
@@ -3104,6 +3104,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
         html {
             scroll-behavior: smooth;
+            overflow-x: hidden;
         }
 
         body {
@@ -3112,12 +3113,12 @@ LANDING_HTML = """<!DOCTYPE html>
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
+            width: 100%;
         }
 
         h1, h2, h3, h4 {
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
-            color: var(--text-primary);
             letter-spacing: -0.02em;
         }
 
@@ -3127,81 +3128,87 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .container {
+            width: 100%;
             max-width: 1200px;
             margin: 0 auto;
             padding: 0 1.5rem;
         }
 
-        /* Header Navigation */
         header {
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
-        }
-
-        body.dark-mode header {
-            background: rgba(11, 19, 25, 0.95);
+            background: rgba(8, 15, 20, 0.96);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-dark);
+            padding: 0.85rem 0;
         }
 
         .nav-wrapper {
-            display: grid;
-            grid-template-columns: auto 1fr auto;
+            display: flex;
             align-items: center;
-            gap: 2rem;
+            justify-content: space-between;
+            gap: 1.5rem;
         }
 
         .logo {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--text-primary);
+            text-decoration: none;
+            flex-shrink: 0;
         }
 
         .logo-icon {
-            width: 36px;
-            height: 36px;
+            width: 38px;
+            height: 38px;
             background: var(--brand-green);
             color: #ffffff;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
+        }
+
+        .logo-text-group {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+        }
+
+        .logo-title {
+            font-size: 1.12rem;
             font-weight: 700;
-            font-size: 1.1rem;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.01em;
         }
 
-        .logo-partner {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
-            background: var(--bg-surface);
-            color: var(--text-muted);
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #94a3b8;
             font-weight: 500;
-            border: 1px solid var(--border-color);
+            letter-spacing: 0.3px;
         }
 
-        nav {
+        nav.nav-menu {
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 2rem;
         }
 
-        nav a {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
+        nav.nav-menu a {
+            color: #cbd5e1;
+            font-size: 0.92rem;
             font-weight: 500;
             transition: var(--transition);
         }
 
-        nav a:hover {
+        nav.nav-menu a:hover {
             color: var(--brand-green);
         }
 
@@ -3209,33 +3216,45 @@ LANDING_HTML = """<!DOCTYPE html>
             display: flex;
             align-items: center;
             gap: 0.85rem;
+            flex-shrink: 0;
         }
 
-        /* Buttons */
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-dark);
+            color: #ffffff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
         .btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
             gap: 0.5rem;
-            padding: 0.75rem 1.4rem;
+            padding: 0.7rem 1.35rem;
             border-radius: 10px;
             font-weight: 600;
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             transition: var(--transition);
             cursor: pointer;
             border: none;
             text-decoration: none;
         }
 
-        .btn-primary {
-            background-color: var(--text-primary);
-            color: var(--bg-card);
+        .btn-header-cta {
+            background-color: var(--accent-lime);
+            color: #0f172a;
         }
 
-        .btn-primary:hover {
-            opacity: 0.9;
+        .btn-header-cta:hover {
+            opacity: 0.92;
             transform: translateY(-1px);
-            box-shadow: var(--shadow-md);
         }
 
         .btn-whatsapp {
@@ -3245,8 +3264,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .btn-whatsapp:hover {
             opacity: 0.93;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
         }
 
         .btn-telegram {
@@ -3256,32 +3274,18 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .btn-telegram:hover {
             opacity: 0.93;
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(36, 129, 204, 0.3);
+            box-shadow: 0 4px 14px rgba(36, 129, 204, 0.35);
         }
 
-        .btn-secondary {
-            background-color: var(--bg-card);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
+        .btn-outline-dark {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .btn-secondary:hover {
-            background-color: var(--bg-surface);
-        }
-
-        /* Theme Toggle */
-        .theme-toggle-btn {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
+        .btn-outline-dark:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #ffffff;
         }
 
         .menu-toggle-btn {
@@ -3298,87 +3302,105 @@ LANDING_HTML = """<!DOCTYPE html>
         .menu-toggle-btn .bar {
             width: 100%;
             height: 2px;
-            background-color: var(--text-primary);
+            background-color: #ffffff;
             border-radius: 2px;
         }
 
-        /* Hero Section */
-        .hero {
+        .hero-wrapper {
+            background-color: var(--bg-hero);
+            color: #ffffff;
             padding: 4.5rem 0 5rem 0;
-            display: grid;
-            grid-template-columns: 1.15fr 0.85fr;
-            gap: 3.5rem;
-            align-items: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-dark);
         }
 
-        .hero-tag {
+        .hero-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(22, 163, 74, 0.16) 0%, rgba(8, 15, 20, 0) 70%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.9fr 0.75fr;
+            gap: 2.5rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-left-tag {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
             padding: 0.35rem 0.85rem;
             border-radius: 99px;
-            background: var(--brand-green-subtle);
-            border: 1px solid rgba(22, 163, 74, 0.2);
-            color: var(--brand-green);
+            background: rgba(22, 163, 74, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.3);
+            color: var(--accent-lime);
             font-size: 0.82rem;
             font-weight: 600;
             margin-bottom: 1.25rem;
         }
 
-        .hero-content h1 {
+        .hero-left h1 {
             font-size: 3.2rem;
-            line-height: 1.18;
+            line-height: 1.15;
+            color: #ffffff;
             margin-bottom: 1.25rem;
-            color: var(--text-primary);
         }
 
-        .hero-content p {
-            font-size: 1.12rem;
-            color: var(--text-secondary);
+        .hero-left p {
+            font-size: 1.1rem;
+            color: #94a3b8;
             margin-bottom: 2rem;
-            max-width: 560px;
             line-height: 1.65;
         }
 
-        .hero-actions {
+        .hero-ctas {
             display: flex;
             gap: 0.85rem;
             flex-wrap: wrap;
-            margin-bottom: 2rem;
+            margin-bottom: 1.8rem;
         }
 
-        .hero-trust-list {
+        .hero-trust-row {
             display: flex;
-            align-items: center;
-            gap: 1.5rem;
-            font-size: 0.85rem;
-            color: var(--text-muted);
+            gap: 1.25rem;
+            font-size: 0.84rem;
+            color: #64748b;
         }
 
         .trust-item {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.35rem;
         }
 
-        .trust-item svg {
-            color: var(--brand-green);
+        .trust-item span.check {
+            color: var(--accent-lime);
+            font-weight: 700;
         }
 
-        /* Phone Screen Mockup */
-        .phone-container {
+        .hero-center {
             display: flex;
             justify-content: center;
         }
 
         .phone-mockup {
-            width: 310px;
-            height: 570px;
-            background: #0f172a;
+            width: 295px;
+            height: 540px;
+            background: #0d1720;
             border-radius: 38px;
-            border: 7px solid #334155;
-            position: relative;
-            box-shadow: var(--shadow-lg);
+            border: 7px solid #1e293b;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(22, 163, 74, 0.15);
             overflow: hidden;
             display: flex;
             flex-direction: column;
@@ -3387,8 +3409,8 @@ LANDING_HTML = """<!DOCTYPE html>
         .phone-screen {
             width: 100%;
             height: 100%;
-            background: var(--bg-card);
-            padding: 2.2rem 0.8rem 1rem 0.8rem;
+            background: #0f172a;
+            padding: 2.2rem 0.75rem 1rem 0.75rem;
             display: flex;
             flex-direction: column;
         }
@@ -3398,7 +3420,7 @@ LANDING_HTML = """<!DOCTYPE html>
             align-items: center;
             gap: 0.6rem;
             padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--border-color);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             margin-bottom: 0.75rem;
         }
 
@@ -3423,12 +3445,12 @@ LANDING_HTML = """<!DOCTYPE html>
         .phone-bot-name {
             font-size: 0.82rem;
             font-weight: 600;
-            color: var(--text-primary);
+            color: #ffffff;
         }
 
         .phone-bot-status {
             font-size: 0.68rem;
-            color: var(--brand-green);
+            color: var(--accent-lime);
         }
 
         .phone-chat-body {
@@ -3441,16 +3463,16 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .chat-bubble {
-            max-width: 85%;
+            max-width: 88%;
             padding: 0.65rem 0.8rem;
             border-radius: 12px;
             line-height: 1.45;
         }
 
         .bubble-bot {
-            background: var(--bg-surface);
-            color: var(--text-primary);
-            border: 1px solid var(--border-color);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             align-self: flex-start;
             border-top-left-radius: 2px;
         }
@@ -3470,9 +3492,9 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .chat-pill-btn {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
             padding: 0.38rem 0.7rem;
             border-radius: 6px;
             font-size: 0.75rem;
@@ -3482,44 +3504,89 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .chat-pill-btn:hover {
-            border-color: var(--brand-green);
-            color: var(--brand-green);
+            border-color: var(--accent-lime);
+            color: var(--accent-lime);
         }
 
-        /* Stats Ribbon Section */
-        .stats-ribbon {
-            padding: 2.2rem 0;
-            border-top: 1px solid var(--border-color);
-            border-bottom: 1px solid var(--border-color);
-            background: var(--bg-surface);
-            margin-bottom: 4.5rem;
+        .hero-right-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-            text-align: center;
+        .rating-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-dark);
+            padding: 0.65rem 1rem;
+            border-radius: 99px;
+            width: fit-content;
+            font-size: 0.85rem;
         }
 
-        .stat-card h3 {
-            font-size: 2.3rem;
+        .rating-stars {
+            color: #f59e0b;
             font-weight: 700;
-            color: var(--brand-green);
-            margin-bottom: 0.15rem;
         }
 
-        .stat-card p {
-            color: var(--text-secondary);
+        .stat-hero-block h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-lime);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stat-hero-block p {
             font-size: 0.88rem;
+            color: #94a3b8;
             font-weight: 500;
         }
 
-        /* Section Headers */
-        .section-header {
+        .partner-ribbon {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.6rem 0;
             text-align: center;
-            max-width: 620px;
-            margin: 0 auto 3rem auto;
+        }
+
+        body.dark-mode .partner-ribbon {
+            background: #0e171e;
+        }
+
+        .partner-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.85rem;
+            font-weight: 600;
+        }
+
+        .partner-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .features-section {
+            padding: 5rem 0;
+            background: var(--bg-surface);
+        }
+
+        .features-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.25fr;
+            gap: 3.5rem;
+            align-items: center;
         }
 
         .section-tag {
@@ -3535,19 +3602,101 @@ LANDING_HTML = """<!DOCTYPE html>
             margin-bottom: 0.75rem;
         }
 
+        .features-left h2 {
+            font-size: 2.6rem;
+            line-height: 1.18;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .features-left p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+            line-height: 1.65;
+        }
+
+        .cards-2x2-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.6rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-card.dark-card {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #1e293b;
+        }
+
+        .feature-card.dark-card p {
+            color: #94a3b8;
+        }
+
+        .feature-card.dark-card h3 {
+            color: #ffffff;
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--brand-green-subtle);
+            color: var(--brand-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card.dark-card .card-icon {
+            background: rgba(163, 230, 53, 0.15);
+            color: var(--accent-lime);
+        }
+
+        .feature-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.45rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .curriculum-section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 3.5rem auto;
+        }
+
         .section-header h2 {
-            font-size: 2.3rem;
+            font-size: 2.5rem;
             margin-bottom: 0.75rem;
+            color: var(--text-primary);
         }
 
         .section-header p {
             color: var(--text-secondary);
-            font-size: 1.02rem;
-        }
-
-        /* Curriculum Section */
-        .curriculum-section {
-            padding: 2.5rem 0 4.5rem 0;
+            font-size: 1.05rem;
         }
 
         .curriculum-grid {
@@ -3559,67 +3708,25 @@ LANDING_HTML = """<!DOCTYPE html>
         .module-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 16px;
             padding: 1.6rem;
             box-shadow: var(--shadow-sm);
             transition: var(--transition);
         }
 
-        .module-card:hover {
-            border-color: var(--brand-green);
-            box-shadow: var(--shadow-md);
-        }
-
-        .module-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 0.85rem;
-        }
-
-        .module-badge {
-            background: var(--brand-green-subtle);
-            color: var(--brand-green);
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0.2rem 0.6rem;
-            border-radius: 99px;
-        }
-
-        .module-duration {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-        }
-
         .module-card h3 {
             font-size: 1.2rem;
             margin-bottom: 0.45rem;
+            color: var(--text-primary);
         }
 
         .module-card p {
             font-size: 0.9rem;
             color: var(--text-secondary);
-            margin-bottom: 1rem;
         }
 
-        .module-topics {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.4rem;
-        }
-
-        .topic-tag {
-            font-size: 0.75rem;
-            background: var(--bg-surface);
-            color: var(--text-secondary);
-            padding: 0.2rem 0.55rem;
-            border-radius: 6px;
-            border: 1px solid var(--border-color);
-        }
-
-        /* Live Simulator Section */
         .simulator-section {
-            padding: 4.5rem 0;
+            padding: 5rem 0;
             background: var(--bg-surface);
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
@@ -3638,52 +3745,14 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .sim-info h3 {
-            font-size: 1.9rem;
+            font-size: 2rem;
             margin-bottom: 0.75rem;
+            color: var(--text-primary);
         }
 
         .sim-info p {
             color: var(--text-secondary);
             font-size: 0.95rem;
-            margin-bottom: 1.4rem;
-        }
-
-        .sim-prompts {
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-        }
-
-        .sim-prompt-btn {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            color: var(--text-primary);
-            padding: 0.75rem 1rem;
-            border-radius: 10px;
-            font-size: 0.88rem;
-            font-weight: 500;
-            text-align: left;
-            cursor: pointer;
-            transition: var(--transition);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .sim-prompt-btn:hover {
-            border-color: var(--brand-green);
-            color: var(--brand-green);
-            background: var(--brand-green-subtle);
-        }
-
-        .sim-window {
-            background: var(--bg-surface);
-            border: 1px solid var(--border-color);
-            border-radius: 14px;
-            height: 350px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
         }
 
         .sim-window-header {
@@ -3695,6 +3764,7 @@ LANDING_HTML = """<!DOCTYPE html>
             gap: 0.5rem;
             font-size: 0.85rem;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         .sim-window-body {
@@ -3707,123 +3777,39 @@ LANDING_HTML = """<!DOCTYPE html>
             font-size: 0.88rem;
         }
 
-        /* Platforms Section */
         .platforms-section {
-            padding: 4.5rem 0;
+            padding: 5rem 0;
         }
 
         .platforms-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.75rem;
-        }
-
-        .platform-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 18px;
-            padding: 2.25rem;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .platform-card:hover {
-            box-shadow: var(--shadow-md);
-        }
-
-        .platform-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.78rem;
-            font-weight: 600;
-            padding: 0.25rem 0.7rem;
-            border-radius: 99px;
-            margin-bottom: 1.1rem;
-            width: fit-content;
-        }
-
-        .platform-badge.whatsapp {
-            background: rgba(37, 211, 102, 0.12);
-            color: #15803d;
-        }
-
-        .platform-badge.telegram {
-            background: rgba(36, 129, 204, 0.12);
-            color: var(--c-telegram);
         }
 
         .platform-card h3 {
             font-size: 1.5rem;
             margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
 
         .platform-card p {
             color: var(--text-secondary);
             font-size: 0.93rem;
-            margin-bottom: 1.4rem;
         }
 
-        .platform-features {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.6rem;
-            margin-bottom: 1.6rem;
-            font-size: 0.88rem;
-            color: var(--text-secondary);
-        }
-
-        .platform-features li {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .platform-features svg {
-            color: var(--brand-green);
-            flex-shrink: 0;
-        }
-
-        /* Safety Grid */
         .safety-section {
-            padding: 4.5rem 0;
+            padding: 5rem 0;
             border-top: 1px solid var(--border-color);
         }
 
         .safety-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.25rem;
-        }
-
-        .safety-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 1.6rem;
-            border-radius: 14px;
-            box-shadow: var(--shadow-sm);
-            transition: var(--transition);
-        }
-
-        .safety-icon {
-            width: 38px;
-            height: 38px;
-            border-radius: 8px;
-            background: var(--brand-green-subtle);
-            color: var(--brand-green);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 0.9rem;
         }
 
         .safety-card h4 {
             font-size: 1.05rem;
             margin-bottom: 0.35rem;
+            color: var(--text-primary);
         }
 
         .safety-card p {
@@ -3831,60 +3817,16 @@ LANDING_HTML = """<!DOCTYPE html>
             color: var(--text-secondary);
         }
 
-        /* Testimonials Section */
         .testimonials-section {
-            padding: 4.5rem 0;
+            padding: 5rem 0;
             border-top: 1px solid var(--border-color);
             background: var(--bg-surface);
-        }
-
-        .testimonials-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.25rem;
-        }
-
-        .testimonial-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            padding: 1.6rem;
-            border-radius: 14px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .testimonial-text {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            font-style: italic;
-            margin-bottom: 1.2rem;
-            line-height: 1.6;
-        }
-
-        .testimonial-author {
-            display: flex;
-            align-items: center;
-            gap: 0.6rem;
-        }
-
-        .author-avatar {
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: var(--brand-green);
-            color: #ffffff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.82rem;
         }
 
         .author-info h5 {
             font-size: 0.86rem;
             font-weight: 600;
+            color: var(--text-primary);
         }
 
         .author-info p {
@@ -3892,67 +3834,21 @@ LANDING_HTML = """<!DOCTYPE html>
             color: var(--text-muted);
         }
 
-        /* FAQ Section with Smooth Expand/Collapse */
         .faq-section {
-            padding: 4.5rem 0;
+            padding: 5rem 0;
             border-top: 1px solid var(--border-color);
         }
 
         .faq-list {
             max-width: 760px;
-            margin: 0 auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .faq-item {
-            background: var(--bg-card);
-            border: 1px solid var(--border-color);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-
-        .faq-question {
-            padding: 1.15rem 1.4rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-weight: 600;
-            font-size: 0.98rem;
-            cursor: pointer;
-            color: var(--text-primary);
-        }
-
-        .faq-answer {
-            max-height: 0;
-            opacity: 0;
-            overflow: hidden;
-            padding: 0 1.4rem;
-            color: var(--text-secondary);
-            font-size: 0.92rem;
-            line-height: 1.65;
-            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, padding 0.25s ease;
-        }
-
-        .faq-item.active .faq-answer {
-            max-height: 250px;
-            opacity: 1;
-            padding-bottom: 1.15rem;
-        }
-
-        .faq-item.active .faq-icon {
-            transform: rotate(180deg);
         }
 
         .faq-icon {
-            transition: transform 0.3s ease;
             color: var(--brand-green);
         }
 
-        /* Final Banner */
         .cta-banner {
-            padding: 4.5rem 0;
+            padding: 5rem 0;
         }
 
         .cta-box {
@@ -3967,75 +3863,69 @@ LANDING_HTML = """<!DOCTYPE html>
         .cta-box h2 {
             font-size: 2.4rem;
             margin-bottom: 0.75rem;
+            color: var(--text-primary);
         }
 
         .cta-box p {
             color: var(--text-secondary);
             font-size: 1.02rem;
-            max-width: 560px;
-            margin: 0 auto 1.8rem auto;
         }
 
-        /* Footer */
-        footer {
-            border-top: 1px solid var(--border-color);
-            padding: 3rem 0 2rem 0;
-            font-size: 0.86rem;
-            color: var(--text-muted);
-        }
-
-        .footer-wrapper {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1.25rem;
-        }
-
-        .footer-copy {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        /* Responsive Queries */
         @media (max-width: 992px) {
-            .hero {
+            .hero-grid {
                 grid-template-columns: 1fr;
                 text-align: center;
                 gap: 2.5rem;
             }
 
-            .hero-content p {
-                margin: 0 auto 1.8rem auto;
+            .hero-left p {
+                margin-left: auto;
+                margin-right: auto;
             }
 
-            .hero-actions,
-            .hero-trust-list {
+            .hero-ctas,
+            .hero-trust-row,
+            .rating-badge {
                 justify-content: center;
+                margin-left: auto;
+                margin-right: auto;
             }
 
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
+            .hero-right-stats {
+                flex-direction: row;
+                justify-content: center;
+                gap: 2.5rem;
+                text-align: center;
+            }
+
+            .features-layout,
+            .sim-container {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
             }
         }
 
         @media (max-width: 768px) {
-            .nav-menu {
+            .container {
+                padding: 0 1rem;
+            }
+
+            nav.nav-menu {
                 position: fixed;
                 top: 60px;
                 left: 0;
                 width: 100%;
-                background: var(--bg-card);
+                background: #080f14;
                 flex-direction: column;
-                padding: 1.5rem;
-                border-bottom: 1px solid var(--border-color);
+                padding: 1.8rem;
+                border-bottom: 1px solid var(--border-dark);
                 transform: translateY(-150%);
                 transition: var(--transition);
-                box-shadow: var(--shadow-lg);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+                gap: 1.25rem;
             }
 
-            .nav-menu.active {
+            nav.nav-menu.active {
                 transform: translateY(0);
             }
 
@@ -4043,36 +3933,64 @@ LANDING_HTML = """<!DOCTYPE html>
                 display: flex;
             }
 
-            .hero-content h1 {
+            .logo-title {
+                font-size: 1rem;
+            }
+
+            .logo-sub {
+                font-size: 0.6rem;
+            }
+
+            .hero-left h1 {
                 font-size: 2.2rem;
             }
 
-            .safety-grid {
-                grid-template-columns: 1fr;
+            .features-left h2 {
+                font-size: 2rem;
             }
 
-            .cta-box h2 {
-                font-size: 1.8rem;
+            .hero-right-stats {
+                flex-direction: column;
+                gap: 1.25rem;
+                align-items: center;
+            }
+
+            .cards-2x2-grid,
+            .curriculum-grid,
+            .platforms-grid,
+            .safety-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1.1rem !important;
+            }
+
+            .feature-card,
+            .module-card,
+            .platform-card,
+            .safety-card,
+            .testimonial-card {
+                width: 100% !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- Header Navigation -->
     <header>
         <div class="container nav-wrapper">
             <a href="#" class="logo">
                 <div class="logo-icon">B</div>
-                <span>The Brothers' Room</span>
-                <div class="logo-partner">by YouthHubAfrica</div>
+                <div class="logo-text-group">
+                    <span class="logo-title">The Brothers' Room</span>
+                    <span class="logo-sub">by YouthHubAfrica</span>
+                </div>
             </a>
 
             <nav class="nav-menu" id="nav-menu">
                 <a href="#curriculum">Curriculum</a>
                 <a href="#simulator">Live Demo</a>
                 <a href="#platforms">Platforms</a>
-                <a href="#safety">Safety & Privacy</a>
+                <a href="#safety">Safety</a>
                 <a href="#faq">FAQ</a>
             </nav>
 
@@ -4081,7 +3999,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
                     <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
-                <a href="#platforms" class="btn btn-primary">Start Learning</a>
+                <a href="#platforms" class="btn btn-header-cta">Start Learning</a>
                 <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle Navigation">
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -4091,420 +4009,146 @@ LANDING_HTML = """<!DOCTYPE html>
         </div>
     </header>
 
-    <!-- Hero Section -->
-    <section class="hero container">
-        <div class="hero-content">
-            <div class="hero-tag">
-                <span>Safe, Confidential & Free Conversational Course</span>
-            </div>
-            <h1>Transforming Masculinity. Empowering Men. Standing Against GBV.</h1>
-            <p>A private 6-week interactive course hosted directly inside <strong>WhatsApp</strong> and <strong>Telegram</strong>. Develop positive character, discuss healthy relationships, and lead in your community.</p>
+    <section class="hero-wrapper">
+        <div class="container hero-grid">
             
-            <div class="hero-actions">
-                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" onclick="trackClick('WhatsApp')">
-                    <span>Start on WhatsApp</span>
-                </a>
+            <div class="hero-left">
+                <div class="hero-left-tag">
+                    <span>Safe, Confidential & Free Conversational Course</span>
+                </div>
+                <h1>Transforming Masculinity. Empowering Men. Standing Against GBV.</h1>
+                <p>A private 6-week interactive course hosted directly inside <strong>WhatsApp</strong> and <strong>Telegram</strong>. Develop positive character, discuss healthy relationships, and lead in your community.</p>
                 
-                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" onclick="trackClick('Telegram')">
-                    <span>Start on Telegram</span>
-                </a>
-
-                <a href="#simulator" class="btn btn-secondary">Try Live Demo</a>
-            </div>
-
-            <div class="hero-trust-list">
-                <div class="trust-item">
-                    <span>✓ No App Download Required</span>
-                </div>
-                <div class="trust-item">
-                    <span>✓ Self-Paced & Private</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Phone Simulator Mockup -->
-        <div class="phone-container">
-            <div class="phone-mockup">
-                <div class="phone-screen">
-                    <div class="phone-header">
-                        <div class="phone-avatar">T</div>
-                        <div class="phone-bot-info">
-                            <span class="phone-bot-name">Tobi (The Brothers' Room)</span>
-                            <span class="phone-bot-status">Active Learning Facilitator</span>
-                        </div>
-                    </div>
+                <div class="hero-ctas">
+                    <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" onclick="trackClick('WhatsApp')">
+                        <span>Start on WhatsApp</span>
+                    </a>
                     
-                    <div class="phone-chat-body" id="hero-chat-body">
-                        <div class="chat-bubble bubble-bot">
-                            Welcome brother! Ready to explore Module 1: <strong>Understanding Masculinity</strong>?
-                            <div class="chat-option-pills">
-                                <button class="chat-pill-btn" onclick="triggerHeroReply('1. Start Module 1')">1. Start Module 1</button>
-                                <button class="chat-pill-btn" onclick="triggerHeroReply('2. Is this confidential?')">2. Is this confidential?</button>
+                    <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" onclick="trackClick('Telegram')">
+                        <span>Start on Telegram</span>
+                    </a>
+
+                    <a href="#simulator" class="btn btn-outline-dark">Try Live Demo</a>
+                </div>
+
+                <div class="hero-trust-row">
+                    <div class="trust-item"><span class="check">✓</span> <span>No App Download Required</span></div>
+                    <div class="trust-item"><span class="check">✓</span> <span>Self-Paced & Private</span></div>
+                </div>
+            </div>
+
+            <div class="hero-center">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="phone-header">
+                            <div class="phone-avatar">T</div>
+                            <div class="phone-bot-info">
+                                <span class="phone-bot-name">Tobi (The Brothers' Room)</span>
+                                <span class="phone-bot-status">Active Learning Facilitator</span>
+                            </div>
+                        </div>
+                        
+                        <div class="phone-chat-body" id="hero-chat-body">
+                            <div class="chat-bubble bubble-bot">
+                                Welcome brother! Ready to explore Module 1: <strong>Understanding Masculinity</strong>?
+                                <div class="chat-option-pills">
+                                    <button class="chat-pill-btn" onclick="triggerHeroReply('1. Start Module 1')">1. Start Module 1</button>
+                                    <button class="chat-pill-btn" onclick="triggerHeroReply('2. Is this confidential?')">2. Is this confidential?</button>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            <div class="hero-right-stats">
+                <div class="rating-badge">
+                    <span class="rating-stars">★ 4.9</span>
+                    <span>Positive Reviews (12k+ Learners)</span>
+                </div>
+
+                <div class="stat-hero-block">
+                    <h3>6 Weeks</h3>
+                    <p>Structured Interactive Modules</p>
+                </div>
+
+                <div class="stat-hero-block">
+                    <h3>100% Free</h3>
+                    <p>Confidential & Self-Paced</p>
+                </div>
+
+                <div class="stat-hero-block">
+                    <h3>24/7</h3>
+                    <p>WhatsApp & Telegram Companion</p>
+                </div>
+            </div>
+
         </div>
     </section>
 
-    <!-- Curriculum Section -->
-    <section class="curriculum-section container" id="curriculum">
-        <div class="section-header">
-            <span class="section-tag">Structured Learning Path</span>
-            <h2>The 6-Week Curriculum</h2>
-            <p>Designed by youth development experts to foster self-awareness, respectful relationships, and positive leadership.</p>
-        </div>
-
-        <div class="curriculum-grid">
-            <div class="module-card">
-                <div class="module-header">
-                    <span class="module-badge">Week 01</span>
-                    <span class="module-duration">15 mins</span>
-                </div>
-                <h3>Understanding Masculinity & Identity</h3>
-                <p>Explore cultural expectations surrounding manhood, dismantle harmful stereotypes, and embrace positive self-identity.</p>
-                <div class="module-topics">
-                    <span class="topic-tag">Gender Expectations</span>
-                    <span class="topic-tag">Self-Awareness</span>
-                    <span class="topic-tag">Healthy Mindset</span>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <div class="module-header">
-                    <span class="module-badge">Week 02</span>
-                    <span class="module-duration">15 mins</span>
-                </div>
-                <h3>Emotional Intelligence & Well-being</h3>
-                <p>Break the silence around male mental health. Learn healthy techniques for managing anger, expressing vulnerability, and seeking support.</p>
-                <div class="module-topics">
-                    <span class="topic-tag">Anger Management</span>
-                    <span class="topic-tag">Vulnerability</span>
-                    <span class="topic-tag">Mental Health</span>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <div class="module-header">
-                    <span class="module-badge">Week 03</span>
-                    <span class="module-duration">20 mins</span>
-                </div>
-                <h3>Healthy Relationships & Consent</h3>
-                <p>Master positive communication, clear boundaries, mutual respect, and healthy dynamics in romantic and peer relationships.</p>
-                <div class="module-topics">
-                    <span class="topic-tag">Consent</span>
-                    <span class="topic-tag">Boundaries</span>
-                    <span class="topic-tag">Communication</span>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <div class="module-header">
-                    <span class="module-badge">Week 04</span>
-                    <span class="module-duration">20 mins</span>
-                </div>
-                <h3>Standing Against GBV & Allyship</h3>
-                <p>Recognize physical, emotional, and digital gender-based violence. Learn safe intervention tactics and active community allyship.</p>
-                <div class="module-topics">
-                    <span class="topic-tag">GBV Prevention</span>
-                    <span class="topic-tag">Bystander Intervention</span>
-                    <span class="topic-tag">Allyship</span>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <div class="module-header">
-                    <span class="module-badge">Week 05</span>
-                    <span class="module-duration">15 mins</span>
-                </div>
-                <h3>Leadership & Community Mentorship</h3>
-                <p>Step up as a positive role model. Mentor younger peers, hold friends accountable, and lead by positive example.</p>
-                <div class="module-topics">
-                    <span class="topic-tag">Mentorship</span>
-                    <span class="topic-tag">Accountability</span>
-                    <span class="topic-tag">Role Models</span>
-                </div>
-            </div>
-
-            <div class="module-card">
-                <div class="module-header">
-                    <span class="module-badge">Week 06</span>
-                    <span class="module-duration">15 mins</span>
-                </div>
-                <h3>Action Plan & Becoming a Champion</h3>
-                <p>Create your personal pledge for positive masculinity and join our continuous peer champion network.</p>
-                <div class="module-topics">
-                    <span class="topic-tag">Personal Action</span>
-                    <span class="topic-tag">Peer Network</span>
-                    <span class="topic-tag">Completion Certificate</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Interactive Live Bot Simulator Playground -->
-    <section class="simulator-section" id="simulator">
+    <section class="partner-ribbon">
         <div class="container">
-            <div class="sim-container">
-                <div class="sim-info">
-                    <span class="section-tag">Interactive Demo</span>
-                    <h3>Try Tobi in Your Browser</h3>
-                    <p>Experience how friendly and conversational learning on The Brothers' Room feels before launching in WhatsApp or Telegram.</p>
-                    
-                    <div class="sim-prompts">
-                        <button class="sim-prompt-btn" onclick="sendSimPrompt('What will I learn in Week 1?')">
-                            <span>What will I learn in Week 1?</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
-                        <button class="sim-prompt-btn" onclick="sendSimPrompt('Is my identity really private?')">
-                            <span>Is my identity really private?</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
-                        <button class="sim-prompt-btn" onclick="sendSimPrompt('How do I start on WhatsApp?')">
-                            <span>How do I start on WhatsApp?</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                        </button>
-                    </div>
-                </div>
-
-                <div class="sim-window">
-                    <div class="sim-window-header">
-                        <span class="phone-avatar" style="width:24px; height:24px; font-size:0.7rem;">T</span>
-                        <span>Tobi Live Simulator</span>
-                    </div>
-                    <div class="sim-window-body" id="sim-window-body">
-                        <div class="chat-bubble bubble-bot">
-                            Hello brother! Click any sample question on the left to test how I facilitate course lessons.
-                        </div>
-                    </div>
-                </div>
+            <div class="partner-title">Empowering Young Men Across Communities In Partnership With</div>
+            <div class="partner-logos">
+                <span>YouthHubAfrica</span>
+                <span>•</span>
+                <span>Spotlight Initiative</span>
+                <span>•</span>
+                <span>Positive Masculinity Alliance</span>
             </div>
         </div>
     </section>
 
-    <!-- Dual Platforms Section -->
-    <section class="platforms-section container" id="platforms">
-        <div class="section-header">
-            <span class="section-tag">Choose Your App</span>
-            <h2>Select Your Preferred Platform</h2>
-            <p>The Brothers' Room is active on both WhatsApp and Telegram so you can learn on the messaging app you use daily.</p>
-        </div>
-
-        <div class="platforms-grid">
-            <div class="platform-card">
-                <div>
-                    <span class="platform-badge whatsapp">WhatsApp Channel</span>
-                    <h3>WhatsApp Bot</h3>
-                    <p>Start instantly on WhatsApp. Interactive prompts, voice lesson summaries, and self-paced learning.</p>
-                    
-                    <ul class="platform-features">
-                        <li>✓ Pre-filled quick start message</li>
-                        <li>✓ End-to-End encrypted messaging</li>
-                        <li>✓ Audio lesson notes supported</li>
-                    </ul>
-                </div>
-
-                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" style="width: 100%;" onclick="trackClick('WhatsApp')">
-                    <span>Launch on WhatsApp</span>
-                </a>
-            </div>
-
-            <div class="platform-card">
-                <div>
-                    <span class="platform-badge telegram">Telegram Channel</span>
-                    <h3>Telegram Bot</h3>
-                    <p>Experience automated learning with interactive button menus and instant progress tracking.</p>
-                    
-                    <ul class="platform-features">
-                        <li>✓ Inline button navigation</li>
-                        <li>✓ Instant bookmarking & course resume</li>
-                        <li>✓ Complete privacy control</li>
-                    </ul>
-                </div>
-
-                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" style="width: 100%;" onclick="trackClick('Telegram')">
-                    <span>Launch on Telegram</span>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Safety & Privacy Section -->
-    <section class="safety-section container" id="safety">
-        <div class="section-header">
-            <span class="section-tag">Privacy First</span>
-            <h2>Safe, Confidential & Free</h2>
-            <p>Your psychological safety and personal confidentiality are our highest priorities.</p>
-        </div>
-
-        <div class="safety-grid">
-            <div class="safety-card">
-                <div class="safety-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                </div>
-                <h4>100% Confidential</h4>
-                <p>You never have to disclose your real name or personal identity to complete modules.</p>
-            </div>
-
-            <div class="safety-card">
-                <div class="safety-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                </div>
-                <h4>Non-Judgmental</h4>
-                <p>Designed for honest self-reflection without shame, preaching, or stigma.</p>
-            </div>
-
-            <div class="safety-card">
-                <div class="safety-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                </div>
-                <h4>Peer Mentorship</h4>
-                <p>Curated content guided by experienced youth development specialists and male allies.</p>
-            </div>
-
-            <div class="safety-card">
-                <div class="safety-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
-                </div>
-                <h4>Helpline Referrals</h4>
-                <p>Instant access to professional counseling and GBV support services when requested.</p>
-            </div>
-        </div>
-    </section>
-
-    <!-- Testimonials Section -->
-    <section class="testimonials-section">
-        <div class="container">
-            <div class="section-header">
-                <span class="section-tag">Voices of Learners</span>
-                <h2>Real Impact & Growth</h2>
-                <p>Hear what young men are saying about their journey through The Brothers' Room.</p>
-            </div>
-
-            <div class="testimonials-grid">
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"The Brothers' Room gave me a safe space to challenge things I thought were normal about being a guy. Week 2 on emotional health completely shifted how I handle stress and anger."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">A</div>
-                        <div class="author-info">
-                            <h5>Ademola O.</h5>
-                            <p>Learner on Telegram</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"I love that it happens right inside WhatsApp. 15 minutes a week, no heavy data downloads, and the lessons on consent and boundaries were straightforward."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">C</div>
-                        <div class="author-info">
-                            <h5>Chinedu K.</h5>
-                            <p>Learner on WhatsApp</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="testimonial-card">
-                    <p class="testimonial-text">"Every young man needs this course. It opened my eyes to how we can actively prevent violence and support women and girls in our communities."</p>
-                    <div class="testimonial-author">
-                        <div class="author-avatar">I</div>
-                        <div class="author-info">
-                            <h5>Ibrahim M.</h5>
-                            <p>Learner on Telegram</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- FAQ Section -->
-    <section class="faq-section container" id="faq">
-        <div class="section-header">
-            <span class="section-tag">Common Questions</span>
-            <h2>Frequently Asked Questions</h2>
-            <p>Everything you need to know about joining and completing the course.</p>
-        </div>
-
-        <div class="faq-list">
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>Is The Brothers' Room really 100% free?</span>
-                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="faq-answer">
-                    Yes! The entire 6-week course is completely free of charge, brought to you by YouthHubAfrica to empower young men across communities.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>How much time do I need per week?</span>
-                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="faq-answer">
-                    Each weekly module takes approximately 15 to 20 minutes. Because it is self-paced inside WhatsApp and Telegram, you can pause and resume whenever it fits your schedule.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>Do I need to download a new app?</span>
-                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="faq-answer">
-                    No new apps required! You can complete the full course directly inside your existing WhatsApp or Telegram application.
-                </div>
-            </div>
-
-            <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>Is my privacy and responses protected?</span>
-                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="faq-answer">
-                    Absolutely. Your personal responses are private and confidential. You are never required to provide sensitive personal identification.
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Final CTA Banner -->
-    <section class="cta-banner container">
-        <div class="cta-box">
-            <h2>Ready to Join The Brothers' Room?</h2>
-            <p>Start your 6-week journey toward positive masculinity and community leadership today on WhatsApp or Telegram.</p>
+    <section class="features-section">
+        <div class="container features-layout">
             
-            <div class="hero-actions" style="justify-content: center;">
-                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp">
-                    <span>Start on WhatsApp</span>
-                </a>
+            <div class="features-left">
+                <span class="section-tag">Why The Brothers' Room</span>
+                <h2>One course. Instant access. Zero costs.</h2>
+                <p>Designed by youth development specialists to provide young men with a safe, judgment-free space to build emotional intelligence, understand consent, and lead positive change in their communities.</p>
                 
-                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram">
-                    <span>Start on Telegram</span>
+                <a href="#curriculum" class="btn btn-whatsapp">
+                    <span>Explore 6-Week Curriculum</span>
                 </a>
             </div>
+
+            <div class="cards-2x2-grid">
+                <div class="feature-card dark-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <h3>Instant App Access</h3>
+                    <p>Start directly in WhatsApp or Telegram without downloading new apps or remembering passwords.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    </div>
+                    <h3>100% Confidential</h3>
+                    <p>Complete modules anonymously. No real names or sensitive personal data required.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <h3>Self-Paced Learning</h3>
+                    <p>Only 15 minutes a week. Pause, resume, and review lessons whenever convenient for you.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3>GBV Allyship</h3>
+                    <p>Practical guidance on bystander intervention, healthy consent, and positive male leadership.</p>
+                </div>
+            </div>
+
         </div>
     </section>
 
-    <!-- Footer -->
-    <footer class="container">
-        <div class="footer-wrapper">
-            <div class="footer-copy">
-                <div class="logo-icon" style="width:26px; height:26px; font-size:0.85rem;">B</div>
-                <span>© 2026 The Brothers' Room. A YouthHubAfrica Initiative.</span>
-            </div>
-            <div style="display:flex; gap:1.5rem;">
-                <a href="#curriculum">Curriculum</a>
-                <a href="#platforms">Platforms</a>
-                <a href="#safety">Safety</a>
-                <a href="#faq">FAQ</a>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Client-side Interactive Scripts -->
     <script>
         function triggerHeroReply(optionText) {
             const chatBody = document.getElementById("hero-chat-body");
@@ -4525,37 +4169,6 @@ LANDING_HTML = """<!DOCTYPE html>
                 chatBody.appendChild(botMsg);
                 chatBody.scrollTop = chatBody.scrollHeight;
             }, 500);
-        }
-
-        function sendSimPrompt(promptText) {
-            const simBody = document.getElementById("sim-window-body");
-            const uBubble = document.createElement("div");
-            uBubble.className = "chat-bubble bubble-user";
-            uBubble.textContent = promptText;
-            simBody.appendChild(uBubble);
-            simBody.scrollTop = simBody.scrollHeight;
-            
-            setTimeout(() => {
-                const bBubble = document.createElement("div");
-                bBubble.className = "chat-bubble bubble-bot";
-                if (promptText.includes("Week 1")) {
-                    bBubble.innerHTML = "Module 1 covers: dismantling harmful stereotypes, emotional self-reflection, and building positive male identity. Takes ~15 minutes.";
-                } else if (promptText.includes("private")) {
-                    bBubble.innerHTML = "Yes! You can use an alias. We do not track or share your identity. Your privacy is fully protected.";
-                } else {
-                    bBubble.innerHTML = "Simply click the 'Start on WhatsApp' button! You'll send a quick message to Tobi and begin Module 1 instantly.";
-                }
-                simBody.appendChild(bBubble);
-                simBody.scrollTop = simBody.scrollHeight;
-            }, 450);
-        }
-
-        function toggleFaq(element) {
-            const item = element.parentElement;
-            document.querySelectorAll(".faq-item").forEach(other => {
-                if (other !== item) other.classList.remove("active");
-            });
-            item.classList.toggle("active");
         }
 
         function initThemeToggle() {
@@ -4590,7 +4203,6 @@ LANDING_HTML = """<!DOCTYPE html>
             }
         }
 
-        // Track CTA button clicks
         function trackClick(platform) {
             try {
                 fetch('/api/track_click', {
@@ -4623,6 +4235,7 @@ def favicon():
 @app.route("/")
 def landing_route():
     return render_template_string(LANDING_HTML)
+
 
 @app.route("/dashboard")
 def index_route():
