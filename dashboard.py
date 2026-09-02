@@ -3010,7 +3010,7 @@ LANDING_HTML = """<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Brothers' Room | Positive Masculinity & Safe Learning Space</title>
-    <meta name="description" content="A safe, private, and free 6-week conversational learning bot on WhatsApp & Telegram helping young men connect, develop positive character, and stand against Gender-Based Violence.">
+    <meta name="description" content="A safe, private, and free 6-week conversational learning course on WhatsApp & Telegram helping young men connect, develop positive character, and stand against Gender-Based Violence.">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/assets/youthhub_africa_logo.png">
@@ -3018,40 +3018,46 @@ LANDING_HTML = """<!DOCTYPE html>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     
     <style>
         :root {
-            --bg-dark: #050e14;
-            --bg-card: #0c1c26;
-            --bg-card-hover: #122735;
-            --accent: #9eff00;
-            --accent-hover: #b5ff33;
-            --accent-glow: rgba(158, 255, 0, 0.25);
-            --cyan-glow: rgba(0, 245, 255, 0.2);
-            --c-cyan: #00f5ff;
-            --c-purple: #a855f7;
+            /* Default: Clean White Theme */
+            --bg-body: #ffffff;
+            --bg-surface: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f1f5f9;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-brand: #16a34a;
+            --accent-brand-hover: #15803d;
+            --accent-subtle: #f0fdf4;
             --c-whatsapp: #25d366;
             --c-telegram: #2481cc;
-            --text-white: #ffffff;
-            --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.09);
-            --glass-bg: rgba(12, 28, 38, 0.7);
-            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.1);
+            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Light Mode Tokens */
-        body.light-mode {
-            --bg-dark: #f4f8fb;
-            --bg-card: #ffffff;
-            --bg-card-hover: #f0f4f8;
-            --accent: #15803d;
-            --accent-hover: #166534;
-            --accent-glow: rgba(21, 128, 61, 0.15);
-            --text-white: #0f172a;
-            --text-muted: #475569;
-            --border-color: rgba(15, 23, 42, 0.1);
-            --glass-bg: rgba(255, 255, 255, 0.85);
+        /* Dark Mode Theme Tokens (Optional toggle) */
+        body.dark-mode {
+            --bg-body: #080f14;
+            --bg-surface: #0e171e;
+            --bg-card: #121d26;
+            --bg-card-hover: #182633;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent-brand: #22c55e;
+            --accent-brand-hover: #16a34a;
+            --accent-subtle: rgba(34, 197, 94, 0.12);
+            --shadow-sm: none;
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
         }
 
         * {
@@ -3065,17 +3071,18 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         body {
-            background-color: var(--bg-dark);
-            color: var(--text-white);
+            background-color: var(--bg-body);
+            color: var(--text-primary);
             font-family: 'Inter', sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
-            position: relative;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
         h1, h2, h3, h4, .font-heading {
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
+            color: var(--text-primary);
             letter-spacing: -0.02em;
         }
 
@@ -3084,56 +3091,10 @@ LANDING_HTML = """<!DOCTYPE html>
             text-decoration: none;
         }
 
-        /* Background Ambient Glowing Orbs */
-        .ambient-glow {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(140px);
-            pointer-events: none;
-            z-index: 0;
-            opacity: 0.5;
-        }
-
-        .glow-1 {
-            top: -100px;
-            left: -100px;
-            width: 500px;
-            height: 500px;
-            background: radial-gradient(circle, var(--accent-glow) 0%, transparent 70%);
-        }
-
-        .glow-2 {
-            top: 400px;
-            right: -150px;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, var(--cyan-glow) 0%, transparent 70%);
-        }
-
-        .glow-3 {
-            bottom: 20%;
-            left: 20%;
-            width: 550px;
-            height: 550px;
-            background: radial-gradient(circle, rgba(168, 85, 247, 0.15) 0%, transparent 70%);
-        }
-
-        /* Layout Container */
         .container {
-            max-width: 1240px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 0 2rem;
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Glass Panel Helper */
-        .glass-panel {
-            background: var(--glass-bg);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid var(--border-color);
-            border-radius: 24px;
         }
 
         /* Header Navigation */
@@ -3141,16 +3102,16 @@ LANDING_HTML = """<!DOCTYPE html>
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(5, 14, 20, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
-            padding: 1rem 0;
+            padding: 1.1rem 0;
             transition: var(--transition);
         }
 
-        body.light-mode header {
-            background: rgba(244, 248, 251, 0.85);
+        body.dark-mode header {
+            background: rgba(8, 15, 20, 0.9);
         }
 
         .nav-wrapper {
@@ -3162,35 +3123,30 @@ LANDING_HTML = """<!DOCTYPE html>
         .logo {
             display: flex;
             align-items: center;
-            gap: 0.85rem;
-            font-size: 1.35rem;
-            font-weight: 800;
-            font-family: 'Outfit', sans-serif;
-            color: var(--text-white);
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
         .logo-icon {
-            width: 38px;
-            height: 38px;
-            background: linear-gradient(135deg, var(--accent) 0%, #00f5ff 100%);
-            color: #050e14;
+            width: 36px;
+            height: 36px;
+            background: var(--accent-brand);
+            color: #ffffff;
             border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
+            font-weight: 700;
             font-size: 1.1rem;
-            box-shadow: 0 4px 12px var(--accent-glow);
         }
 
         .logo-partner {
-            display: flex;
-            align-items: center;
-            gap: 0.4rem;
-            font-size: 0.72rem;
-            padding: 0.25rem 0.6rem;
+            font-size: 0.75rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 20px;
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--bg-surface);
             color: var(--text-muted);
             font-weight: 500;
             border: 1px solid var(--border-color);
@@ -3203,20 +3159,20 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         nav a {
-            color: var(--text-muted);
-            font-weight: 500;
+            color: var(--text-secondary);
             font-size: 0.95rem;
+            font-weight: 500;
             transition: var(--transition);
         }
 
         nav a:hover {
-            color: var(--text-white);
+            color: var(--accent-brand);
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 1.2rem;
+            gap: 1rem;
         }
 
         /* Buttons */
@@ -3224,71 +3180,68 @@ LANDING_HTML = """<!DOCTYPE html>
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.6rem;
-            padding: 0.85rem 1.6rem;
-            border-radius: 99px;
+            gap: 0.55rem;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             transition: var(--transition);
             cursor: pointer;
             border: none;
             text-decoration: none;
         }
 
-        .btn-accent {
-            background-color: var(--accent);
-            color: #050e14;
-            box-shadow: 0 8px 24px var(--accent-glow);
+        .btn-primary {
+            background-color: var(--accent-brand);
+            color: #ffffff;
         }
 
-        .btn-accent:hover {
-            background-color: var(--accent-hover);
+        .btn-primary:hover {
+            background-color: var(--accent-brand-hover);
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(158, 255, 0, 0.4);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-whatsapp {
             background-color: var(--c-whatsapp);
             color: #ffffff;
-            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.3);
         }
 
         .btn-whatsapp:hover {
-            opacity: 0.92;
+            opacity: 0.94;
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(37, 211, 102, 0.45);
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
         }
 
         .btn-telegram {
             background-color: var(--c-telegram);
             color: #ffffff;
-            box-shadow: 0 8px 24px rgba(36, 129, 204, 0.3);
         }
 
         .btn-telegram:hover {
-            opacity: 0.92;
+            opacity: 0.94;
             transform: translateY(-2px);
-            box-shadow: 0 12px 28px rgba(36, 129, 204, 0.45);
+            box-shadow: 0 4px 14px rgba(36, 129, 204, 0.3);
         }
 
         .btn-secondary {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-white);
+            background-color: var(--bg-surface);
+            color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.1);
+            background-color: var(--bg-card-hover);
             transform: translateY(-2px);
         }
 
-        /* Theme Toggle & Hamburger */
+        /* Theme Toggle */
         .theme-toggle-btn {
-            background: rgba(255, 255, 255, 0.06);
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            color: var(--text-white);
-            width: 40px;
-            height: 40px;
+            color: var(--text-primary);
+            width: 38px;
+            height: 38px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -3298,69 +3251,63 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .theme-toggle-btn:hover {
-            background: rgba(255, 255, 255, 0.12);
-            transform: rotate(15deg);
+            border-color: var(--accent-brand);
+            color: var(--accent-brand);
         }
 
         .menu-toggle-btn {
             display: none;
             flex-direction: column;
             justify-content: space-between;
-            width: 26px;
+            width: 24px;
             height: 18px;
             background: transparent;
             border: none;
             cursor: pointer;
-            z-index: 101;
         }
 
         .menu-toggle-btn .bar {
             width: 100%;
-            height: 2.5px;
-            background-color: var(--text-white);
+            height: 2px;
+            background-color: var(--text-primary);
             border-radius: 2px;
             transition: var(--transition);
         }
 
         /* Hero Section */
         .hero {
-            padding: 5rem 0 6rem 0;
+            padding: 5rem 0 5.5rem 0;
             display: grid;
             grid-template-columns: 1.15fr 0.85fr;
             gap: 4rem;
             align-items: center;
         }
 
-        .hero-badge {
+        .hero-tag {
             display: inline-flex;
             align-items: center;
-            gap: 0.6rem;
-            padding: 0.4rem 1rem;
+            gap: 0.5rem;
+            padding: 0.35rem 0.9rem;
             border-radius: 99px;
-            background: rgba(158, 255, 0, 0.08);
-            border: 1px solid rgba(158, 255, 0, 0.25);
-            color: var(--accent);
-            font-size: 0.85rem;
+            background: var(--accent-subtle);
+            border: 1px solid rgba(22, 163, 74, 0.25);
+            color: var(--accent-brand);
+            font-size: 0.82rem;
             font-weight: 600;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
         }
 
         .hero-content h1 {
-            font-size: 3.6rem;
-            line-height: 1.12;
-            margin-bottom: 1.5rem;
-        }
-
-        .text-gradient {
-            background: linear-gradient(135deg, #ffffff 0%, var(--accent) 50%, var(--c-cyan) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 3.4rem;
+            line-height: 1.15;
+            margin-bottom: 1.25rem;
+            color: var(--text-primary);
         }
 
         .hero-content p {
-            font-size: 1.18rem;
-            color: var(--text-muted);
-            margin-bottom: 2.5rem;
+            font-size: 1.15rem;
+            color: var(--text-secondary);
+            margin-bottom: 2.25rem;
             max-width: 580px;
             line-height: 1.7;
         }
@@ -3369,14 +3316,14 @@ LANDING_HTML = """<!DOCTYPE html>
             display: flex;
             gap: 1rem;
             flex-wrap: wrap;
-            margin-bottom: 2.5rem;
+            margin-bottom: 2rem;
         }
 
         .hero-trust-list {
             display: flex;
             align-items: center;
             gap: 1.8rem;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
             color: var(--text-muted);
         }
 
@@ -3387,46 +3334,33 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .trust-item svg {
-            color: var(--accent);
+            color: var(--accent-brand);
         }
 
-        /* Phone Simulator in Hero */
+        /* Phone Screen Mockup */
         .phone-container {
-            position: relative;
             display: flex;
             justify-content: center;
         }
 
         .phone-mockup {
-            width: 330px;
-            height: 610px;
-            background: #02070a;
-            border-radius: 46px;
-            border: 10px solid #1e293b;
+            width: 320px;
+            height: 590px;
+            background: var(--bg-surface);
+            border-radius: 42px;
+            border: 8px solid var(--border-color);
             position: relative;
-            box-shadow: 0 35px 70px -15px rgba(0,0,0,0.8), 0 0 30px rgba(158, 255, 0, 0.1);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
 
-        .dynamic-island {
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            height: 26px;
-            background: #000;
-            border-radius: 20px;
-            z-index: 20;
-        }
-
         .phone-screen {
             width: 100%;
             height: 100%;
-            background: #09141c;
-            padding: 3.2rem 0.9rem 1.2rem 0.9rem;
+            background: var(--bg-card);
+            padding: 2.5rem 0.85rem 1rem 0.85rem;
             display: flex;
             flex-direction: column;
         }
@@ -3434,23 +3368,23 @@ LANDING_HTML = """<!DOCTYPE html>
         .phone-header {
             display: flex;
             align-items: center;
-            gap: 0.7rem;
-            padding-bottom: 0.8rem;
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            gap: 0.65rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
             margin-bottom: 0.8rem;
         }
 
         .phone-avatar {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            color: #fff;
+            width: 34px;
+            height: 34px;
+            background: var(--accent-brand);
+            color: #ffffff;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
         }
 
         .phone-bot-info {
@@ -3460,70 +3394,49 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .phone-bot-name {
             font-size: 0.85rem;
-            font-weight: 700;
-            color: #ffffff;
+            font-weight: 600;
+            color: var(--text-primary);
         }
 
         .phone-bot-status {
             font-size: 0.68rem;
-            color: var(--accent);
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--accent);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent);
+            color: var(--accent-brand);
         }
 
         .phone-chat-body {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 0.8rem;
+            gap: 0.75rem;
             overflow-y: auto;
             font-size: 0.8rem;
-            padding-right: 2px;
-        }
-
-        .phone-chat-body::-webkit-scrollbar {
-            width: 4px;
-        }
-        .phone-chat-body::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
         }
 
         .chat-bubble {
-            max-width: 82%;
-            padding: 0.75rem 0.9rem;
-            border-radius: 16px;
+            max-width: 85%;
+            padding: 0.7rem 0.85rem;
+            border-radius: 14px;
             line-height: 1.45;
-            animation: fadeInBubble 0.4s ease-out;
+            animation: fadeIn 0.3s ease-out;
         }
 
-        @keyframes fadeInBubble {
-            from { opacity: 0; transform: translateY(8px); }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .bubble-bot {
-            background: #0f2c1d;
-            color: #e2e8f0;
-            border: 1px solid rgba(37, 211, 102, 0.2);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
             align-self: flex-start;
             border-top-left-radius: 4px;
         }
 
         .bubble-user {
-            background: #172a38;
+            background: var(--accent-brand);
             color: #ffffff;
             align-self: flex-end;
-            border: 1px solid rgba(255, 255, 255, 0.08);
             border-top-right-radius: 4px;
         }
 
@@ -3535,30 +3448,30 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .chat-pill-btn {
-            background: rgba(158, 255, 0, 0.1);
-            border: 1px solid rgba(158, 255, 0, 0.3);
-            color: var(--accent);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
             padding: 0.4rem 0.75rem;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 0.75rem;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
             text-align: left;
             transition: var(--transition);
         }
 
         .chat-pill-btn:hover {
-            background: var(--accent);
-            color: #050e14;
+            border-color: var(--accent-brand);
+            color: var(--accent-brand);
         }
 
         /* Stats Ribbon Section */
         .stats-ribbon {
-            padding: 3rem 0;
+            padding: 2.5rem 0;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
-            background: rgba(12, 28, 38, 0.4);
-            margin-bottom: 6rem;
+            background: var(--bg-surface);
+            margin-bottom: 5rem;
         }
 
         .stats-grid {
@@ -3569,51 +3482,51 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .stat-card h3 {
-            font-size: 2.8rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin-bottom: 0.25rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--accent-brand);
+            margin-bottom: 0.2rem;
         }
 
         .stat-card p {
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-size: 0.88rem;
             font-weight: 500;
         }
 
         /* Section Commons */
         .section-header {
             text-align: center;
-            max-width: 680px;
-            margin: 0 auto 4rem auto;
+            max-width: 650px;
+            margin: 0 auto 3.5rem auto;
         }
 
         .section-tag {
             display: inline-block;
-            padding: 0.3rem 0.9rem;
+            padding: 0.25rem 0.8rem;
             border-radius: 99px;
-            background: rgba(158, 255, 0, 0.08);
-            color: var(--accent);
-            font-size: 0.8rem;
+            background: var(--accent-subtle);
+            color: var(--accent-brand);
+            font-size: 0.78rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 1rem;
+            letter-spacing: 0.8px;
+            margin-bottom: 0.8rem;
         }
 
         .section-header h2 {
-            font-size: 2.8rem;
-            margin-bottom: 1rem;
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
         }
 
         .section-header p {
-            color: var(--text-muted);
-            font-size: 1.08rem;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
         }
 
-        /* Curriculum Accordion Section */
+        /* Curriculum Section */
         .curriculum-section {
-            padding: 4rem 0 6rem 0;
+            padding: 3rem 0 5rem 0;
         }
 
         .curriculum-grid {
@@ -3625,18 +3538,16 @@ LANDING_HTML = """<!DOCTYPE html>
         .module-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 1.8rem;
             transition: var(--transition);
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
 
         .module-card:hover {
-            border-color: rgba(158, 255, 0, 0.3);
-            transform: translateY(-4px);
-            background: var(--bg-card-hover);
+            border-color: var(--accent-brand);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
         }
 
         .module-header {
@@ -3647,11 +3558,11 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .module-badge {
-            background: rgba(158, 255, 0, 0.1);
-            color: var(--accent);
+            background: var(--accent-subtle);
+            color: var(--accent-brand);
             font-size: 0.75rem;
-            font-weight: 700;
-            padding: 0.25rem 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.65rem;
             border-radius: 99px;
         }
 
@@ -3661,72 +3572,76 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .module-card h3 {
-            font-size: 1.3rem;
-            margin-bottom: 0.6rem;
+            font-size: 1.25rem;
+            margin-bottom: 0.5rem;
         }
 
         .module-card p {
             font-size: 0.92rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
             margin-bottom: 1.2rem;
         }
 
         .module-topics {
             display: flex;
             flex-wrap: wrap;
-            gap: 0.5rem;
+            gap: 0.4rem;
         }
 
         .topic-tag {
             font-size: 0.75rem;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-            padding: 0.25rem 0.65rem;
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            padding: 0.2rem 0.6rem;
             border-radius: 6px;
             border: 1px solid var(--border-color);
         }
 
-        /* Interactive Bot Simulator Playground */
+        /* Live Simulator Playground */
         .simulator-section {
-            padding: 6rem 0;
-            background: linear-gradient(180deg, transparent 0%, rgba(12, 28, 38, 0.6) 100%);
+            padding: 5rem 0;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
         }
 
         .sim-container {
             display: grid;
-            grid-template-columns: 1fr 1.2fr;
+            grid-template-columns: 1fr 1.1fr;
             gap: 3rem;
             align-items: center;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 32px;
-            padding: 3rem;
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
         }
 
         .sim-info h3 {
-            font-size: 2.2rem;
-            margin-bottom: 1rem;
+            font-size: 2rem;
+            margin-bottom: 0.8rem;
         }
 
         .sim-info p {
-            color: var(--text-muted);
-            font-size: 1rem;
-            margin-bottom: 1.8rem;
+            color: var(--text-secondary);
+            font-size: 0.98rem;
+            margin-bottom: 1.5rem;
         }
 
         .sim-prompts {
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.65rem;
         }
 
         .sim-prompt-btn {
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            color: var(--text-white);
-            padding: 0.85rem 1.2rem;
-            border-radius: 14px;
-            font-size: 0.9rem;
+            color: var(--text-primary);
+            padding: 0.8rem 1.1rem;
+            border-radius: 12px;
+            font-size: 0.88rem;
+            font-weight: 500;
             text-align: left;
             cursor: pointer;
             transition: var(--transition);
@@ -3736,45 +3651,45 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .sim-prompt-btn:hover {
-            border-color: var(--accent);
-            background: rgba(158, 255, 0, 0.06);
-            color: var(--accent);
+            border-color: var(--accent-brand);
+            color: var(--accent-brand);
+            background: var(--accent-subtle);
         }
 
         .sim-window {
-            background: #061118;
+            background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            height: 380px;
+            border-radius: 16px;
+            height: 360px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
 
         .sim-window-header {
-            background: rgba(255, 255, 255, 0.04);
-            padding: 0.85rem 1.2rem;
+            background: var(--bg-card);
+            padding: 0.75rem 1.1rem;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
             font-size: 0.85rem;
             font-weight: 600;
         }
 
         .sim-window-body {
             flex-grow: 1;
-            padding: 1.2rem;
+            padding: 1.1rem;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.85rem;
             overflow-y: auto;
             font-size: 0.88rem;
         }
 
-        /* Dual Platforms Section */
+        /* Platforms Section */
         .platforms-section {
-            padding: 6rem 0;
+            padding: 5rem 0;
         }
 
         .platforms-grid {
@@ -3786,45 +3701,35 @@ LANDING_HTML = """<!DOCTYPE html>
         .platform-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 28px;
-            padding: 2.8rem;
+            border-radius: 20px;
+            padding: 2.5rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             transition: var(--transition);
-            position: relative;
-            overflow: hidden;
+            box-shadow: var(--shadow-sm);
         }
 
         .platform-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .platform-card.whatsapp-card:hover {
-            border-color: var(--c-whatsapp);
-            box-shadow: 0 16px 40px rgba(37, 211, 102, 0.15);
-        }
-
-        .platform-card.telegram-card:hover {
-            border-color: var(--c-telegram);
-            box-shadow: 0 16px 40px rgba(36, 129, 204, 0.15);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
         }
 
         .platform-badge {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 0.35rem 0.85rem;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.3rem 0.75rem;
             border-radius: 99px;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             width: fit-content;
         }
 
         .platform-badge.whatsapp {
             background: rgba(37, 211, 102, 0.12);
-            color: var(--c-whatsapp);
+            color: #15803d;
         }
 
         .platform-badge.telegram {
@@ -3833,40 +3738,40 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .platform-card h3 {
-            font-size: 1.8rem;
-            margin-bottom: 0.8rem;
+            font-size: 1.6rem;
+            margin-bottom: 0.6rem;
         }
 
         .platform-card p {
-            color: var(--text-muted);
-            font-size: 0.98rem;
-            margin-bottom: 1.8rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
         }
 
         .platform-features {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-            margin-bottom: 2rem;
-            font-size: 0.9rem;
-            color: var(--text-muted);
+            gap: 0.65rem;
+            margin-bottom: 1.8rem;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
         }
 
         .platform-features li {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
 
         .platform-features svg {
-            color: var(--accent);
+            color: var(--accent-brand);
             flex-shrink: 0;
         }
 
         /* Safety Grid */
         .safety-section {
-            padding: 6rem 0;
+            padding: 5rem 0;
             border-top: 1px solid var(--border-color);
         }
 
@@ -3879,80 +3784,83 @@ LANDING_HTML = """<!DOCTYPE html>
         .safety-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            padding: 2rem;
-            border-radius: 20px;
+            padding: 1.8rem;
+            border-radius: 16px;
             transition: var(--transition);
+            box-shadow: var(--shadow-sm);
         }
 
         .safety-card:hover {
-            border-color: rgba(158, 255, 0, 0.25);
-            transform: translateY(-4px);
+            border-color: var(--accent-brand);
+            transform: translateY(-3px);
         }
 
         .safety-icon {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            background: rgba(158, 255, 0, 0.08);
-            color: var(--accent);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: var(--accent-subtle);
+            color: var(--accent-brand);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .safety-card h4 {
-            font-size: 1.15rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+            margin-bottom: 0.4rem;
         }
 
         .safety-card p {
             font-size: 0.88rem;
-            color: var(--text-muted);
+            color: var(--text-secondary);
         }
 
         /* Testimonials Section */
         .testimonials-section {
-            padding: 6rem 0;
+            padding: 5rem 0;
             border-top: 1px solid var(--border-color);
+            background: var(--bg-surface);
         }
 
         .testimonials-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.8rem;
+            gap: 1.5rem;
         }
 
         .testimonial-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            padding: 2rem;
-            border-radius: 24px;
+            padding: 1.8rem;
+            border-radius: 16px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            box-shadow: var(--shadow-sm);
         }
 
         .testimonial-text {
-            font-size: 0.95rem;
-            color: var(--text-muted);
+            font-size: 0.92rem;
+            color: var(--text-secondary);
             font-style: italic;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.25rem;
             line-height: 1.6;
         }
 
         .testimonial-author {
             display: flex;
             align-items: center;
-            gap: 0.75rem;
+            gap: 0.65rem;
         }
 
         .author-avatar {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, var(--accent) 0%, var(--c-cyan) 100%);
-            color: #050e14;
+            background: var(--accent-brand);
+            color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -3961,8 +3869,8 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .author-info h5 {
-            font-size: 0.9rem;
-            font-weight: 700;
+            font-size: 0.88rem;
+            font-weight: 600;
         }
 
         .author-info p {
@@ -3970,48 +3878,54 @@ LANDING_HTML = """<!DOCTYPE html>
             color: var(--text-muted);
         }
 
-        /* FAQ Section */
+        /* FAQ Section with Smooth Expand/Collapse */
         .faq-section {
-            padding: 6rem 0;
+            padding: 5rem 0;
             border-top: 1px solid var(--border-color);
         }
 
         .faq-list {
-            max-width: 800px;
+            max-width: 780px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 0.85rem;
         }
 
         .faq-item {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
+            border-radius: 14px;
             overflow: hidden;
             transition: var(--transition);
         }
 
         .faq-question {
-            padding: 1.4rem 1.8rem;
+            padding: 1.25rem 1.6rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 600;
-            font-size: 1.05rem;
+            font-size: 1rem;
             cursor: pointer;
+            color: var(--text-primary);
         }
 
         .faq-answer {
-            padding: 0 1.8rem 1.4rem 1.8rem;
-            color: var(--text-muted);
-            font-size: 0.95rem;
-            display: none;
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            padding: 0 1.6rem;
+            color: var(--text-secondary);
+            font-size: 0.93rem;
             line-height: 1.65;
+            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, padding 0.3s ease;
         }
 
         .faq-item.active .faq-answer {
-            display: block;
+            max-height: 250px;
+            opacity: 1;
+            padding-bottom: 1.25rem;
         }
 
         .faq-item.active .faq-icon {
@@ -4019,43 +3933,41 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .faq-icon {
-            transition: var(--transition);
-            color: var(--accent);
+            transition: transform 0.3s ease;
+            color: var(--accent-brand);
         }
 
         /* Final Conversion Banner */
         .cta-banner {
-            padding: 6rem 0;
-            text-align: center;
+            padding: 5rem 0;
         }
 
         .cta-box {
-            background: linear-gradient(135deg, rgba(12, 28, 38, 0.9) 0%, rgba(5, 14, 20, 0.95) 100%);
-            border: 1px solid var(--accent);
-            border-radius: 36px;
-            padding: 4.5rem 2rem;
-            box-shadow: 0 20px 60px -15px var(--accent-glow);
-            position: relative;
-            overflow: hidden;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 28px;
+            padding: 4rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
         }
 
         .cta-box h2 {
-            font-size: 3rem;
-            margin-bottom: 1rem;
+            font-size: 2.6rem;
+            margin-bottom: 0.8rem;
         }
 
         .cta-box p {
-            color: var(--text-muted);
-            font-size: 1.12rem;
-            max-width: 600px;
-            margin: 0 auto 2.5rem auto;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            max-width: 580px;
+            margin: 0 auto 2rem auto;
         }
 
         /* Footer */
         footer {
             border-top: 1px solid var(--border-color);
-            padding: 4rem 0 3rem 0;
-            font-size: 0.9rem;
+            padding: 3.5rem 0 2.5rem 0;
+            font-size: 0.88rem;
             color: var(--text-muted);
         }
 
@@ -4064,7 +3976,7 @@ LANDING_HTML = """<!DOCTYPE html>
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 2rem;
+            gap: 1.5rem;
         }
 
         .footer-copy {
@@ -4073,11 +3985,11 @@ LANDING_HTML = """<!DOCTYPE html>
             gap: 0.6rem;
         }
 
-        /* Scroll Reveal Utility */
+        /* Smooth Scroll Reveal Utility */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(24px);
+            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .reveal.visible {
@@ -4090,7 +4002,7 @@ LANDING_HTML = """<!DOCTYPE html>
             .hero {
                 grid-template-columns: 1fr;
                 text-align: center;
-                gap: 3rem;
+                gap: 2.5rem;
             }
 
             .hero-content p {
@@ -4127,15 +4039,16 @@ LANDING_HTML = """<!DOCTYPE html>
         @media (max-width: 768px) {
             .nav-menu {
                 position: fixed;
-                top: 70px;
+                top: 65px;
                 left: 0;
                 width: 100%;
-                background: var(--bg-dark);
+                background: var(--bg-body);
                 flex-direction: column;
-                padding: 2rem;
+                padding: 1.8rem;
                 border-bottom: 1px solid var(--border-color);
                 transform: translateY(-150%);
                 transition: var(--transition);
+                box-shadow: var(--shadow-lg);
             }
 
             .nav-menu.active {
@@ -4147,7 +4060,7 @@ LANDING_HTML = """<!DOCTYPE html>
             }
 
             .hero-content h1 {
-                font-size: 2.5rem;
+                font-size: 2.4rem;
             }
 
             .safety-grid {
@@ -4155,16 +4068,12 @@ LANDING_HTML = """<!DOCTYPE html>
             }
 
             .cta-box h2 {
-                font-size: 2.2rem;
+                font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Background Ambient Glow Orbs -->
-    <div class="ambient-glow glow-1"></div>
-    <div class="ambient-glow glow-2"></div>
-    <div class="ambient-glow glow-3"></div>
 
     <!-- Header Navigation -->
     <header>
@@ -4185,11 +4094,13 @@ LANDING_HTML = """<!DOCTYPE html>
 
             <div class="header-actions">
                 <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <svg class="sun-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    <!-- Sun Icon (shown in dark mode) -->
+                    <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <!-- Moon Icon (shown in light mode) -->
+                    <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
-                <a href="#platforms" class="btn btn-accent">Start Learning</a>
-                <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle Menu">
+                <a href="#platforms" class="btn btn-primary">Start Learning</a>
+                <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle Navigation">
                     <span class="bar"></span>
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -4201,15 +4112,15 @@ LANDING_HTML = """<!DOCTYPE html>
     <!-- Hero Section -->
     <section class="hero container">
         <div class="hero-content reveal">
-            <div class="hero-badge">
-                <span>🔥 100% Free, Safe & Anonymous Learning Space</span>
+            <div class="hero-tag">
+                <span>Safe, Confidential & Free Conversational Course</span>
             </div>
-            <h1>Transforming Masculinity. <span class="text-gradient">Empowering Men.</span></h1>
-            <p>A private 6-week conversational course hosted directly inside <strong>WhatsApp</strong> & <strong>Telegram</strong>. Develop positive character, discuss healthy relationships, and stand against Gender-Based Violence.</p>
+            <h1>Transforming Masculinity. Empowering Men. Standing Against GBV.</h1>
+            <p>A private 6-week interactive course hosted directly inside <strong>WhatsApp</strong> and <strong>Telegram</strong>. Develop positive character, discuss healthy relationships, and lead in your community.</p>
             
             <div class="hero-actions">
                 <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                     <span>Start on WhatsApp</span>
                 </a>
                 
@@ -4223,32 +4134,31 @@ LANDING_HTML = """<!DOCTYPE html>
 
             <div class="hero-trust-list">
                 <div class="trust-item">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>No App Download Needed</span>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <span>No App Download Required</span>
                 </div>
                 <div class="trust-item">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                     <span>Self-Paced & Private</span>
                 </div>
             </div>
         </div>
 
-        <!-- Realistic Interactive iPhone Mockup -->
+        <!-- Phone Simulator Mockup -->
         <div class="phone-container reveal">
             <div class="phone-mockup">
-                <div class="dynamic-island"></div>
                 <div class="phone-screen">
                     <div class="phone-header">
                         <div class="phone-avatar">T</div>
                         <div class="phone-bot-info">
                             <span class="phone-bot-name">Tobi (The Brothers' Room)</span>
-                            <span class="phone-bot-status"><span class="status-dot"></span> Active Now</span>
+                            <span class="phone-bot-status">Active Learning Facilitator</span>
                         </div>
                     </div>
                     
                     <div class="phone-chat-body" id="hero-chat-body">
                         <div class="chat-bubble bubble-bot">
-                            Welcome brother! ✊ Ready to explore Module 1: <strong>Understanding Masculinity</strong>?
+                            Welcome brother! Ready to explore Module 1: <strong>Understanding Masculinity</strong>?
                             <div class="chat-option-pills">
                                 <button class="chat-pill-btn" onclick="triggerHeroReply('1. Start Module 1')">1. Start Module 1</button>
                                 <button class="chat-pill-btn" onclick="triggerHeroReply('2. Is this confidential?')">2. Is this confidential?</button>
@@ -4269,7 +4179,7 @@ LANDING_HTML = """<!DOCTYPE html>
             </div>
             <div class="stat-card">
                 <h3>100%</h3>
-                <p>Free & Anonymous</p>
+                <p>Free & Confidential</p>
             </div>
             <div class="stat-card">
                 <h3>2 Channels</h3>
@@ -4277,7 +4187,7 @@ LANDING_HTML = """<!DOCTYPE html>
             </div>
             <div class="stat-card">
                 <h3>24/7</h3>
-                <p>Automated Companion</p>
+                <p>Self-Paced Companion</p>
             </div>
         </div>
     </section>
@@ -4297,7 +4207,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     <span class="module-duration">15 mins</span>
                 </div>
                 <h3>Understanding Masculinity & Identity</h3>
-                <p>Explore cultural stereotypes surrounding manhood, dismantle toxic expectations, and embrace positive self-identity.</p>
+                <p>Explore cultural expectations surrounding manhood, dismantle harmful stereotypes, and embrace positive self-identity.</p>
                 <div class="module-topics">
                     <span class="topic-tag">Gender Expectations</span>
                     <span class="topic-tag">Self-Awareness</span>
@@ -4311,7 +4221,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     <span class="module-duration">15 mins</span>
                 </div>
                 <h3>Emotional Intelligence & Well-being</h3>
-                <p>Break the silence around male mental health. Learn safe techniques for anger management, vulnerability, and seeking help.</p>
+                <p>Break the silence around male mental health. Learn healthy techniques for managing anger, expressing vulnerability, and seeking support.</p>
                 <div class="module-topics">
                     <span class="topic-tag">Anger Management</span>
                     <span class="topic-tag">Vulnerability</span>
@@ -4325,7 +4235,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     <span class="module-duration">20 mins</span>
                 </div>
                 <h3>Healthy Relationships & Consent</h3>
-                <p>Master healthy communication, clear boundaries, mutual respect, and positive dynamics in romantic and peer relationships.</p>
+                <p>Master positive communication, clear boundaries, mutual respect, and healthy dynamics in romantic and peer relationships.</p>
                 <div class="module-topics">
                     <span class="topic-tag">Consent</span>
                     <span class="topic-tag">Boundaries</span>
@@ -4339,7 +4249,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     <span class="module-duration">20 mins</span>
                 </div>
                 <h3>Standing Against GBV & Allyship</h3>
-                <p>Recognize physical, emotional, and digital gender-based violence. Learn safe intervention tactics and active allyship.</p>
+                <p>Recognize physical, emotional, and digital gender-based violence. Learn safe intervention tactics and active community allyship.</p>
                 <div class="module-topics">
                     <span class="topic-tag">GBV Prevention</span>
                     <span class="topic-tag">Bystander Intervention</span>
@@ -4371,7 +4281,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 <div class="module-topics">
                     <span class="topic-tag">Personal Action</span>
                     <span class="topic-tag">Peer Network</span>
-                    <span class="topic-tag">Certification</span>
+                    <span class="topic-tag">Completion Certificate</span>
                 </div>
             </div>
         </div>
@@ -4382,9 +4292,9 @@ LANDING_HTML = """<!DOCTYPE html>
         <div class="container">
             <div class="sim-container">
                 <div class="sim-info reveal">
-                    <span class="section-tag">Interactive Preview</span>
+                    <span class="section-tag">Interactive Demo</span>
                     <h3>Try Tobi in Your Browser</h3>
-                    <p>Experience how conversational and friendly learning on The Brothers' Room feels before launching on WhatsApp or Telegram.</p>
+                    <p>Experience how friendly and conversational learning on The Brothers' Room feels before launching in WhatsApp or Telegram.</p>
                     
                     <div class="sim-prompts">
                         <button class="sim-prompt-btn" onclick="sendSimPrompt('What will I learn in Week 1?')">
@@ -4404,12 +4314,12 @@ LANDING_HTML = """<!DOCTYPE html>
 
                 <div class="sim-window reveal">
                     <div class="sim-window-header">
-                        <div class="status-dot"></div>
+                        <span class="phone-avatar" style="width:24px; height:24px; font-size:0.7rem;">T</span>
                         <span>Tobi Live Simulator</span>
                     </div>
                     <div class="sim-window-body" id="sim-window-body">
                         <div class="chat-bubble bubble-bot">
-                            Hey brother! Click any sample prompt on the left to see how I guide you through the course! 🚀
+                            Hello brother! Click any sample question on the left to test how I facilitate course lessons.
                         </div>
                     </div>
                 </div>
@@ -4426,27 +4336,24 @@ LANDING_HTML = """<!DOCTYPE html>
         </div>
 
         <div class="platforms-grid">
-            <div class="platform-card whatsapp-card reveal">
+            <div class="platform-card reveal">
                 <div>
-                    <span class="platform-badge whatsapp">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
-                        WhatsApp Active
-                    </span>
-                    <h3>WhatsApp Learning Bot</h3>
-                    <p>Start instantly on WhatsApp. Interactive prompts, voice lesson summaries, and zero data waste.</p>
+                    <span class="platform-badge whatsapp">WhatsApp Channel</span>
+                    <h3>WhatsApp Bot</h3>
+                    <p>Start instantly on WhatsApp. Interactive prompts, voice lesson summaries, and self-paced learning.</p>
                     
                     <ul class="platform-features">
                         <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Pre-filled quick trigger start</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Pre-filled quick start message</span>
                         </li>
                         <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
                             <span>End-to-End encrypted messaging</span>
                         </li>
                         <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Audio lesson summaries supported</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Audio lesson notes supported</span>
                         </li>
                     </ul>
                 </div>
@@ -4456,27 +4363,24 @@ LANDING_HTML = """<!DOCTYPE html>
                 </a>
             </div>
 
-            <div class="platform-card telegram-card reveal">
+            <div class="platform-card reveal">
                 <div>
-                    <span class="platform-badge telegram">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                        Telegram Active
-                    </span>
-                    <h3>Telegram Learning Bot</h3>
-                    <p>Experience seamless automated learning with quick button menus and instant progress tracking.</p>
+                    <span class="platform-badge telegram">Telegram Channel</span>
+                    <h3>Telegram Bot</h3>
+                    <p>Experience automated learning with interactive button menus and instant progress tracking.</p>
                     
                     <ul class="platform-features">
                         <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Rich inline button navigation</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Inline button navigation</span>
                         </li>
                         <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Instant bookmarking & progress restart</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Instant bookmarking & course resume</span>
                         </li>
                         <li>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Full privacy control</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                            <span>Complete privacy control</span>
                         </li>
                     </ul>
                 </div>
@@ -4493,82 +4397,84 @@ LANDING_HTML = """<!DOCTYPE html>
         <div class="section-header reveal">
             <span class="section-tag">Privacy First</span>
             <h2>Safe, Confidential & Free</h2>
-            <p>Your trust and psychological safety are our highest priorities.</p>
+            <p>Your psychological safety and personal confidentiality are our highest priorities.</p>
         </div>
 
         <div class="safety-grid">
             <div class="safety-card reveal">
                 <div class="safety-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
                 <h4>100% Confidential</h4>
-                <p>You never have to reveal your full name or personal details to complete modules.</p>
+                <p>You never have to disclose your real name or personal identity to complete modules.</p>
             </div>
 
             <div class="safety-card reveal">
                 <div class="safety-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                 </div>
                 <h4>Non-Judgmental</h4>
-                <p>Designed for open reflection without shame, guilt, or preachiness.</p>
+                <p>Designed for honest self-reflection without shame, preaching, or stigma.</p>
             </div>
 
             <div class="safety-card reveal">
                 <div class="safety-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 </div>
                 <h4>Peer Mentorship</h4>
-                <p>Curated content guided by experienced youth facilitators and male allies.</p>
+                <p>Curated content guided by experienced youth development specialists and male allies.</p>
             </div>
 
             <div class="safety-card reveal">
                 <div class="safety-icon">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                 </div>
-                <h4>Crisis Helplines</h4>
-                <p>Instant referral options to professional counseling & support services when needed.</p>
+                <h4>Helpline Referrals</h4>
+                <p>Instant access to professional counseling and GBV support services when requested.</p>
             </div>
         </div>
     </section>
 
     <!-- Testimonials Section -->
-    <section class="testimonials-section container">
-        <div class="section-header reveal">
-            <span class="section-tag">Voices of Learners</span>
-            <h2>Real Impact & Growth</h2>
-            <p>Hear what young men are saying about their journey through The Brothers' Room.</p>
-        </div>
-
-        <div class="testimonials-grid">
-            <div class="testimonial-card reveal">
-                <p class="testimonial-text">"The Brothers' Room gave me a safe space to challenge things I thought were normal about being a guy. Week 2 on emotional health completely shifted how I manage anger."</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">A</div>
-                    <div class="author-info">
-                        <h5>Ademola O.</h5>
-                        <p>Learner on Telegram</p>
-                    </div>
-                </div>
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-tag">Voices of Learners</span>
+                <h2>Real Impact & Growth</h2>
+                <p>Hear what young men are saying about their journey through The Brothers' Room.</p>
             </div>
 
-            <div class="testimonial-card reveal">
-                <p class="testimonial-text">"I love that it happens right inside WhatsApp. 15 minutes a week, no heavy data downloads, and the lessons on consent and respect were practical."</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">C</div>
-                    <div class="author-info">
-                        <h5>Chinedu K.</h5>
-                        <p>Learner on WhatsApp</p>
+            <div class="testimonials-grid">
+                <div class="testimonial-card reveal">
+                    <p class="testimonial-text">"The Brothers' Room gave me a safe space to challenge things I thought were normal about being a guy. Week 2 on emotional health completely shifted how I handle stress and anger."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">A</div>
+                        <div class="author-info">
+                            <h5>Ademola O.</h5>
+                            <p>Learner on Telegram</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="testimonial-card reveal">
-                <p class="testimonial-text">"Every young man needs this course. It opened my eyes to how we can actively stop gender violence and support our female peers."</p>
-                <div class="testimonial-author">
-                    <div class="author-avatar">I</div>
-                    <div class="author-info">
-                        <h5>Ibrahim M.</h5>
-                        <p>Learner on Telegram</p>
+                <div class="testimonial-card reveal">
+                    <p class="testimonial-text">"I love that it happens right inside WhatsApp. 15 minutes a week, no heavy data downloads, and the lessons on consent and boundaries were straightforward."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">C</div>
+                        <div class="author-info">
+                            <h5>Chinedu K.</h5>
+                            <p>Learner on WhatsApp</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card reveal">
+                    <p class="testimonial-text">"Every young man needs this course. It opened my eyes to how we can actively prevent violence and support women and girls in our communities."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">I</div>
+                        <div class="author-info">
+                            <h5>Ibrahim M.</h5>
+                            <p>Learner on Telegram</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -4587,7 +4493,7 @@ LANDING_HTML = """<!DOCTYPE html>
             <div class="faq-item reveal">
                 <div class="faq-question" onclick="toggleFaq(this)">
                     <span>Is The Brothers' Room really 100% free?</span>
-                    <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
                 <div class="faq-answer">
                     Yes! The entire 6-week course is completely free of charge, brought to you by YouthHubAfrica to empower young men across communities.
@@ -4596,31 +4502,31 @@ LANDING_HTML = """<!DOCTYPE html>
 
             <div class="faq-item reveal">
                 <div class="faq-question" onclick="toggleFaq(this)">
-                    <span>How much time do I need to dedicate per week?</span>
-                    <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <span>How much time do I need per week?</span>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
                 <div class="faq-answer">
-                    Each weekly module takes only 15 to 20 minutes to complete. Because it is self-paced inside WhatsApp and Telegram, you can pause and resume whenever it fits your schedule.
+                    Each weekly module takes approximately 15 to 20 minutes. Because it is self-paced inside WhatsApp and Telegram, you can pause and resume whenever it fits your schedule.
                 </div>
             </div>
 
             <div class="faq-item reveal">
                 <div class="faq-question" onclick="toggleFaq(this)">
                     <span>Do I need to download a new app?</span>
-                    <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
                 <div class="faq-answer">
-                    No new apps required! You can take the entire course inside your existing WhatsApp or Telegram app.
+                    No new apps required! You can complete the full course directly inside your existing WhatsApp or Telegram application.
                 </div>
             </div>
 
             <div class="faq-item reveal">
                 <div class="faq-question" onclick="toggleFaq(this)">
                     <span>Is my privacy and responses protected?</span>
-                    <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </div>
                 <div class="faq-answer">
-                    Absolutely. Your personal responses are private and confidential. You do not need to provide sensitive personal identification to complete the course.
+                    Absolutely. Your personal responses are private and confidential. You are never required to provide sensitive personal identification.
                 </div>
             </div>
         </div>
@@ -4630,11 +4536,11 @@ LANDING_HTML = """<!DOCTYPE html>
     <section class="cta-banner container">
         <div class="cta-box reveal">
             <h2>Ready to Join The Brothers' Room?</h2>
-            <p>Start your 6-week journey toward positive masculinity and leadership today on WhatsApp or Telegram.</p>
+            <p>Start your 6-week journey toward positive masculinity and community leadership today on WhatsApp or Telegram.</p>
             
             <div class="hero-actions" style="justify-content: center;">
                 <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                     <span>Start on WhatsApp</span>
                 </a>
                 
@@ -4650,8 +4556,8 @@ LANDING_HTML = """<!DOCTYPE html>
     <footer class="container">
         <div class="footer-wrapper">
             <div class="footer-copy">
-                <div class="logo-icon" style="width:28px; height:28px; font-size:0.9rem;">B</div>
-                <span>© 2026 The Brothers' Room. Supported by YouthHubAfrica.</span>
+                <div class="logo-icon" style="width:26px; height:26px; font-size:0.85rem;">B</div>
+                <span>© 2026 The Brothers' Room. A YouthHubAfrica Initiative.</span>
             </div>
             <div style="display:flex; gap:1.5rem;">
                 <a href="#curriculum">Curriculum</a>
@@ -4668,69 +4574,69 @@ LANDING_HTML = """<!DOCTYPE html>
         function triggerHeroReply(optionText) {
             const chatBody = document.getElementById("hero-chat-body");
             
-            // Append user bubble
             const userMsg = document.createElement("div");
             userMsg.className = "chat-bubble bubble-user";
             userMsg.textContent = optionText;
             chatBody.appendChild(userMsg);
-            
-            // Auto scroll down
             chatBody.scrollTop = chatBody.scrollHeight;
             
-            // Bot response after delay
             setTimeout(() => {
                 const botMsg = document.createElement("div");
                 botMsg.className = "chat-bubble bubble-bot";
                 
                 if (optionText.includes("Module 1")) {
-                    botMsg.innerHTML = "Awesome! In Module 1, we unpack societal expectations and define what positive masculinity means to you. Ready?";
+                    botMsg.innerHTML = "In Module 1, we unpack societal expectations and define what positive masculinity means to you. Ready to begin?";
                 } else {
-                    botMsg.innerHTML = "🔒 100% Anonymous! No real names required. Everything stays private between you and Tobi.";
+                    botMsg.innerHTML = "100% Anonymous. No real names required. Everything stays private between you and Tobi.";
                 }
                 
                 chatBody.appendChild(botMsg);
                 chatBody.scrollTop = chatBody.scrollHeight;
-            }, 600);
+            }, 500);
         }
 
         // Live Simulator Playground Logic
         function sendSimPrompt(promptText) {
             const simBody = document.getElementById("sim-window-body");
             
-            // User prompt
             const uBubble = document.createElement("div");
             uBubble.className = "chat-bubble bubble-user";
             uBubble.textContent = promptText;
             simBody.appendChild(uBubble);
             simBody.scrollTop = simBody.scrollHeight;
             
-            // Bot response
             setTimeout(() => {
                 const bBubble = document.createElement("div");
                 bBubble.className = "chat-bubble bubble-bot";
                 
                 if (promptText.includes("Week 1")) {
-                    bBubble.innerHTML = "Module 1 covers: dismantling harmful stereotypes, emotional self-reflection, and building positive male identity! Takes 15 minutes.";
+                    bBubble.innerHTML = "Module 1 covers: dismantling harmful stereotypes, emotional self-reflection, and building positive male identity. Takes ~15 minutes.";
                 } else if (promptText.includes("private")) {
-                    bBubble.innerHTML = "Yes! You can use an alias. We do not track or share your identity. Your psychological safety is fully protected.";
+                    bBubble.innerHTML = "Yes! You can use an alias. We do not track or share your identity. Your privacy is fully protected.";
                 } else {
-                    bBubble.innerHTML = "Simply click the 'Start on WhatsApp' button! You'll send a quick pre-filled message to Tobi and begin Module 1 instantly!";
+                    bBubble.innerHTML = "Simply click the 'Start on WhatsApp' button! You'll send a quick message to Tobi and begin Module 1 instantly.";
                 }
                 
                 simBody.appendChild(bBubble);
                 simBody.scrollTop = simBody.scrollHeight;
-            }, 500);
+            }, 450);
         }
 
-        // FAQ Toggle
+        // FAQ Smooth Accordion Toggle
         function toggleFaq(element) {
             const item = element.parentElement;
+            
+            // Close other items for single-accordion feel
+            document.querySelectorAll(".faq-item").forEach(other => {
+                if (other !== item) other.classList.remove("active");
+            });
+
             item.classList.toggle("active");
         }
 
-        // Scroll Reveal Animations
+        // Smooth Scroll Reveal Animations
         function initScrollReveal() {
-            const observerOptions = { threshold: 0.15 };
+            const observerOptions = { threshold: 0.12 };
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
@@ -4742,25 +4648,25 @@ LANDING_HTML = """<!DOCTYPE html>
             document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
         }
 
-        // Theme Toggle
+        // Theme Toggle (Dark/Light mode switch)
         function initThemeToggle() {
             const toggleBtn = document.getElementById("theme-toggle");
             const sunIcon = toggleBtn.querySelector(".sun-icon");
             const moonIcon = toggleBtn.querySelector(".moon-icon");
 
             const savedTheme = localStorage.getItem("theme");
-            if (savedTheme === "light") {
-                document.body.classList.add("light-mode");
-                sunIcon.style.display = "none";
-                moonIcon.style.display = "block";
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark-mode");
+                sunIcon.style.display = "block";
+                moonIcon.style.display = "none";
             }
 
             toggleBtn.addEventListener("click", () => {
-                document.body.classList.toggle("light-mode");
-                const isLight = document.body.classList.contains("light-mode");
-                localStorage.setItem("theme", isLight ? "light" : "dark");
-                sunIcon.style.display = isLight ? "none" : "block";
-                moonIcon.style.display = isLight ? "block" : "none";
+                document.body.classList.toggle("dark-mode");
+                const isDark = document.body.classList.contains("dark-mode");
+                localStorage.setItem("theme", isDark ? "dark" : "light");
+                sunIcon.style.display = isDark ? "block" : "none";
+                moonIcon.style.display = isDark ? "none" : "block";
             });
         }
 
@@ -4780,11 +4686,6 @@ LANDING_HTML = """<!DOCTYPE html>
             }
         }
 
-        window.addEventListener("load", () => {
-            initScrollReveal();
-            initThemeToggle();
-            initMobileNav();
-        });
     </script>
 </body>
 </html>
