@@ -3714,6 +3714,32 @@ LANDING_HTML = """<!DOCTYPE html>
             transition: var(--transition);
         }
 
+        .module-card:hover {
+            border-color: var(--brand-green);
+            box-shadow: var(--shadow-md);
+        }
+
+        .module-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.85rem;
+        }
+
+        .module-badge {
+            background: var(--brand-green-subtle);
+            color: var(--brand-green);
+            font-size: 0.75rem;
+            font-weight: 600;
+            padding: 0.2rem 0.6rem;
+            border-radius: 99px;
+        }
+
+        .module-duration {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+        }
+
         .module-card h3 {
             font-size: 1.2rem;
             margin-bottom: 0.45rem;
@@ -3723,6 +3749,22 @@ LANDING_HTML = """<!DOCTYPE html>
         .module-card p {
             font-size: 0.9rem;
             color: var(--text-secondary);
+            margin-bottom: 1rem;
+        }
+
+        .module-topics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+        }
+
+        .topic-tag {
+            font-size: 0.75rem;
+            background: var(--bg-surface);
+            color: var(--text-secondary);
+            padding: 0.2rem 0.55rem;
+            border-radius: 6px;
+            border: 1px solid var(--border-color);
         }
 
         .simulator-section {
@@ -3753,6 +3795,45 @@ LANDING_HTML = """<!DOCTYPE html>
         .sim-info p {
             color: var(--text-secondary);
             font-size: 0.95rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .sim-prompts {
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .sim-prompt-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            text-align: left;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .sim-prompt-btn:hover {
+            border-color: var(--brand-green);
+            color: var(--brand-green);
+            background: var(--brand-green-subtle);
+        }
+
+        .sim-window {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            height: 350px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
 
         .sim-window-header {
@@ -3784,6 +3865,45 @@ LANDING_HTML = """<!DOCTYPE html>
         .platforms-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
+            gap: 1.75rem;
+        }
+
+        .platform-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 2.25rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .platform-card:hover {
+            box-shadow: var(--shadow-md);
+        }
+
+        .platform-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-size: 0.78rem;
+            font-weight: 600;
+            padding: 0.25rem 0.7rem;
+            border-radius: 99px;
+            margin-bottom: 1.1rem;
+            width: fit-content;
+        }
+
+        .platform-badge.whatsapp {
+            background: rgba(37, 211, 102, 0.12);
+            color: #15803d;
+        }
+
+        .platform-badge.telegram {
+            background: rgba(36, 129, 204, 0.12);
+            color: var(--c-telegram);
         }
 
         .platform-card h3 {
@@ -3795,6 +3915,23 @@ LANDING_HTML = """<!DOCTYPE html>
         .platform-card p {
             color: var(--text-secondary);
             font-size: 0.93rem;
+            margin-bottom: 1.4rem;
+        }
+
+        .platform-features {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            margin-bottom: 1.6rem;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .platform-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .safety-section {
@@ -3804,6 +3941,29 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .safety-grid {
             display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.25rem;
+        }
+
+        .safety-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1.6rem;
+            border-radius: 14px;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .safety-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: var(--brand-green-subtle);
+            color: var(--brand-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.9rem;
         }
 
         .safety-card h4 {
@@ -3821,6 +3981,50 @@ LANDING_HTML = """<!DOCTYPE html>
             padding: 5rem 0;
             border-top: 1px solid var(--border-color);
             background: var(--bg-surface);
+        }
+
+        .testimonials-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.25rem;
+        }
+
+        .testimonial-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 1.6rem;
+            border-radius: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .testimonial-text {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-bottom: 1.2rem;
+            line-height: 1.6;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .author-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--brand-green);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.82rem;
         }
 
         .author-info h5 {
@@ -3841,9 +4045,53 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .faq-list {
             max-width: 760px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .faq-item {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .faq-question {
+            padding: 1.15rem 1.4rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 0.98rem;
+            cursor: pointer;
+            color: var(--text-primary);
+        }
+
+        .faq-answer {
+            max-height: 0;
+            opacity: 0;
+            overflow: hidden;
+            padding: 0 1.4rem;
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+            line-height: 1.65;
+            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, padding 0.25s ease;
+        }
+
+        .faq-item.active .faq-answer {
+            max-height: 250px;
+            opacity: 1;
+            padding-bottom: 1.15rem;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
         }
 
         .faq-icon {
+            transition: transform 0.3s ease;
             color: var(--brand-green);
         }
 
@@ -3869,6 +4117,29 @@ LANDING_HTML = """<!DOCTYPE html>
         .cta-box p {
             color: var(--text-secondary);
             font-size: 1.02rem;
+            max-width: 560px;
+            margin: 0 auto 1.8rem auto;
+        }
+
+        footer {
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 0 2rem 0;
+            font-size: 0.86rem;
+            color: var(--text-muted);
+        }
+
+        .footer-wrapper {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+        }
+
+        .footer-copy {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         @media (max-width: 992px) {
@@ -3987,6 +4258,7 @@ LANDING_HTML = """<!DOCTYPE html>
             </a>
 
             <nav class="nav-menu" id="nav-menu">
+                <a href="#features">Features</a>
                 <a href="#curriculum">Curriculum</a>
                 <a href="#simulator">Live Demo</a>
                 <a href="#platforms">Platforms</a>
@@ -4099,7 +4371,7 @@ LANDING_HTML = """<!DOCTYPE html>
         </div>
     </section>
 
-    <section class="features-section">
+    <section class="features-section" id="features">
         <div class="container features-layout">
             
             <div class="features-left">
@@ -4139,7 +4411,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
                 <div class="feature-card">
                     <div class="card-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 1 0 7.75"></path></svg>
                     </div>
                     <h3>GBV Allyship</h3>
                     <p>Practical guidance on bystander intervention, healthy consent, and positive male leadership.</p>
@@ -4148,6 +4420,354 @@ LANDING_HTML = """<!DOCTYPE html>
 
         </div>
     </section>
+
+    <section class="curriculum-section container" id="curriculum">
+        <div class="section-header">
+            <span class="section-tag">Structured Learning Path</span>
+            <h2>The 6-Week Curriculum</h2>
+            <p>Designed by youth development experts to foster self-awareness, respectful relationships, and positive leadership.</p>
+        </div>
+
+        <div class="curriculum-grid">
+            <div class="module-card">
+                <div class="module-header">
+                    <span class="module-badge">Week 01</span>
+                    <span class="module-duration">15 mins</span>
+                </div>
+                <h3>Understanding Masculinity & Identity</h3>
+                <p>Explore cultural expectations surrounding manhood, dismantle harmful stereotypes, and embrace positive self-identity.</p>
+                <div class="module-topics">
+                    <span class="topic-tag">Gender Expectations</span>
+                    <span class="topic-tag">Self-Awareness</span>
+                    <span class="topic-tag">Healthy Mindset</span>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-header">
+                    <span class="module-badge">Week 02</span>
+                    <span class="module-duration">15 mins</span>
+                </div>
+                <h3>Emotional Intelligence & Well-being</h3>
+                <p>Break the silence around male mental health. Learn healthy techniques for managing anger, expressing vulnerability, and seeking support.</p>
+                <div class="module-topics">
+                    <span class="topic-tag">Anger Management</span>
+                    <span class="topic-tag">Vulnerability</span>
+                    <span class="topic-tag">Mental Health</span>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-header">
+                    <span class="module-badge">Week 03</span>
+                    <span class="module-duration">20 mins</span>
+                </div>
+                <h3>Healthy Relationships & Consent</h3>
+                <p>Master positive communication, clear boundaries, mutual respect, and healthy dynamics in romantic and peer relationships.</p>
+                <div class="module-topics">
+                    <span class="topic-tag">Consent</span>
+                    <span class="topic-tag">Boundaries</span>
+                    <span class="topic-tag">Communication</span>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-header">
+                    <span class="module-badge">Week 04</span>
+                    <span class="module-duration">20 mins</span>
+                </div>
+                <h3>Standing Against GBV & Allyship</h3>
+                <p>Recognize physical, emotional, and digital gender-based violence. Learn safe intervention tactics and active community allyship.</p>
+                <div class="module-topics">
+                    <span class="topic-tag">GBV Prevention</span>
+                    <span class="topic-tag">Bystander Intervention</span>
+                    <span class="topic-tag">Allyship</span>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-header">
+                    <span class="module-badge">Week 05</span>
+                    <span class="module-duration">15 mins</span>
+                </div>
+                <h3>Leadership & Community Mentorship</h3>
+                <p>Step up as a positive role model. Mentor younger peers, hold friends accountable, and lead by positive example.</p>
+                <div class="module-topics">
+                    <span class="topic-tag">Mentorship</span>
+                    <span class="topic-tag">Accountability</span>
+                    <span class="topic-tag">Role Models</span>
+                </div>
+            </div>
+
+            <div class="module-card">
+                <div class="module-header">
+                    <span class="module-badge">Week 06</span>
+                    <span class="module-duration">15 mins</span>
+                </div>
+                <h3>Action Plan & Becoming a Champion</h3>
+                <p>Create your personal pledge for positive masculinity and join our continuous peer champion network.</p>
+                <div class="module-topics">
+                    <span class="topic-tag">Personal Action</span>
+                    <span class="topic-tag">Peer Network</span>
+                    <span class="topic-tag">Completion Certificate</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="simulator-section" id="simulator">
+        <div class="container">
+            <div class="sim-container">
+                <div class="sim-info">
+                    <span class="section-tag">Interactive Demo</span>
+                    <h3>Try Tobi in Your Browser</h3>
+                    <p>Experience how friendly and conversational learning on The Brothers' Room feels before launching in WhatsApp or Telegram.</p>
+                    
+                    <div class="sim-prompts">
+                        <button class="sim-prompt-btn" onclick="sendSimPrompt('What will I learn in Week 1?')">
+                            <span>What will I learn in Week 1?</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                        <button class="sim-prompt-btn" onclick="sendSimPrompt('Is my identity really private?')">
+                            <span>Is my identity really private?</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                        <button class="sim-prompt-btn" onclick="sendSimPrompt('How do I start on WhatsApp?')">
+                            <span>How do I start on WhatsApp?</span>
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="sim-window">
+                    <div class="sim-window-header">
+                        <span class="phone-avatar" style="width:24px; height:24px; font-size:0.7rem;">T</span>
+                        <span>Tobi Live Simulator</span>
+                    </div>
+                    <div class="sim-window-body" id="sim-window-body">
+                        <div class="chat-bubble bubble-bot">
+                            Hello brother! Click any sample question on the left to test how I facilitate course lessons.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="platforms-section container" id="platforms">
+        <div class="section-header">
+            <span class="section-tag">Choose Your App</span>
+            <h2>Select Your Preferred Platform</h2>
+            <p>The Brothers' Room is active on both WhatsApp and Telegram so you can learn on the messaging app you use daily.</p>
+        </div>
+
+        <div class="platforms-grid">
+            <div class="platform-card">
+                <div>
+                    <span class="platform-badge whatsapp">WhatsApp Channel</span>
+                    <h3>WhatsApp Bot</h3>
+                    <p>Start instantly on WhatsApp. Interactive prompts, voice lesson summaries, and self-paced learning.</p>
+                    
+                    <ul class="platform-features">
+                        <li>✓ Pre-filled quick start message</li>
+                        <li>✓ End-to-End encrypted messaging</li>
+                        <li>✓ Audio lesson notes supported</li>
+                    </ul>
+                </div>
+
+                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" style="width: 100%;" onclick="trackClick('WhatsApp')">
+                    <span>Launch on WhatsApp</span>
+                </a>
+            </div>
+
+            <div class="platform-card">
+                <div>
+                    <span class="platform-badge telegram">Telegram Channel</span>
+                    <h3>Telegram Bot</h3>
+                    <p>Experience automated learning with interactive button menus and instant progress tracking.</p>
+                    
+                    <ul class="platform-features">
+                        <li>✓ Inline button navigation</li>
+                        <li>✓ Instant bookmarking & course resume</li>
+                        <li>✓ Complete privacy control</li>
+                    </ul>
+                </div>
+
+                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" style="width: 100%;" onclick="trackClick('Telegram')">
+                    <span>Launch on Telegram</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="safety-section container" id="safety">
+        <div class="section-header">
+            <span class="section-tag">Privacy First</span>
+            <h2>Safe, Confidential & Free</h2>
+            <p>Your psychological safety and personal confidentiality are our highest priorities.</p>
+        </div>
+
+        <div class="safety-grid">
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                </div>
+                <h4>100% Confidential</h4>
+                <p>You never have to disclose your real name or personal identity to complete modules.</p>
+            </div>
+
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                </div>
+                <h4>Non-Judgmental</h4>
+                <p>Designed for honest self-reflection without shame, preaching, or stigma.</p>
+            </div>
+
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 1 0 7.75"></path></svg>
+                </div>
+                <h4>Peer Mentorship</h4>
+                <p>Curated content guided by experienced youth development specialists and male allies.</p>
+            </div>
+
+            <div class="safety-card">
+                <div class="safety-icon">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                </div>
+                <h4>Helpline Referrals</h4>
+                <p>Instant access to professional counseling and GBV support services when requested.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials-section">
+        <div class="container">
+            <div class="section-header">
+                <span class="section-tag">Voices of Learners</span>
+                <h2>Real Impact & Growth</h2>
+                <p>Hear what young men are saying about their journey through The Brothers' Room.</p>
+            </div>
+
+            <div class="testimonials-grid">
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"The Brothers' Room gave me a safe space to challenge things I thought were normal about being a guy. Week 2 on emotional health completely shifted how I handle stress and anger."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">A</div>
+                        <div class="author-info">
+                            <h5>Ademola O.</h5>
+                            <p>Learner on Telegram</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"I love that it happens right inside WhatsApp. 15 minutes a week, no heavy data downloads, and the lessons on consent and boundaries were straightforward."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">C</div>
+                        <div class="author-info">
+                            <h5>Chinedu K.</h5>
+                            <p>Learner on WhatsApp</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="testimonial-card">
+                    <p class="testimonial-text">"Every young man needs this course. It opened my eyes to how we can actively prevent violence and support women and girls in our communities."</p>
+                    <div class="testimonial-author">
+                        <div class="author-avatar">I</div>
+                        <div class="author-info">
+                            <h5>Ibrahim M.</h5>
+                            <p>Learner on Telegram</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq-section container" id="faq">
+        <div class="section-header">
+            <span class="section-tag">Common Questions</span>
+            <h2>Frequently Asked Questions</h2>
+            <p>Everything you need to know about joining and completing the course.</p>
+        </div>
+
+        <div class="faq-list">
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Is The Brothers' Room really 100% free?</span>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="faq-answer">
+                    Yes! The entire 6-week course is completely free of charge, brought to you by YouthHubAfrica to empower young men across communities.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>How much time do I need per week?</span>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="faq-answer">
+                    Each weekly module takes approximately 15 to 20 minutes. Because it is self-paced inside WhatsApp and Telegram, you can pause and resume whenever it fits your schedule.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Do I need to download a new app?</span>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="faq-answer">
+                    No new apps required! You can complete the full course directly inside your existing WhatsApp or Telegram application.
+                </div>
+            </div>
+
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">
+                    <span>Is my privacy and responses protected?</span>
+                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </div>
+                <div class="faq-answer">
+                    Absolutely. Your personal responses are private and confidential. You are never required to provide sensitive personal identification.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-banner container">
+        <div class="cta-box">
+            <h2>Ready to Join The Brothers' Room?</h2>
+            <p>Start your 6-week journey toward positive masculinity and community leadership today on WhatsApp or Telegram.</p>
+            
+            <div class="hero-ctas" style="justify-content: center;">
+                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" onclick="trackClick('WhatsApp')">
+                    <span>Start on WhatsApp</span>
+                </a>
+                
+                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" onclick="trackClick('Telegram')">
+                    <span>Start on Telegram</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-wrapper">
+            <div class="footer-copy">
+                <div class="logo-icon" style="width:26px; height:26px; font-size:0.85rem;">B</div>
+                <span>© 2026 The Brothers' Room. A YouthHubAfrica Initiative.</span>
+            </div>
+            <div style="display:flex; gap:1.5rem;">
+                <a href="#curriculum">Curriculum</a>
+                <a href="#platforms">Platforms</a>
+                <a href="#safety">Safety</a>
+                <a href="#faq">FAQ</a>
+            </div>
+        </div>
+    </footer>
 
     <script>
         function triggerHeroReply(optionText) {
@@ -4169,6 +4789,37 @@ LANDING_HTML = """<!DOCTYPE html>
                 chatBody.appendChild(botMsg);
                 chatBody.scrollTop = chatBody.scrollHeight;
             }, 500);
+        }
+
+        function sendSimPrompt(promptText) {
+            const simBody = document.getElementById("sim-window-body");
+            const uBubble = document.createElement("div");
+            uBubble.className = "chat-bubble bubble-user";
+            uBubble.textContent = promptText;
+            simBody.appendChild(uBubble);
+            simBody.scrollTop = simBody.scrollHeight;
+            
+            setTimeout(() => {
+                const bBubble = document.createElement("div");
+                bBubble.className = "chat-bubble bubble-bot";
+                if (promptText.includes("Week 1")) {
+                    bBubble.innerHTML = "Module 1 covers: dismantling harmful stereotypes, emotional self-reflection, and building positive male identity. Takes ~15 minutes.";
+                } else if (promptText.includes("private")) {
+                    bBubble.innerHTML = "Yes! You can use an alias. We do not track or share your identity. Your privacy is fully protected.";
+                } else {
+                    bBubble.innerHTML = "Simply click the 'Start on WhatsApp' button! You'll send a quick message to Tobi and begin Module 1 instantly.";
+                }
+                simBody.appendChild(bBubble);
+                simBody.scrollTop = simBody.scrollHeight;
+            }, 450);
+        }
+
+        function toggleFaq(element) {
+            const item = element.parentElement;
+            document.querySelectorAll(".faq-item").forEach(other => {
+                if (other !== item) other.classList.remove("active");
+            });
+            item.classList.toggle("active");
         }
 
         function initThemeToggle() {
@@ -4219,8 +4870,7 @@ LANDING_HTML = """<!DOCTYPE html>
         });
     </script>
 </body>
-</html>
-"""
+</html>"""
 
 @app.route("/assets/<path:filename>")
 def serve_assets(filename):
