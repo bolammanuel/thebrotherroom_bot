@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Brothers' Room | Positive Masculinity & Safe Learning Space</title>
+    <meta name="description" content="A safe, private, and free 6-week conversational learning course on WhatsApp & Telegram helping young men connect, develop positive character, and stand against Gender-Based Violence.">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/assets/youthhub_africa_logo.png">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-hero: #080f14;
+            --bg-body: #f8fafc;
+            --bg-card: #ffffff;
+            --bg-surface: #f1f5f9;
+            --text-hero-primary: #ffffff;
+            --text-hero-secondary: #94a3b8;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --border-dark: rgba(255, 255, 255, 0.12);
+            --brand-green: #16a34a;
+            --brand-green-hover: #15803d;
+            --brand-green-subtle: #dcfce7;
+            --accent-lime: #a3e635;
+            --c-whatsapp: #25d366;
+            --c-telegram: #2481cc;
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.08);
+            --shadow-lg: 0 12px 32px -4px rgba(15, 23, 42, 0.12);
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body.dark-mode {
+            --bg-hero: #03070a;
+            --bg-body: #0b1319;
+            --bg-card: #121d26;
+            --bg-surface: #1a2734;
+            --text-hero-primary: #ffffff;
+            --text-hero-secondary: #94a3b8;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
+            --border-color: rgba(255, 255, 255, 0.12);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overflow-x: hidden;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.6;
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        header {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(8, 15, 20, 0.96);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border-bottom: 1px solid var(--border-dark);
+            padding: 0.85rem 0;
+        }
+
+        .nav-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+            flex-shrink: 0;
+        }
+
+        .logo-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--brand-green);
+            color: #ffffff;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 8px rgba(22, 163, 74, 0.4);
+        }
+
+        .logo-text-group {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.15;
+        }
+
+        .logo-title {
+            font-size: 1.12rem;
+            font-weight: 700;
+            color: #ffffff;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: -0.01em;
+        }
+
+        .logo-sub {
+            font-size: 0.65rem;
+            color: #94a3b8;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        nav.nav-menu {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+        }
+
+        nav.nav-menu a {
+            color: #cbd5e1;
+            font-size: 0.92rem;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        nav.nav-menu a:hover {
+            color: var(--brand-green);
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.85rem;
+            flex-shrink: 0;
+        }
+
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid var(--border-dark);
+            color: #ffffff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.7rem 1.35rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+        }
+
+        .btn-header-cta {
+            background-color: var(--accent-lime);
+            color: #0f172a;
+        }
+
+        .btn-header-cta:hover {
+            opacity: 0.92;
+            transform: translateY(-1px);
+        }
+
+        .btn-whatsapp {
+            background-color: var(--c-whatsapp);
+            color: #ffffff;
+        }
+
+        .btn-whatsapp:hover {
+            opacity: 0.93;
+            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.35);
+        }
+
+        .btn-telegram {
+            background-color: var(--c-telegram);
+            color: #ffffff;
+        }
+
+        .btn-telegram:hover {
+            opacity: 0.93;
+            box-shadow: 0 4px 14px rgba(36, 129, 204, 0.35);
+        }
+
+        .btn-outline-dark {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-outline-dark:hover {
+            background: rgba(255, 255, 255, 0.08);
+            border-color: #ffffff;
+        }
+
+        .menu-toggle-btn {
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            width: 24px;
+            height: 18px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .menu-toggle-btn .bar {
+            width: 100%;
+            height: 2px;
+            background-color: #ffffff;
+            border-radius: 2px;
+        }
+
+        .hero-wrapper {
+            background-color: var(--bg-hero);
+            color: #ffffff;
+            padding: 4.5rem 0 5rem 0;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--border-dark);
+        }
+
+        .hero-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 550px;
+            height: 550px;
+            background: radial-gradient(circle, rgba(22, 163, 74, 0.16) 0%, rgba(8, 15, 20, 0) 70%);
+            pointer-events: none;
+        }
+
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.9fr 0.75fr;
+            gap: 2.5rem;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-left-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
+            border-radius: 99px;
+            background: rgba(22, 163, 74, 0.15);
+            border: 1px solid rgba(22, 163, 74, 0.3);
+            color: var(--accent-lime);
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-left h1 {
+            font-size: 3.2rem;
+            line-height: 1.15;
+            color: #ffffff;
+            margin-bottom: 1.25rem;
+        }
+
+        .hero-left p {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            margin-bottom: 2rem;
+            line-height: 1.65;
+        }
+
+        .hero-ctas {
+            display: flex;
+            gap: 0.85rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.8rem;
+        }
+
+        .hero-trust-row {
+            display: flex;
+            gap: 1.25rem;
+            font-size: 0.84rem;
+            color: #64748b;
+        }
+
+        .trust-item {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+
+        .trust-item span.check {
+            color: var(--accent-lime);
+            font-weight: 700;
+        }
+
+        .hero-center {
+            display: flex;
+            justify-content: center;
+        }
+
+        .phone-mockup {
+            width: 295px;
+            height: 540px;
+            background: #0d1720;
+            border-radius: 38px;
+            border: 7px solid #1e293b;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 30px rgba(22, 163, 74, 0.15);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            background: #0f172a;
+            padding: 2.2rem 0.75rem 1rem 0.75rem;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 0.75rem;
+        }
+
+        .phone-avatar {
+            width: 32px;
+            height: 32px;
+            background: var(--brand-green);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+
+        .phone-bot-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .phone-bot-name {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #ffffff;
+        }
+
+        .phone-bot-status {
+            font-size: 0.68rem;
+            color: var(--accent-lime);
+        }
+
+        .phone-chat-body {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            overflow-y: auto;
+            font-size: 0.78rem;
+        }
+
+        .chat-bubble {
+            max-width: 88%;
+            padding: 0.65rem 0.8rem;
+            border-radius: 12px;
+            line-height: 1.45;
+        }
+
+        .bubble-bot {
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            align-self: flex-start;
+            border-top-left-radius: 2px;
+        }
+
+        .bubble-user {
+            background: var(--brand-green);
+            color: #ffffff;
+            align-self: flex-end;
+            border-top-right-radius: 2px;
+        }
+
+        .chat-option-pills {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            margin-top: 0.5rem;
+        }
+
+        .chat-pill-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 0.38rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .chat-pill-btn:hover {
+            border-color: var(--accent-lime);
+            color: var(--accent-lime);
+        }
+
+        .hero-right-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1.8rem;
+        }
+
+        .rating-badge {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-dark);
+            padding: 0.65rem 1rem;
+            border-radius: 99px;
+            width: fit-content;
+            font-size: 0.85rem;
+        }
+
+        .rating-stars {
+            color: #f59e0b;
+            font-weight: 700;
+        }
+
+        .stat-hero-block h3 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent-lime);
+            line-height: 1;
+            margin-bottom: 0.25rem;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .stat-hero-block p {
+            font-size: 0.88rem;
+            color: #94a3b8;
+            font-weight: 500;
+        }
+
+        .partner-ribbon {
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.6rem 0;
+            text-align: center;
+        }
+
+        body.dark-mode .partner-ribbon {
+            background: #0e171e;
+        }
+
+        .partner-title {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.85rem;
+            font-weight: 600;
+        }
+
+        .partner-logos {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 3rem;
+            flex-wrap: wrap;
+            font-weight: 700;
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .features-section {
+            padding: 5rem 0;
+            background: var(--bg-surface);
+        }
+
+        .features-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.25fr;
+            gap: 3.5rem;
+            align-items: center;
+        }
+
+        .section-tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 99px;
+            background: var(--brand-green-subtle);
+            color: var(--brand-green);
+            font-size: 0.78rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 0.75rem;
+        }
+
+        .features-left h2 {
+            font-size: 2.6rem;
+            line-height: 1.18;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .features-left p {
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+            line-height: 1.65;
+        }
+
+        .cards-2x2-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.6rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-card.dark-card {
+            background: #0f172a;
+            color: #ffffff;
+            border-color: #1e293b;
+        }
+
+        .feature-card.dark-card p {
+            color: #94a3b8;
+        }
+
+        .feature-card.dark-card h3 {
+            color: #ffffff;
+        }
+
+        .card-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: var(--brand-green-subtle);
+            color: var(--brand-green);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card.dark-card .card-icon {
+            background: rgba(163, 230, 53, 0.15);
+            color: var(--accent-lime);
+        }
+
+        .feature-card h3 {
+            font-size: 1.15rem;
+            margin-bottom: 0.45rem;
+            color: var(--text-primary);
+        }
+
+        .feature-card p {
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .curriculum-section {
+            padding: 5rem 0;
+        }
+
+        .section-header {
+            text-align: center;
+            max-width: 640px;
+            margin: 0 auto 3.5rem auto;
+        }
+
+        .section-header h2 {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+        }
+
+        .curriculum-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.25rem;
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.6rem;
+            box-shadow: var(--shadow-sm);
+            transition: var(--transition);
+        }
+
+        .module-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 0.45rem;
+            color: var(--text-primary);
+        }
+
+        .module-card p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .simulator-section {
+            padding: 5rem 0;
+            background: var(--bg-surface);
+            border-top: 1px solid var(--border-color);
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sim-container {
+            display: grid;
+            grid-template-columns: 1fr 1.1fr;
+            gap: 2.5rem;
+            align-items: center;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 2.25rem;
+            box-shadow: var(--shadow-md);
+        }
+
+        .sim-info h3 {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .sim-info p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .sim-window-header {
+            background: var(--bg-card);
+            padding: 0.75rem 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .sim-window-body {
+            flex-grow: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            overflow-y: auto;
+            font-size: 0.88rem;
+        }
+
+        .platforms-section {
+            padding: 5rem 0;
+        }
+
+        .platforms-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+        }
+
+        .platform-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .platform-card p {
+            color: var(--text-secondary);
+            font-size: 0.93rem;
+        }
+
+        .safety-section {
+            padding: 5rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .safety-grid {
+            display: grid;
+        }
+
+        .safety-card h4 {
+            font-size: 1.05rem;
+            margin-bottom: 0.35rem;
+            color: var(--text-primary);
+        }
+
+        .safety-card p {
+            font-size: 0.86rem;
+            color: var(--text-secondary);
+        }
+
+        .testimonials-section {
+            padding: 5rem 0;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-surface);
+        }
+
+        .author-info h5 {
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .author-info p {
+            font-size: 0.76rem;
+            color: var(--text-muted);
+        }
+
+        .faq-section {
+            padding: 5rem 0;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .faq-list {
+            max-width: 760px;
+        }
+
+        .faq-icon {
+            color: var(--brand-green);
+        }
+
+        .cta-banner {
+            padding: 5rem 0;
+        }
+
+        .cta-box {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 3.5rem 2rem;
+            text-align: center;
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-box h2 {
+            font-size: 2.4rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .cta-box p {
+            color: var(--text-secondary);
+            font-size: 1.02rem;
+        }
+
+        @media (max-width: 992px) {
+            .hero-grid {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 2.5rem;
+            }
+
+            .hero-left p {
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-ctas,
+            .hero-trust-row,
+            .rating-badge {
+                justify-content: center;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-right-stats {
+                flex-direction: row;
+                justify-content: center;
+                gap: 2.5rem;
+                text-align: center;
+            }
+
+            .features-layout,
+            .sim-container {
+                grid-template-columns: 1fr;
+                gap: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 0 1rem;
+            }
+
+            nav.nav-menu {
+                position: fixed;
+                top: 60px;
+                left: 0;
+                width: 100%;
+                background: #080f14;
+                flex-direction: column;
+                padding: 1.8rem;
+                border-bottom: 1px solid var(--border-dark);
+                transform: translateY(-150%);
+                transition: var(--transition);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+                gap: 1.25rem;
+            }
+
+            nav.nav-menu.active {
+                transform: translateY(0);
+            }
+
+            .menu-toggle-btn {
+                display: flex;
+            }
+
+            .logo-title {
+                font-size: 1rem;
+            }
+
+            .logo-sub {
+                font-size: 0.6rem;
+            }
+
+            .hero-left h1 {
+                font-size: 2.2rem;
+            }
+
+            .features-left h2 {
+                font-size: 2rem;
+            }
+
+            .hero-right-stats {
+                flex-direction: column;
+                gap: 1.25rem;
+                align-items: center;
+            }
+
+            .cards-2x2-grid,
+            .curriculum-grid,
+            .platforms-grid,
+            .safety-grid,
+            .testimonials-grid {
+                grid-template-columns: 1fr !important;
+                gap: 1.1rem !important;
+            }
+
+            .feature-card,
+            .module-card,
+            .platform-card,
+            .safety-card,
+            .testimonial-card {
+                width: 100% !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="container nav-wrapper">
+            <a href="#" class="logo">
+                <div class="logo-icon">B</div>
+                <div class="logo-text-group">
+                    <span class="logo-title">The Brothers' Room</span>
+                    <span class="logo-sub">by YouthHubAfrica</span>
+                </div>
+            </a>
+
+            <nav class="nav-menu" id="nav-menu">
+                <a href="#curriculum">Curriculum</a>
+                <a href="#simulator">Live Demo</a>
+                <a href="#platforms">Platforms</a>
+                <a href="#safety">Safety</a>
+                <a href="#faq">FAQ</a>
+            </nav>
+
+            <div class="header-actions">
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
+                    <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                </button>
+                <a href="#platforms" class="btn btn-header-cta">Start Learning</a>
+                <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle Navigation">
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                    <span class="bar"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero-wrapper">
+        <div class="container hero-grid">
+            
+            <div class="hero-left">
+                <div class="hero-left-tag">
+                    <span>Safe, Confidential & Free Conversational Course</span>
+                </div>
+                <h1>Transforming Masculinity. Empowering Men. Standing Against GBV.</h1>
+                <p>A private 6-week interactive course hosted directly inside <strong>WhatsApp</strong> and <strong>Telegram</strong>. Develop positive character, discuss healthy relationships, and lead in your community.</p>
+                
+                <div class="hero-ctas">
+                    <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" onclick="trackClick('WhatsApp')">
+                        <span>Start on WhatsApp</span>
+                    </a>
+                    
+                    <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" onclick="trackClick('Telegram')">
+                        <span>Start on Telegram</span>
+                    </a>
+
+                    <a href="#simulator" class="btn btn-outline-dark">Try Live Demo</a>
+                </div>
+
+                <div class="hero-trust-row">
+                    <div class="trust-item"><span class="check">✓</span> <span>No App Download Required</span></div>
+                    <div class="trust-item"><span class="check">✓</span> <span>Self-Paced & Private</span></div>
+                </div>
+            </div>
+
+            <div class="hero-center">
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="phone-header">
+                            <div class="phone-avatar">T</div>
+                            <div class="phone-bot-info">
+                                <span class="phone-bot-name">Tobi (The Brothers' Room)</span>
+                                <span class="phone-bot-status">Active Learning Facilitator</span>
+                            </div>
+                        </div>
+                        
+                        <div class="phone-chat-body" id="hero-chat-body">
+                            <div class="chat-bubble bubble-bot">
+                                Welcome brother! Ready to explore Module 1: <strong>Understanding Masculinity</strong>?
+                                <div class="chat-option-pills">
+                                    <button class="chat-pill-btn" onclick="triggerHeroReply('1. Start Module 1')">1. Start Module 1</button>
+                                    <button class="chat-pill-btn" onclick="triggerHeroReply('2. Is this confidential?')">2. Is this confidential?</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hero-right-stats">
+                <div class="rating-badge">
+                    <span class="rating-stars">★ 4.9</span>
+                    <span>Positive Reviews (12k+ Learners)</span>
+                </div>
+
+                <div class="stat-hero-block">
+                    <h3>6 Weeks</h3>
+                    <p>Structured Interactive Modules</p>
+                </div>
+
+                <div class="stat-hero-block">
+                    <h3>100% Free</h3>
+                    <p>Confidential & Self-Paced</p>
+                </div>
+
+                <div class="stat-hero-block">
+                    <h3>24/7</h3>
+                    <p>WhatsApp & Telegram Companion</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="partner-ribbon">
+        <div class="container">
+            <div class="partner-title">Empowering Young Men Across Communities In Partnership With</div>
+            <div class="partner-logos">
+                <span>YouthHubAfrica</span>
+                <span>•</span>
+                <span>Spotlight Initiative</span>
+                <span>•</span>
+                <span>Positive Masculinity Alliance</span>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="container features-layout">
+            
+            <div class="features-left">
+                <span class="section-tag">Why The Brothers' Room</span>
+                <h2>One course. Instant access. Zero costs.</h2>
+                <p>Designed by youth development specialists to provide young men with a safe, judgment-free space to build emotional intelligence, understand consent, and lead positive change in their communities.</p>
+                
+                <a href="#curriculum" class="btn btn-whatsapp">
+                    <span>Explore 6-Week Curriculum</span>
+                </a>
+            </div>
+
+            <div class="cards-2x2-grid">
+                <div class="feature-card dark-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <h3>Instant App Access</h3>
+                    <p>Start directly in WhatsApp or Telegram without downloading new apps or remembering passwords.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    </div>
+                    <h3>100% Confidential</h3>
+                    <p>Complete modules anonymously. No real names or sensitive personal data required.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <h3>Self-Paced Learning</h3>
+                    <p>Only 15 minutes a week. Pause, resume, and review lessons whenever convenient for you.</p>
+                </div>
+
+                <div class="feature-card">
+                    <div class="card-icon">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <h3>GBV Allyship</h3>
+                    <p>Practical guidance on bystander intervention, healthy consent, and positive male leadership.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <script>
+        function triggerHeroReply(optionText) {
+            const chatBody = document.getElementById("hero-chat-body");
+            const userMsg = document.createElement("div");
+            userMsg.className = "chat-bubble bubble-user";
+            userMsg.textContent = optionText;
+            chatBody.appendChild(userMsg);
+            chatBody.scrollTop = chatBody.scrollHeight;
+            
+            setTimeout(() => {
+                const botMsg = document.createElement("div");
+                botMsg.className = "chat-bubble bubble-bot";
+                if (optionText.includes("Module 1")) {
+                    botMsg.innerHTML = "In Module 1, we unpack societal expectations and define what positive masculinity means to you. Ready to begin?";
+                } else {
+                    botMsg.innerHTML = "100% Anonymous. No real names required. Everything stays private between you and Tobi.";
+                }
+                chatBody.appendChild(botMsg);
+                chatBody.scrollTop = chatBody.scrollHeight;
+            }, 500);
+        }
+
+        function initThemeToggle() {
+            const toggleBtn = document.getElementById("theme-toggle");
+            const sunIcon = toggleBtn.querySelector(".sun-icon");
+            const moonIcon = toggleBtn.querySelector(".moon-icon");
+            const savedTheme = localStorage.getItem("theme");
+            if (savedTheme === "dark") {
+                document.body.classList.add("dark-mode");
+                sunIcon.style.display = "block";
+                moonIcon.style.display = "none";
+            }
+            toggleBtn.addEventListener("click", () => {
+                document.body.classList.toggle("dark-mode");
+                const isDark = document.body.classList.contains("dark-mode");
+                localStorage.setItem("theme", isDark ? "dark" : "light");
+                sunIcon.style.display = isDark ? "block" : "none";
+                moonIcon.style.display = isDark ? "none" : "block";
+            });
+        }
+
+        function initMobileNav() {
+            const menuToggle = document.getElementById("menu-toggle");
+            const navMenu = document.getElementById("nav-menu");
+            if (menuToggle && navMenu) {
+                menuToggle.addEventListener("click", () => {
+                    navMenu.classList.toggle("active");
+                });
+                navMenu.querySelectorAll("a").forEach(link => {
+                    link.addEventListener("click", () => navMenu.classList.remove("active"));
+                });
+            }
+        }
+
+        function trackClick(platform) {
+            try {
+                fetch('/api/track_click', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform: platform })
+                });
+            } catch(e) {}
+        }
+
+        window.addEventListener("load", () => {
+            initThemeToggle();
+            initMobileNav();
+        });
+    </script>
+</body>
+</html>
