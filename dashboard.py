@@ -3329,7 +3329,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .hero-grid {
             display: grid;
-            grid-template-columns: 1.15fr 0.9fr 0.75fr;
+            grid-template-columns: 1.15fr 1fr;
             gap: 2.5rem;
             align-items: center;
             position: relative;
@@ -3470,11 +3470,24 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .bubble-bot {
+            align-self: flex-start;
+            border-top-left-radius: 2px;
+            padding: 0.65rem 0.8rem;
+            border-radius: 12px;
+            line-height: 1.45;
+        }
+
+        .phone-screen .bubble-bot {
             background: rgba(255, 255, 255, 0.08);
             color: #ffffff;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            align-self: flex-start;
-            border-top-left-radius: 2px;
+        }
+
+        .sim-window-body .bubble-bot {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
         .bubble-user {
@@ -4285,9 +4298,6 @@ LANDING_HTML = """<!DOCTYPE html>
         <div class="container hero-grid">
             
             <div class="hero-left">
-                <div class="hero-left-tag">
-                    <span>Safe, Confidential & Free Conversational Course</span>
-                </div>
                 <h1>Transforming Masculinity. Empowering Men. Standing Against GBV.</h1>
                 <p>A private 6-week interactive course hosted directly inside <strong>WhatsApp</strong> and <strong>Telegram</strong>. Develop positive character, discuss healthy relationships, and lead in your community.</p>
                 
@@ -4333,43 +4343,11 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="hero-right-stats">
-                <div class="rating-badge">
-                    <span class="rating-stars">★ 4.9</span>
-                    <span>Positive Reviews (12k+ Learners)</span>
-                </div>
 
-                <div class="stat-hero-block">
-                    <h3>6 Weeks</h3>
-                    <p>Structured Interactive Modules</p>
-                </div>
-
-                <div class="stat-hero-block">
-                    <h3>100% Free</h3>
-                    <p>Confidential & Self-Paced</p>
-                </div>
-
-                <div class="stat-hero-block">
-                    <h3>24/7</h3>
-                    <p>WhatsApp & Telegram Companion</p>
-                </div>
-            </div>
 
         </div>
     </section>
 
-    <section class="partner-ribbon">
-        <div class="container">
-            <div class="partner-title">Empowering Young Men Across Communities In Partnership With</div>
-            <div class="partner-logos">
-                <span>YouthHubAfrica</span>
-                <span>•</span>
-                <span>Spotlight Initiative</span>
-                <span>•</span>
-                <span>Positive Masculinity Alliance</span>
-            </div>
-        </div>
-    </section>
 
     <section class="features-section" id="features">
         <div class="container features-layout">
