@@ -4263,7 +4263,6 @@ LANDING_HTML = """<!DOCTYPE html>
     <header>
         <div class="container nav-wrapper">
             <a href="#" class="logo">
-                <div class="logo-icon">B</div>
                 <div class="logo-text-group">
                     <span class="logo-title">The Brothers' Room</span>
                     <span class="logo-sub">by YouthHubAfrica</span>
@@ -4735,7 +4734,6 @@ LANDING_HTML = """<!DOCTYPE html>
     <footer>
         <div class="container footer-wrapper">
             <div class="footer-copy">
-                <div class="logo-icon" style="width:26px; height:26px; font-size:0.85rem;">B</div>
                 <span>© 2026 The Brothers' Room. A YouthHubAfrica Initiative.</span>
             </div>
             <div style="display:flex; gap:1.5rem;">
