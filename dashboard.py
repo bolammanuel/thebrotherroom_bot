@@ -3022,42 +3022,40 @@ LANDING_HTML = """<!DOCTYPE html>
     
     <style>
         :root {
-            /* Default: Clean White Theme */
-            --bg-body: #ffffff;
-            --bg-surface: #f8fafc;
+            /* Default: Clean White High-Contrast Theme */
+            --bg-body: #f8fafc;
             --bg-card: #ffffff;
-            --bg-card-hover: #f1f5f9;
+            --bg-surface: #f1f5f9;
             --text-primary: #0f172a;
-            --text-secondary: #475569;
+            --text-secondary: #334155;
             --text-muted: #64748b;
             --border-color: #e2e8f0;
-            --accent-brand: #16a34a;
-            --accent-brand-hover: #15803d;
-            --accent-subtle: #f0fdf4;
+            --brand-green: #16a34a;
+            --brand-green-hover: #15803d;
+            --brand-green-subtle: #dcfce7;
             --c-whatsapp: #25d366;
             --c-telegram: #2481cc;
-            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
             --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08);
-            --shadow-lg: 0 12px 24px -4px rgba(15, 23, 42, 0.1);
-            --transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            --shadow-lg: 0 10px 25px -3px rgba(15, 23, 42, 0.1);
+            --transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Dark Mode Theme Tokens (Optional toggle) */
+        /* Dark Mode Theme Tokens */
         body.dark-mode {
-            --bg-body: #080f14;
-            --bg-surface: #0e171e;
+            --bg-body: #0b1319;
             --bg-card: #121d26;
-            --bg-card-hover: #182633;
+            --bg-surface: #1a2734;
             --text-primary: #f8fafc;
             --text-secondary: #cbd5e1;
             --text-muted: #94a3b8;
-            --border-color: rgba(255, 255, 255, 0.1);
-            --accent-brand: #22c55e;
-            --accent-brand-hover: #16a34a;
-            --accent-subtle: rgba(34, 197, 94, 0.12);
+            --border-color: rgba(255, 255, 255, 0.12);
+            --brand-green: #22c55e;
+            --brand-green-hover: #16a34a;
+            --brand-green-subtle: rgba(34, 197, 94, 0.15);
             --shadow-sm: none;
-            --shadow-md: 0 4px 16px rgba(0,0,0,0.4);
-            --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+            --shadow-md: 0 4px 16px rgba(0,0,0,0.3);
+            --shadow-lg: 0 12px 32px rgba(0,0,0,0.4);
         }
 
         * {
@@ -3073,13 +3071,12 @@ LANDING_HTML = """<!DOCTYPE html>
         body {
             background-color: var(--bg-body);
             color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             line-height: 1.6;
             overflow-x: hidden;
-            transition: background-color 0.3s ease, color 0.3s ease;
         }
 
-        h1, h2, h3, h4, .font-heading {
+        h1, h2, h3, h4 {
             font-family: 'Outfit', sans-serif;
             font-weight: 700;
             color: var(--text-primary);
@@ -3094,7 +3091,7 @@ LANDING_HTML = """<!DOCTYPE html>
         .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 2rem;
+            padding: 0 1.5rem;
         }
 
         /* Header Navigation */
@@ -3102,16 +3099,15 @@ LANDING_HTML = """<!DOCTYPE html>
             position: sticky;
             top: 0;
             z-index: 100;
-            background: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border-bottom: 1px solid var(--border-color);
-            padding: 1.1rem 0;
-            transition: var(--transition);
+            padding: 1rem 0;
         }
 
         body.dark-mode header {
-            background: rgba(8, 15, 20, 0.9);
+            background: rgba(11, 19, 25, 0.95);
         }
 
         .nav-wrapper {
@@ -3132,7 +3128,7 @@ LANDING_HTML = """<!DOCTYPE html>
         .logo-icon {
             width: 36px;
             height: 36px;
-            background: var(--accent-brand);
+            background: var(--brand-green);
             color: #ffffff;
             border-radius: 10px;
             display: flex;
@@ -3155,7 +3151,7 @@ LANDING_HTML = """<!DOCTYPE html>
         nav {
             display: flex;
             align-items: center;
-            gap: 2rem;
+            gap: 1.8rem;
         }
 
         nav a {
@@ -3166,13 +3162,13 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         nav a:hover {
-            color: var(--accent-brand);
+            color: var(--brand-green);
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 1rem;
+            gap: 0.85rem;
         }
 
         /* Buttons */
@@ -3180,9 +3176,9 @@ LANDING_HTML = """<!DOCTYPE html>
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.55rem;
-            padding: 0.75rem 1.5rem;
-            border-radius: 12px;
+            gap: 0.5rem;
+            padding: 0.75rem 1.4rem;
+            border-radius: 10px;
             font-weight: 600;
             font-size: 0.92rem;
             transition: var(--transition);
@@ -3192,13 +3188,13 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .btn-primary {
-            background-color: var(--accent-brand);
-            color: #ffffff;
+            background-color: var(--text-primary);
+            color: var(--bg-card);
         }
 
         .btn-primary:hover {
-            background-color: var(--accent-brand-hover);
-            transform: translateY(-2px);
+            opacity: 0.9;
+            transform: translateY(-1px);
             box-shadow: var(--shadow-md);
         }
 
@@ -3208,9 +3204,9 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .btn-whatsapp:hover {
-            opacity: 0.94;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 14px rgba(37, 211, 102, 0.3);
+            opacity: 0.93;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(37, 211, 102, 0.3);
         }
 
         .btn-telegram {
@@ -3219,20 +3215,19 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .btn-telegram:hover {
-            opacity: 0.94;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 14px rgba(36, 129, 204, 0.3);
+            opacity: 0.93;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(36, 129, 204, 0.3);
         }
 
         .btn-secondary {
-            background-color: var(--bg-surface);
+            background-color: var(--bg-card);
             color: var(--text-primary);
             border: 1px solid var(--border-color);
         }
 
         .btn-secondary:hover {
-            background-color: var(--bg-card-hover);
-            transform: translateY(-2px);
+            background-color: var(--bg-surface);
         }
 
         /* Theme Toggle */
@@ -3240,19 +3235,13 @@ LANDING_HTML = """<!DOCTYPE html>
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .theme-toggle-btn:hover {
-            border-color: var(--accent-brand);
-            color: var(--accent-brand);
         }
 
         .menu-toggle-btn {
@@ -3271,50 +3260,49 @@ LANDING_HTML = """<!DOCTYPE html>
             height: 2px;
             background-color: var(--text-primary);
             border-radius: 2px;
-            transition: var(--transition);
         }
 
         /* Hero Section */
         .hero {
-            padding: 5rem 0 5.5rem 0;
+            padding: 4.5rem 0 5rem 0;
             display: grid;
             grid-template-columns: 1.15fr 0.85fr;
-            gap: 4rem;
+            gap: 3.5rem;
             align-items: center;
         }
 
         .hero-tag {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.35rem 0.9rem;
+            gap: 0.4rem;
+            padding: 0.35rem 0.85rem;
             border-radius: 99px;
-            background: var(--accent-subtle);
-            border: 1px solid rgba(22, 163, 74, 0.25);
-            color: var(--accent-brand);
+            background: var(--brand-green-subtle);
+            border: 1px solid rgba(22, 163, 74, 0.2);
+            color: var(--brand-green);
             font-size: 0.82rem;
             font-weight: 600;
             margin-bottom: 1.25rem;
         }
 
         .hero-content h1 {
-            font-size: 3.4rem;
-            line-height: 1.15;
+            font-size: 3.2rem;
+            line-height: 1.18;
             margin-bottom: 1.25rem;
             color: var(--text-primary);
         }
 
         .hero-content p {
-            font-size: 1.15rem;
+            font-size: 1.12rem;
             color: var(--text-secondary);
-            margin-bottom: 2.25rem;
-            max-width: 580px;
-            line-height: 1.7;
+            margin-bottom: 2rem;
+            max-width: 560px;
+            line-height: 1.65;
         }
 
         .hero-actions {
             display: flex;
-            gap: 1rem;
+            gap: 0.85rem;
             flex-wrap: wrap;
             margin-bottom: 2rem;
         }
@@ -3322,8 +3310,8 @@ LANDING_HTML = """<!DOCTYPE html>
         .hero-trust-list {
             display: flex;
             align-items: center;
-            gap: 1.8rem;
-            font-size: 0.88rem;
+            gap: 1.5rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
         }
 
@@ -3334,7 +3322,7 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .trust-item svg {
-            color: var(--accent-brand);
+            color: var(--brand-green);
         }
 
         /* Phone Screen Mockup */
@@ -3344,11 +3332,11 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .phone-mockup {
-            width: 320px;
-            height: 590px;
-            background: var(--bg-surface);
-            border-radius: 42px;
-            border: 8px solid var(--border-color);
+            width: 310px;
+            height: 570px;
+            background: #0f172a;
+            border-radius: 38px;
+            border: 7px solid #334155;
             position: relative;
             box-shadow: var(--shadow-lg);
             overflow: hidden;
@@ -3360,7 +3348,7 @@ LANDING_HTML = """<!DOCTYPE html>
             width: 100%;
             height: 100%;
             background: var(--bg-card);
-            padding: 2.5rem 0.85rem 1rem 0.85rem;
+            padding: 2.2rem 0.8rem 1rem 0.8rem;
             display: flex;
             flex-direction: column;
         }
@@ -3368,16 +3356,16 @@ LANDING_HTML = """<!DOCTYPE html>
         .phone-header {
             display: flex;
             align-items: center;
-            gap: 0.65rem;
+            gap: 0.6rem;
             padding-bottom: 0.75rem;
             border-bottom: 1px solid var(--border-color);
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.75rem;
         }
 
         .phone-avatar {
-            width: 34px;
-            height: 34px;
-            background: var(--accent-brand);
+            width: 32px;
+            height: 32px;
+            background: var(--brand-green);
             color: #ffffff;
             border-radius: 50%;
             display: flex;
@@ -3393,36 +3381,30 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .phone-bot-name {
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 600;
             color: var(--text-primary);
         }
 
         .phone-bot-status {
             font-size: 0.68rem;
-            color: var(--accent-brand);
+            color: var(--brand-green);
         }
 
         .phone-chat-body {
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
+            gap: 0.7rem;
             overflow-y: auto;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
         }
 
         .chat-bubble {
             max-width: 85%;
-            padding: 0.7rem 0.85rem;
-            border-radius: 14px;
+            padding: 0.65rem 0.8rem;
+            border-radius: 12px;
             line-height: 1.45;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(6px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         .bubble-bot {
@@ -3430,20 +3412,20 @@ LANDING_HTML = """<!DOCTYPE html>
             color: var(--text-primary);
             border: 1px solid var(--border-color);
             align-self: flex-start;
-            border-top-left-radius: 4px;
+            border-top-left-radius: 2px;
         }
 
         .bubble-user {
-            background: var(--accent-brand);
+            background: var(--brand-green);
             color: #ffffff;
             align-self: flex-end;
-            border-top-right-radius: 4px;
+            border-top-right-radius: 2px;
         }
 
         .chat-option-pills {
             display: flex;
             flex-direction: column;
-            gap: 0.4rem;
+            gap: 0.35rem;
             margin-top: 0.5rem;
         }
 
@@ -3451,41 +3433,40 @@ LANDING_HTML = """<!DOCTYPE html>
             background: var(--bg-card);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 0.4rem 0.75rem;
-            border-radius: 8px;
+            padding: 0.38rem 0.7rem;
+            border-radius: 6px;
             font-size: 0.75rem;
             font-weight: 500;
             cursor: pointer;
             text-align: left;
-            transition: var(--transition);
         }
 
         .chat-pill-btn:hover {
-            border-color: var(--accent-brand);
-            color: var(--accent-brand);
+            border-color: var(--brand-green);
+            color: var(--brand-green);
         }
 
         /* Stats Ribbon Section */
         .stats-ribbon {
-            padding: 2.5rem 0;
+            padding: 2.2rem 0;
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
             background: var(--bg-surface);
-            margin-bottom: 5rem;
+            margin-bottom: 4.5rem;
         }
 
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 2rem;
+            gap: 1.5rem;
             text-align: center;
         }
 
         .stat-card h3 {
-            font-size: 2.5rem;
+            font-size: 2.3rem;
             font-weight: 700;
-            color: var(--accent-brand);
-            margin-bottom: 0.2rem;
+            color: var(--brand-green);
+            margin-bottom: 0.15rem;
         }
 
         .stat-card p {
@@ -3494,59 +3475,58 @@ LANDING_HTML = """<!DOCTYPE html>
             font-weight: 500;
         }
 
-        /* Section Commons */
+        /* Section Headers */
         .section-header {
             text-align: center;
-            max-width: 650px;
-            margin: 0 auto 3.5rem auto;
+            max-width: 620px;
+            margin: 0 auto 3rem auto;
         }
 
         .section-tag {
             display: inline-block;
-            padding: 0.25rem 0.8rem;
+            padding: 0.25rem 0.75rem;
             border-radius: 99px;
-            background: var(--accent-subtle);
-            color: var(--accent-brand);
+            background: var(--brand-green-subtle);
+            color: var(--brand-green);
             font-size: 0.78rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.8px;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.75rem;
         }
 
         .section-header h2 {
-            font-size: 2.5rem;
-            margin-bottom: 0.8rem;
+            font-size: 2.3rem;
+            margin-bottom: 0.75rem;
         }
 
         .section-header p {
             color: var(--text-secondary);
-            font-size: 1.05rem;
+            font-size: 1.02rem;
         }
 
         /* Curriculum Section */
         .curriculum-section {
-            padding: 3rem 0 5rem 0;
+            padding: 2.5rem 0 4.5rem 0;
         }
 
         .curriculum-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
         .module-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.8rem;
-            transition: var(--transition);
+            border-radius: 14px;
+            padding: 1.6rem;
             box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
 
         .module-card:hover {
-            border-color: var(--accent-brand);
-            transform: translateY(-3px);
+            border-color: var(--brand-green);
             box-shadow: var(--shadow-md);
         }
 
@@ -3554,32 +3534,32 @@ LANDING_HTML = """<!DOCTYPE html>
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1rem;
+            margin-bottom: 0.85rem;
         }
 
         .module-badge {
-            background: var(--accent-subtle);
-            color: var(--accent-brand);
+            background: var(--brand-green-subtle);
+            color: var(--brand-green);
             font-size: 0.75rem;
             font-weight: 600;
-            padding: 0.2rem 0.65rem;
+            padding: 0.2rem 0.6rem;
             border-radius: 99px;
         }
 
         .module-duration {
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             color: var(--text-muted);
         }
 
         .module-card h3 {
-            font-size: 1.25rem;
-            margin-bottom: 0.5rem;
+            font-size: 1.2rem;
+            margin-bottom: 0.45rem;
         }
 
         .module-card p {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
-            margin-bottom: 1.2rem;
+            margin-bottom: 1rem;
         }
 
         .module-topics {
@@ -3592,14 +3572,14 @@ LANDING_HTML = """<!DOCTYPE html>
             font-size: 0.75rem;
             background: var(--bg-surface);
             color: var(--text-secondary);
-            padding: 0.2rem 0.6rem;
+            padding: 0.2rem 0.55rem;
             border-radius: 6px;
             border: 1px solid var(--border-color);
         }
 
-        /* Live Simulator Playground */
+        /* Live Simulator Section */
         .simulator-section {
-            padding: 5rem 0;
+            padding: 4.5rem 0;
             background: var(--bg-surface);
             border-top: 1px solid var(--border-color);
             border-bottom: 1px solid var(--border-color);
@@ -3608,38 +3588,38 @@ LANDING_HTML = """<!DOCTYPE html>
         .sim-container {
             display: grid;
             grid-template-columns: 1fr 1.1fr;
-            gap: 3rem;
+            gap: 2.5rem;
             align-items: center;
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 24px;
-            padding: 2.5rem;
+            border-radius: 20px;
+            padding: 2.25rem;
             box-shadow: var(--shadow-md);
         }
 
         .sim-info h3 {
-            font-size: 2rem;
-            margin-bottom: 0.8rem;
+            font-size: 1.9rem;
+            margin-bottom: 0.75rem;
         }
 
         .sim-info p {
             color: var(--text-secondary);
-            font-size: 0.98rem;
-            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+            margin-bottom: 1.4rem;
         }
 
         .sim-prompts {
             display: flex;
             flex-direction: column;
-            gap: 0.65rem;
+            gap: 0.6rem;
         }
 
         .sim-prompt-btn {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
             color: var(--text-primary);
-            padding: 0.8rem 1.1rem;
-            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
             font-size: 0.88rem;
             font-weight: 500;
             text-align: left;
@@ -3651,16 +3631,16 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .sim-prompt-btn:hover {
-            border-color: var(--accent-brand);
-            color: var(--accent-brand);
-            background: var(--accent-subtle);
+            border-color: var(--brand-green);
+            color: var(--brand-green);
+            background: var(--brand-green-subtle);
         }
 
         .sim-window {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            border-radius: 16px;
-            height: 360px;
+            border-radius: 14px;
+            height: 350px;
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -3668,7 +3648,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .sim-window-header {
             background: var(--bg-card);
-            padding: 0.75rem 1.1rem;
+            padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
@@ -3679,39 +3659,38 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .sim-window-body {
             flex-grow: 1;
-            padding: 1.1rem;
+            padding: 1rem;
             display: flex;
             flex-direction: column;
-            gap: 0.85rem;
+            gap: 0.8rem;
             overflow-y: auto;
             font-size: 0.88rem;
         }
 
         /* Platforms Section */
         .platforms-section {
-            padding: 5rem 0;
+            padding: 4.5rem 0;
         }
 
         .platforms-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 2rem;
+            gap: 1.75rem;
         }
 
         .platform-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 20px;
-            padding: 2.5rem;
+            border-radius: 18px;
+            padding: 2.25rem;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            transition: var(--transition);
             box-shadow: var(--shadow-sm);
+            transition: var(--transition);
         }
 
         .platform-card:hover {
-            transform: translateY(-4px);
             box-shadow: var(--shadow-md);
         }
 
@@ -3721,9 +3700,9 @@ LANDING_HTML = """<!DOCTYPE html>
             gap: 0.4rem;
             font-size: 0.78rem;
             font-weight: 600;
-            padding: 0.3rem 0.75rem;
+            padding: 0.25rem 0.7rem;
             border-radius: 99px;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.1rem;
             width: fit-content;
         }
 
@@ -3738,22 +3717,22 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .platform-card h3 {
-            font-size: 1.6rem;
-            margin-bottom: 0.6rem;
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
         }
 
         .platform-card p {
             color: var(--text-secondary);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
+            font-size: 0.93rem;
+            margin-bottom: 1.4rem;
         }
 
         .platform-features {
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 0.65rem;
-            margin-bottom: 1.8rem;
+            gap: 0.6rem;
+            margin-bottom: 1.6rem;
             font-size: 0.88rem;
             color: var(--text-secondary);
         }
@@ -3765,61 +3744,56 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .platform-features svg {
-            color: var(--accent-brand);
+            color: var(--brand-green);
             flex-shrink: 0;
         }
 
         /* Safety Grid */
         .safety-section {
-            padding: 5rem 0;
+            padding: 4.5rem 0;
             border-top: 1px solid var(--border-color);
         }
 
         .safety-grid {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
         .safety-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            padding: 1.8rem;
-            border-radius: 16px;
-            transition: var(--transition);
+            padding: 1.6rem;
+            border-radius: 14px;
             box-shadow: var(--shadow-sm);
-        }
-
-        .safety-card:hover {
-            border-color: var(--accent-brand);
-            transform: translateY(-3px);
+            transition: var(--transition);
         }
 
         .safety-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            background: var(--accent-subtle);
-            color: var(--accent-brand);
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: var(--brand-green-subtle);
+            color: var(--brand-green);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 1rem;
+            margin-bottom: 0.9rem;
         }
 
         .safety-card h4 {
-            font-size: 1.1rem;
-            margin-bottom: 0.4rem;
+            font-size: 1.05rem;
+            margin-bottom: 0.35rem;
         }
 
         .safety-card p {
-            font-size: 0.88rem;
+            font-size: 0.86rem;
             color: var(--text-secondary);
         }
 
         /* Testimonials Section */
         .testimonials-section {
-            padding: 5rem 0;
+            padding: 4.5rem 0;
             border-top: 1px solid var(--border-color);
             background: var(--bg-surface);
         }
@@ -3827,14 +3801,14 @@ LANDING_HTML = """<!DOCTYPE html>
         .testimonials-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
         .testimonial-card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            padding: 1.8rem;
-            border-radius: 16px;
+            padding: 1.6rem;
+            border-radius: 14px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -3842,71 +3816,70 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .testimonial-text {
-            font-size: 0.92rem;
+            font-size: 0.9rem;
             color: var(--text-secondary);
             font-style: italic;
-            margin-bottom: 1.25rem;
+            margin-bottom: 1.2rem;
             line-height: 1.6;
         }
 
         .testimonial-author {
             display: flex;
             align-items: center;
-            gap: 0.65rem;
+            gap: 0.6rem;
         }
 
         .author-avatar {
-            width: 36px;
-            height: 36px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
-            background: var(--accent-brand);
+            background: var(--brand-green);
             color: #ffffff;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: 700;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
         }
 
         .author-info h5 {
-            font-size: 0.88rem;
+            font-size: 0.86rem;
             font-weight: 600;
         }
 
         .author-info p {
-            font-size: 0.78rem;
+            font-size: 0.76rem;
             color: var(--text-muted);
         }
 
         /* FAQ Section with Smooth Expand/Collapse */
         .faq-section {
-            padding: 5rem 0;
+            padding: 4.5rem 0;
             border-top: 1px solid var(--border-color);
         }
 
         .faq-list {
-            max-width: 780px;
+            max-width: 760px;
             margin: 0 auto;
             display: flex;
             flex-direction: column;
-            gap: 0.85rem;
+            gap: 0.75rem;
         }
 
         .faq-item {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
-            border-radius: 14px;
+            border-radius: 12px;
             overflow: hidden;
-            transition: var(--transition);
         }
 
         .faq-question {
-            padding: 1.25rem 1.6rem;
+            padding: 1.15rem 1.4rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             font-weight: 600;
-            font-size: 1rem;
+            font-size: 0.98rem;
             cursor: pointer;
             color: var(--text-primary);
         }
@@ -3915,17 +3888,17 @@ LANDING_HTML = """<!DOCTYPE html>
             max-height: 0;
             opacity: 0;
             overflow: hidden;
-            padding: 0 1.6rem;
+            padding: 0 1.4rem;
             color: var(--text-secondary);
-            font-size: 0.93rem;
+            font-size: 0.92rem;
             line-height: 1.65;
-            transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease, padding 0.3s ease;
+            transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.25s ease, padding 0.25s ease;
         }
 
         .faq-item.active .faq-answer {
             max-height: 250px;
             opacity: 1;
-            padding-bottom: 1.25rem;
+            padding-bottom: 1.15rem;
         }
 
         .faq-item.active .faq-icon {
@@ -3934,40 +3907,40 @@ LANDING_HTML = """<!DOCTYPE html>
 
         .faq-icon {
             transition: transform 0.3s ease;
-            color: var(--accent-brand);
+            color: var(--brand-green);
         }
 
-        /* Final Conversion Banner */
+        /* Final Banner */
         .cta-banner {
-            padding: 5rem 0;
+            padding: 4.5rem 0;
         }
 
         .cta-box {
             background: var(--bg-surface);
             border: 1px solid var(--border-color);
-            border-radius: 28px;
-            padding: 4rem 2rem;
+            border-radius: 24px;
+            padding: 3.5rem 2rem;
             text-align: center;
             box-shadow: var(--shadow-md);
         }
 
         .cta-box h2 {
-            font-size: 2.6rem;
-            margin-bottom: 0.8rem;
+            font-size: 2.4rem;
+            margin-bottom: 0.75rem;
         }
 
         .cta-box p {
             color: var(--text-secondary);
-            font-size: 1.05rem;
-            max-width: 580px;
-            margin: 0 auto 2rem auto;
+            font-size: 1.02rem;
+            max-width: 560px;
+            margin: 0 auto 1.8rem auto;
         }
 
         /* Footer */
         footer {
             border-top: 1px solid var(--border-color);
-            padding: 3.5rem 0 2.5rem 0;
-            font-size: 0.88rem;
+            padding: 3rem 0 2rem 0;
+            font-size: 0.86rem;
             color: var(--text-muted);
         }
 
@@ -3976,28 +3949,16 @@ LANDING_HTML = """<!DOCTYPE html>
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 1.5rem;
+            gap: 1.25rem;
         }
 
         .footer-copy {
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.5rem;
         }
 
-        /* Smooth Scroll Reveal Utility */
-        .reveal {
-            opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-
-        .reveal.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        /* Responsive Media Queries */
+        /* Responsive Queries */
         @media (max-width: 992px) {
             .hero {
                 grid-template-columns: 1fr;
@@ -4006,13 +3967,10 @@ LANDING_HTML = """<!DOCTYPE html>
             }
 
             .hero-content p {
-                margin: 0 auto 2rem auto;
+                margin: 0 auto 1.8rem auto;
             }
 
-            .hero-actions {
-                justify-content: center;
-            }
-
+            .hero-actions,
             .hero-trust-list {
                 justify-content: center;
             }
@@ -4020,31 +3978,17 @@ LANDING_HTML = """<!DOCTYPE html>
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-
-            .curriculum-grid,
-            .platforms-grid,
-            .sim-container {
-                grid-template-columns: 1fr;
-            }
-
-            .safety-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-
-            .testimonials-grid {
-                grid-template-columns: 1fr;
-            }
         }
 
         @media (max-width: 768px) {
             .nav-menu {
                 position: fixed;
-                top: 65px;
+                top: 60px;
                 left: 0;
                 width: 100%;
-                background: var(--bg-body);
+                background: var(--bg-card);
                 flex-direction: column;
-                padding: 1.8rem;
+                padding: 1.5rem;
                 border-bottom: 1px solid var(--border-color);
                 transform: translateY(-150%);
                 transition: var(--transition);
@@ -4060,7 +4004,7 @@ LANDING_HTML = """<!DOCTYPE html>
             }
 
             .hero-content h1 {
-                font-size: 2.4rem;
+                font-size: 2.2rem;
             }
 
             .safety-grid {
@@ -4068,7 +4012,7 @@ LANDING_HTML = """<!DOCTYPE html>
             }
 
             .cta-box h2 {
-                font-size: 2rem;
+                font-size: 1.8rem;
             }
         }
     </style>
@@ -4094,9 +4038,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
             <div class="header-actions">
                 <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <!-- Sun Icon (shown in dark mode) -->
                     <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <!-- Moon Icon (shown in light mode) -->
                     <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
                 <a href="#platforms" class="btn btn-primary">Start Learning</a>
@@ -4111,7 +4053,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
     <!-- Hero Section -->
     <section class="hero container">
-        <div class="hero-content reveal">
+        <div class="hero-content">
             <div class="hero-tag">
                 <span>Safe, Confidential & Free Conversational Course</span>
             </div>
@@ -4120,12 +4062,10 @@ LANDING_HTML = """<!DOCTYPE html>
             
             <div class="hero-actions">
                 <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                     <span>Start on WhatsApp</span>
                 </a>
                 
                 <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     <span>Start on Telegram</span>
                 </a>
 
@@ -4134,18 +4074,16 @@ LANDING_HTML = """<!DOCTYPE html>
 
             <div class="hero-trust-list">
                 <div class="trust-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>No App Download Required</span>
+                    <span>✓ No App Download Required</span>
                 </div>
                 <div class="trust-item">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Self-Paced & Private</span>
+                    <span>✓ Self-Paced & Private</span>
                 </div>
             </div>
         </div>
 
         <!-- Phone Simulator Mockup -->
-        <div class="phone-container reveal">
+        <div class="phone-container">
             <div class="phone-mockup">
                 <div class="phone-screen">
                     <div class="phone-header">
@@ -4170,38 +4108,16 @@ LANDING_HTML = """<!DOCTYPE html>
         </div>
     </section>
 
-    <!-- Stats Ribbon -->
-    <section class="stats-ribbon">
-        <div class="container stats-grid">
-            <div class="stat-card">
-                <h3>6 Weeks</h3>
-                <p>Interactive Modules</p>
-            </div>
-            <div class="stat-card">
-                <h3>100%</h3>
-                <p>Free & Confidential</p>
-            </div>
-            <div class="stat-card">
-                <h3>2 Channels</h3>
-                <p>WhatsApp & Telegram</p>
-            </div>
-            <div class="stat-card">
-                <h3>24/7</h3>
-                <p>Self-Paced Companion</p>
-            </div>
-        </div>
-    </section>
-
     <!-- Curriculum Section -->
     <section class="curriculum-section container" id="curriculum">
-        <div class="section-header reveal">
+        <div class="section-header">
             <span class="section-tag">Structured Learning Path</span>
             <h2>The 6-Week Curriculum</h2>
             <p>Designed by youth development experts to foster self-awareness, respectful relationships, and positive leadership.</p>
         </div>
 
         <div class="curriculum-grid">
-            <div class="module-card reveal">
+            <div class="module-card">
                 <div class="module-header">
                     <span class="module-badge">Week 01</span>
                     <span class="module-duration">15 mins</span>
@@ -4215,7 +4131,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="module-card reveal">
+            <div class="module-card">
                 <div class="module-header">
                     <span class="module-badge">Week 02</span>
                     <span class="module-duration">15 mins</span>
@@ -4229,7 +4145,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="module-card reveal">
+            <div class="module-card">
                 <div class="module-header">
                     <span class="module-badge">Week 03</span>
                     <span class="module-duration">20 mins</span>
@@ -4243,7 +4159,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="module-card reveal">
+            <div class="module-card">
                 <div class="module-header">
                     <span class="module-badge">Week 04</span>
                     <span class="module-duration">20 mins</span>
@@ -4257,7 +4173,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="module-card reveal">
+            <div class="module-card">
                 <div class="module-header">
                     <span class="module-badge">Week 05</span>
                     <span class="module-duration">15 mins</span>
@@ -4271,7 +4187,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="module-card reveal">
+            <div class="module-card">
                 <div class="module-header">
                     <span class="module-badge">Week 06</span>
                     <span class="module-duration">15 mins</span>
@@ -4291,7 +4207,7 @@ LANDING_HTML = """<!DOCTYPE html>
     <section class="simulator-section" id="simulator">
         <div class="container">
             <div class="sim-container">
-                <div class="sim-info reveal">
+                <div class="sim-info">
                     <span class="section-tag">Interactive Demo</span>
                     <h3>Try Tobi in Your Browser</h3>
                     <p>Experience how friendly and conversational learning on The Brothers' Room feels before launching in WhatsApp or Telegram.</p>
@@ -4312,7 +4228,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     </div>
                 </div>
 
-                <div class="sim-window reveal">
+                <div class="sim-window">
                     <div class="sim-window-header">
                         <span class="phone-avatar" style="width:24px; height:24px; font-size:0.7rem;">T</span>
                         <span>Tobi Live Simulator</span>
@@ -4329,32 +4245,23 @@ LANDING_HTML = """<!DOCTYPE html>
 
     <!-- Dual Platforms Section -->
     <section class="platforms-section container" id="platforms">
-        <div class="section-header reveal">
+        <div class="section-header">
             <span class="section-tag">Choose Your App</span>
             <h2>Select Your Preferred Platform</h2>
             <p>The Brothers' Room is active on both WhatsApp and Telegram so you can learn on the messaging app you use daily.</p>
         </div>
 
         <div class="platforms-grid">
-            <div class="platform-card reveal">
+            <div class="platform-card">
                 <div>
                     <span class="platform-badge whatsapp">WhatsApp Channel</span>
                     <h3>WhatsApp Bot</h3>
                     <p>Start instantly on WhatsApp. Interactive prompts, voice lesson summaries, and self-paced learning.</p>
                     
                     <ul class="platform-features">
-                        <li>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Pre-filled quick start message</span>
-                        </li>
-                        <li>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>End-to-End encrypted messaging</span>
-                        </li>
-                        <li>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Audio lesson notes supported</span>
-                        </li>
+                        <li>✓ Pre-filled quick start message</li>
+                        <li>✓ End-to-End encrypted messaging</li>
+                        <li>✓ Audio lesson notes supported</li>
                     </ul>
                 </div>
 
@@ -4363,25 +4270,16 @@ LANDING_HTML = """<!DOCTYPE html>
                 </a>
             </div>
 
-            <div class="platform-card reveal">
+            <div class="platform-card">
                 <div>
                     <span class="platform-badge telegram">Telegram Channel</span>
                     <h3>Telegram Bot</h3>
                     <p>Experience automated learning with interactive button menus and instant progress tracking.</p>
                     
                     <ul class="platform-features">
-                        <li>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Inline button navigation</span>
-                        </li>
-                        <li>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Instant bookmarking & course resume</span>
-                        </li>
-                        <li>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                            <span>Complete privacy control</span>
-                        </li>
+                        <li>✓ Inline button navigation</li>
+                        <li>✓ Instant bookmarking & course resume</li>
+                        <li>✓ Complete privacy control</li>
                     </ul>
                 </div>
 
@@ -4394,14 +4292,14 @@ LANDING_HTML = """<!DOCTYPE html>
 
     <!-- Safety & Privacy Section -->
     <section class="safety-section container" id="safety">
-        <div class="section-header reveal">
+        <div class="section-header">
             <span class="section-tag">Privacy First</span>
             <h2>Safe, Confidential & Free</h2>
             <p>Your psychological safety and personal confidentiality are our highest priorities.</p>
         </div>
 
         <div class="safety-grid">
-            <div class="safety-card reveal">
+            <div class="safety-card">
                 <div class="safety-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
@@ -4409,7 +4307,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 <p>You never have to disclose your real name or personal identity to complete modules.</p>
             </div>
 
-            <div class="safety-card reveal">
+            <div class="safety-card">
                 <div class="safety-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                 </div>
@@ -4417,7 +4315,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 <p>Designed for honest self-reflection without shame, preaching, or stigma.</p>
             </div>
 
-            <div class="safety-card reveal">
+            <div class="safety-card">
                 <div class="safety-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
                 </div>
@@ -4425,7 +4323,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 <p>Curated content guided by experienced youth development specialists and male allies.</p>
             </div>
 
-            <div class="safety-card reveal">
+            <div class="safety-card">
                 <div class="safety-icon">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                 </div>
@@ -4438,14 +4336,14 @@ LANDING_HTML = """<!DOCTYPE html>
     <!-- Testimonials Section -->
     <section class="testimonials-section">
         <div class="container">
-            <div class="section-header reveal">
+            <div class="section-header">
                 <span class="section-tag">Voices of Learners</span>
                 <h2>Real Impact & Growth</h2>
                 <p>Hear what young men are saying about their journey through The Brothers' Room.</p>
             </div>
 
             <div class="testimonials-grid">
-                <div class="testimonial-card reveal">
+                <div class="testimonial-card">
                     <p class="testimonial-text">"The Brothers' Room gave me a safe space to challenge things I thought were normal about being a guy. Week 2 on emotional health completely shifted how I handle stress and anger."</p>
                     <div class="testimonial-author">
                         <div class="author-avatar">A</div>
@@ -4456,7 +4354,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     </div>
                 </div>
 
-                <div class="testimonial-card reveal">
+                <div class="testimonial-card">
                     <p class="testimonial-text">"I love that it happens right inside WhatsApp. 15 minutes a week, no heavy data downloads, and the lessons on consent and boundaries were straightforward."</p>
                     <div class="testimonial-author">
                         <div class="author-avatar">C</div>
@@ -4467,7 +4365,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     </div>
                 </div>
 
-                <div class="testimonial-card reveal">
+                <div class="testimonial-card">
                     <p class="testimonial-text">"Every young man needs this course. It opened my eyes to how we can actively prevent violence and support women and girls in our communities."</p>
                     <div class="testimonial-author">
                         <div class="author-avatar">I</div>
@@ -4483,14 +4381,14 @@ LANDING_HTML = """<!DOCTYPE html>
 
     <!-- FAQ Section -->
     <section class="faq-section container" id="faq">
-        <div class="section-header reveal">
+        <div class="section-header">
             <span class="section-tag">Common Questions</span>
             <h2>Frequently Asked Questions</h2>
             <p>Everything you need to know about joining and completing the course.</p>
         </div>
 
         <div class="faq-list">
-            <div class="faq-item reveal">
+            <div class="faq-item">
                 <div class="faq-question" onclick="toggleFaq(this)">
                     <span>Is The Brothers' Room really 100% free?</span>
                     <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -4500,7 +4398,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="faq-item reveal">
+            <div class="faq-item">
                 <div class="faq-question" onclick="toggleFaq(this)">
                     <span>How much time do I need per week?</span>
                     <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -4510,7 +4408,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="faq-item reveal">
+            <div class="faq-item">
                 <div class="faq-question" onclick="toggleFaq(this)">
                     <span>Do I need to download a new app?</span>
                     <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -4520,7 +4418,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
             </div>
 
-            <div class="faq-item reveal">
+            <div class="faq-item">
                 <div class="faq-question" onclick="toggleFaq(this)">
                     <span>Is my privacy and responses protected?</span>
                     <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
@@ -4534,18 +4432,16 @@ LANDING_HTML = """<!DOCTYPE html>
 
     <!-- Final CTA Banner -->
     <section class="cta-banner container">
-        <div class="cta-box reveal">
+        <div class="cta-box">
             <h2>Ready to Join The Brothers' Room?</h2>
             <p>Start your 6-week journey toward positive masculinity and community leadership today on WhatsApp or Telegram.</p>
             
             <div class="hero-actions" style="justify-content: center;">
                 <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448l-6.305 1.654zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.002-5.462-4.415-9.89-9.881-9.892-5.452 0-9.887 4.434-9.889 9.884-.001 2.225.651 3.891 1.746 5.634l-.999 3.648 3.742-.981zm11.387-5.464c-.074-.124-.272-.198-.57-.347-.297-.149-1.758-.868-2.031-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.151-.172.2-.296.3-.495.099-.198.05-.372-.025-.521-.075-.148-.669-1.611-.916-2.206-.242-.579-.487-.501-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.263.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.695.248-1.29.173-1.414z"/></svg>
                     <span>Start on WhatsApp</span>
                 </a>
                 
                 <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
                     <span>Start on Telegram</span>
                 </a>
             </div>
@@ -4570,10 +4466,8 @@ LANDING_HTML = """<!DOCTYPE html>
 
     <!-- Client-side Interactive Scripts -->
     <script>
-        // Hero Phone Interactive Options
         function triggerHeroReply(optionText) {
             const chatBody = document.getElementById("hero-chat-body");
-            
             const userMsg = document.createElement("div");
             userMsg.className = "chat-bubble bubble-user";
             userMsg.textContent = optionText;
@@ -4583,22 +4477,18 @@ LANDING_HTML = """<!DOCTYPE html>
             setTimeout(() => {
                 const botMsg = document.createElement("div");
                 botMsg.className = "chat-bubble bubble-bot";
-                
                 if (optionText.includes("Module 1")) {
                     botMsg.innerHTML = "In Module 1, we unpack societal expectations and define what positive masculinity means to you. Ready to begin?";
                 } else {
                     botMsg.innerHTML = "100% Anonymous. No real names required. Everything stays private between you and Tobi.";
                 }
-                
                 chatBody.appendChild(botMsg);
                 chatBody.scrollTop = chatBody.scrollHeight;
             }, 500);
         }
 
-        // Live Simulator Playground Logic
         function sendSimPrompt(promptText) {
             const simBody = document.getElementById("sim-window-body");
-            
             const uBubble = document.createElement("div");
             uBubble.className = "chat-bubble bubble-user";
             uBubble.textContent = promptText;
@@ -4608,7 +4498,6 @@ LANDING_HTML = """<!DOCTYPE html>
             setTimeout(() => {
                 const bBubble = document.createElement("div");
                 bBubble.className = "chat-bubble bubble-bot";
-                
                 if (promptText.includes("Week 1")) {
                     bBubble.innerHTML = "Module 1 covers: dismantling harmful stereotypes, emotional self-reflection, and building positive male identity. Takes ~15 minutes.";
                 } else if (promptText.includes("private")) {
@@ -4616,51 +4505,29 @@ LANDING_HTML = """<!DOCTYPE html>
                 } else {
                     bBubble.innerHTML = "Simply click the 'Start on WhatsApp' button! You'll send a quick message to Tobi and begin Module 1 instantly.";
                 }
-                
                 simBody.appendChild(bBubble);
                 simBody.scrollTop = simBody.scrollHeight;
             }, 450);
         }
 
-        // FAQ Smooth Accordion Toggle
         function toggleFaq(element) {
             const item = element.parentElement;
-            
-            // Close other items for single-accordion feel
             document.querySelectorAll(".faq-item").forEach(other => {
                 if (other !== item) other.classList.remove("active");
             });
-
             item.classList.toggle("active");
         }
 
-        // Smooth Scroll Reveal Animations
-        function initScrollReveal() {
-            const observerOptions = { threshold: 0.12 };
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add("visible");
-                    }
-                });
-            }, observerOptions);
-
-            document.querySelectorAll(".reveal").forEach(el => observer.observe(el));
-        }
-
-        // Theme Toggle (Dark/Light mode switch)
         function initThemeToggle() {
             const toggleBtn = document.getElementById("theme-toggle");
             const sunIcon = toggleBtn.querySelector(".sun-icon");
             const moonIcon = toggleBtn.querySelector(".moon-icon");
-
             const savedTheme = localStorage.getItem("theme");
             if (savedTheme === "dark") {
                 document.body.classList.add("dark-mode");
                 sunIcon.style.display = "block";
                 moonIcon.style.display = "none";
             }
-
             toggleBtn.addEventListener("click", () => {
                 document.body.classList.toggle("dark-mode");
                 const isDark = document.body.classList.contains("dark-mode");
@@ -4670,22 +4537,23 @@ LANDING_HTML = """<!DOCTYPE html>
             });
         }
 
-        // Mobile Nav Toggle
         function initMobileNav() {
             const menuToggle = document.getElementById("menu-toggle");
             const navMenu = document.getElementById("nav-menu");
-
             if (menuToggle && navMenu) {
                 menuToggle.addEventListener("click", () => {
                     navMenu.classList.toggle("active");
                 });
-
                 navMenu.querySelectorAll("a").forEach(link => {
                     link.addEventListener("click", () => navMenu.classList.remove("active"));
                 });
             }
         }
 
+        window.addEventListener("load", () => {
+            initThemeToggle();
+            initMobileNav();
+        });
     </script>
 </body>
 </html>
