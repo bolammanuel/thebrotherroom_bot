@@ -887,6 +887,57 @@ def get_vote_stats():
     }
 
 
+def get_platform_analytics():
+    """Retrieve counts, percentages, and log of platform engagements (WhatsApp vs Telegram)."""
+    conn = get_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT platform, COUNT(*) FROM platform_votes GROUP BY platform")
+    results = dict(cursor.fetchall())
+    
+    cursor.execute("SELECT id, name, contact, platform, timestamp FROM platform_votes ORDER BY id DESC LIMIT 100")
+    rows = cursor.fetchall()
+    conn.close()
+    
+    whatsapp_count = results.get("WhatsApp", 0)
+    telegram_count = results.get("Telegram", 0)
+    
+    # Also add learners platform breakdown if learners table has platform data
+    try:
+        conn_l = get_connection()
+        cursor_l = conn_l.cursor()
+        cursor_l.execute("SELECT platform, COUNT(*) FROM learners GROUP BY platform")
+        learner_platforms = dict(cursor_l.fetchall())
+        conn_l.close()
+        whatsapp_count += learner_platforms.get("whatsapp", 0) + learner_platforms.get("WhatsApp", 0)
+        telegram_count += learner_platforms.get("telegram", 0) + learner_platforms.get("Telegram", 0)
+    except Exception:
+        pass
+        
+    total_count = whatsapp_count + telegram_count
+    wa_pct = round((whatsapp_count / total_count) * 100, 1) if total_count > 0 else 50.0
+    tg_pct = round((telegram_count / total_count) * 100, 1) if total_count > 0 else 50.0
+    
+    recent_logs = []
+    for r in rows:
+        recent_logs.append({
+            "id": r[0],
+            "name": r[1] or "Anonymous Visitor",
+            "contact": r[2] or "Direct Platform Click",
+            "platform": r[3],
+            "timestamp": str(r[4]) if r[4] else "Recent"
+        })
+        
+    return {
+        "whatsapp_count": whatsapp_count,
+        "telegram_count": telegram_count,
+        "total_count": total_count,
+        "whatsapp_pct": wa_pct,
+        "telegram_pct": tg_pct,
+        "recent_logs": recent_logs
+    }
+
+
+
 def get_due_midweek_checks():
     """Retrieve users whose Wednesday 'Midweek Check' is due."""
     conn = get_connection()

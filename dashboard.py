@@ -1489,15 +1489,13 @@ DASHBOARD_HTML = """
                     <span>Reflections</span>
                 </li>
                 <li id="menuItemWaitlist" class="sidebar-item" onclick="showSection('waitlist')">
-                    <!-- Waitlist Check/List Icon -->
+                    <!-- Platform Analytics Icon -->
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                        <polyline points="14 2 14 8 20 8"></polyline>
-                        <line x1="16" y1="13" x2="8" y2="13"></line>
-                        <line x1="16" y1="17" x2="8" y2="17"></line>
-                        <polyline points="10 9 9 9 8 9"></polyline>
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
                     </svg>
-                    <span>Waitlist & Votes</span>
+                    <span>Platform Analytics</span>
                 </li>
             </ul>
         </div>
@@ -1865,42 +1863,73 @@ DASHBOARD_HTML = """
                 </div>
             </div>
 
-            <!-- Section 4: Waitlist Tab -->
+            <!-- Section 4: Platform Analytics Tab -->
             <div id="sectionWaitlist" class="tab-content" style="display: none;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 0.75rem;">
                     <div>
-                        <h3 style="font-size: 0.95rem; color: var(--text-color); letter-spacing: 0.5px; margin: 0; font-weight: 400;">WhatsApp Waitlist</h3>
-                        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">View contact details of registered participants for launch notifications.</p>
+                        <h3 style="font-size: 0.95rem; color: var(--text-color); letter-spacing: 0.5px; margin: 0; font-weight: 600;">Platform Metrics & Channel Engagement</h3>
+                        <p style="font-size: 0.75rem; color: var(--text-muted); margin: 0.25rem 0 0 0;">Real-time breakdown of WhatsApp vs. Telegram learner engagement and channel preferences.</p>
                     </div>
                     <div style="display: flex; gap: 0.75rem; align-items: center;">
                         <button onclick="exportWaitlistCSV()" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 38px;">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                <polyline points="7 10 12 15 17 10"></polyline>
-                                <line x1="12" y1="15" x2="12" y2="3"></line>
-                            </svg>
-                            <span>Export Waitlist CSV</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            <span>Export Metrics CSV</span>
                         </button>
-                        <button onclick="clearWaitlist()" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 38px; border-color: #ef4444; color: #ef4444;" onmouseover="this.style.backgroundColor='rgba(239, 68, 68, 0.05)'" onmouseout="this.style.backgroundColor='transparent'">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="3 6 5 6 21 6"></polyline>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                <line x1="10" y1="11" x2="10" y2="17"></line>
-                                <line x1="14" y1="11" x2="14" y2="17"></line>
-                            </svg>
-                            <span>Clear Waitlist</span>
+                        <button onclick="clearWaitlist()" class="btn btn-secondary" style="display: inline-flex; align-items: center; gap: 0.5rem; height: 38px; border-color: #ef4444; color: #ef4444;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            <span>Clear Logs</span>
                         </button>
                     </div>
                 </div>
+
+                <!-- Stat Cards Grid for WhatsApp vs Telegram -->
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 1.5rem;">
+                    <div class="card" style="padding: 1.25rem;">
+                        <div style="font-size: 0.75rem; color: var(--text-muted); font-weight: 500; margin-bottom: 0.4rem;">Total Engagements</div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--text-color);" id="platformTotalCount">0</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Combined channel clicks</div>
+                    </div>
+                    <div class="card" style="padding: 1.25rem; border-left: 4px solid #25d366;">
+                        <div style="font-size: 0.75rem; color: #25d366; font-weight: 600; margin-bottom: 0.4rem;">WhatsApp Share</div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--text-color);" id="waMetricsText">0% (0 clicks)</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Learners preferring WhatsApp</div>
+                    </div>
+                    <div class="card" style="padding: 1.25rem; border-left: 4px solid #2481cc;">
+                        <div style="font-size: 0.75rem; color: #2481cc; font-weight: 600; margin-bottom: 0.4rem;">Telegram Share</div>
+                        <div style="font-size: 1.8rem; font-weight: 700; color: var(--text-color);" id="tgMetricsText">0% (0 clicks)</div>
+                        <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.2rem;">Learners preferring Telegram</div>
+                    </div>
+                </div>
+
+                <!-- Visual Distribution Progress Bar -->
+                <div class="card" style="padding: 1.25rem; margin-bottom: 1.5rem;">
+                    <div style="font-size: 0.85rem; font-weight: 600; color: var(--text-color); margin-bottom: 0.75rem; display: flex; justify-content: space-between;">
+                        <span>Channel Comparison Ratio</span>
+                        <span style="font-size: 0.75rem; color: var(--text-muted); font-weight: 400;">WhatsApp vs Telegram Breakdown</span>
+                    </div>
+                    <div style="height: 12px; border-radius: 6px; background: var(--border-color); display: flex; overflow: hidden;">
+                        <div id="waProgressBar" style="width: 50%; background: #25d366; transition: width 0.4s ease;" title="WhatsApp"></div>
+                        <div id="tgProgressBar" style="width: 50%; background: #2481cc; transition: width 0.4s ease;" title="Telegram"></div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-top: 0.5rem; color: var(--text-muted);">
+                        <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #25d366; display: inline-block;"></span> WhatsApp</span>
+                        <span style="display: flex; align-items: center; gap: 0.3rem;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #2481cc; display: inline-block;"></span> Telegram</span>
+                    </div>
+                </div>
+
+                <!-- Recent Platform Activity Table -->
                 <div class="card">
+                    <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); font-weight: 600; font-size: 0.9rem;">
+                        Recent Platform Activity
+                    </div>
                     <div style="overflow-x: auto;">
                         <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.85rem;" id="waitlistTable">
                             <thead>
                                 <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted);">
-                                    <th style="padding: 0.75rem 1rem;">Name</th>
-                                    <th style="padding: 0.75rem 1rem;">Contact Details</th>
-                                    <th style="padding: 0.75rem 1rem;">Preferred Platform</th>
-                                    <th style="padding: 0.75rem 1rem;">Registered At</th>
+                                    <th style="padding: 0.75rem 1rem;">Visitor / Contact</th>
+                                    <th style="padding: 0.75rem 1rem;">Channel</th>
+                                    <th style="padding: 0.75rem 1rem;">Interaction Source</th>
+                                    <th style="padding: 0.75rem 1rem;">Timestamp</th>
                                 </tr>
                             </thead>
                             <tbody id="waitlistTableBody">
@@ -2175,41 +2204,50 @@ DASHBOARD_HTML = """
                 headerTitle.innerText = "Mirror Moments Reflections";
                 headerSubtitle.innerText = "Participant journals and thoughts";
             } else if (sectionName === "waitlist") {
-                headerTitle.innerText = "Waitlist & Votes";
-                headerSubtitle.innerText = "WhatsApp and Telegram waitlist registrations";
+                headerTitle.innerText = "Platform Analytics";
+                headerSubtitle.innerText = "WhatsApp vs Telegram learner distribution & engagement metrics";
             }
         }
 
         async function loadWaitlist() {
             const tableBody = document.getElementById("waitlistTableBody");
-            tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading waitlist...</td></tr>`;
+            tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading platform analytics...</td></tr>`;
             
             try {
-                const res = await fetch("/api/waitlist?token=" + expectedToken);
+                const res = await fetch("/api/platform-analytics?token=" + expectedToken);
                 const data = await res.json();
                 
-                if (data.success && data.waitlist) {
-                    if (data.waitlist.length === 0) {
-                        tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No waitlist entries found.</td></tr>`;
+                if (data.success && data.analytics) {
+                    const a = data.analytics;
+                    document.getElementById("platformTotalCount").innerText = a.total_count || 0;
+                    document.getElementById("waMetricsText").innerText = `${a.whatsapp_pct}% (${a.whatsapp_count} clicks)`;
+                    document.getElementById("tgMetricsText").innerText = `${a.telegram_pct}% (${a.telegram_count} clicks)`;
+                    
+                    document.getElementById("waProgressBar").style.width = a.whatsapp_pct + "%";
+                    document.getElementById("tgProgressBar").style.width = a.telegram_pct + "%";
+                    
+                    const logs = data.waitlist || [];
+                    if (logs.length === 0) {
+                        tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">No platform interactions logged yet. Click WhatsApp or Telegram on the landing page to test.</td></tr>`;
                         return;
                     }
                     
-                    tableBody.innerHTML = data.waitlist.map(entry => `
+                    tableBody.innerHTML = logs.map(entry => `
                         <tr style="border-bottom: 1px solid var(--border-color);">
-                            <td style="padding: 0.75rem 1rem; font-weight: 500; color: var(--text-color);">${escapeHtml(entry.name || 'Anonymous')}</td>
-                            <td style="padding: 0.75rem 1rem; font-family: monospace; color: var(--text-color);">${escapeHtml(entry.contact || 'N/A')}</td>
+                            <td style="padding: 0.75rem 1rem; font-weight: 500; color: var(--text-color);">${escapeHtml(entry.name || 'Anonymous Learner')}</td>
                             <td style="padding: 0.75rem 1rem;">
                                 <span style="display: inline-block; padding: 0.25rem 0.5rem; border-radius: 4px; font-size: 0.75rem; font-weight: 600; 
                                              background-color: ${entry.platform === 'WhatsApp' ? 'rgba(37, 211, 102, 0.15)' : 'rgba(36, 129, 204, 0.15)'}; 
                                              color: ${entry.platform === 'WhatsApp' ? '#25d366' : '#2481cc'};">
-                                    ${entry.platform}
+                                    ${escapeHtml(entry.platform)}
                                 </span>
                             </td>
-                            <td style="padding: 0.75rem 1rem; color: var(--text-muted);">${escapeHtml(entry.timestamp.split(".")[0])}</td>
+                            <td style="padding: 0.75rem 1rem; color: var(--text-color); font-size: 0.8rem;">${escapeHtml(entry.contact || 'Landing Page CTA')}</td>
+                            <td style="padding: 0.75rem 1rem; color: var(--text-muted); font-size: 0.8rem;">${escapeHtml((entry.timestamp || '').split(".")[0])}</td>
                         </tr>
                     `).join("");
                 } else {
-                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: #ef4444;">Error: ${data.error || 'Failed to load waitlist'}</td></tr>`;
+                    tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: #ef4444;">Error: ${data.error || 'Failed to load analytics'}</td></tr>`;
                 }
             } catch (err) {
                 tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: #ef4444;">Error connecting to server.</td></tr>`;
@@ -3111,9 +3149,10 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .nav-wrapper {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: auto 1fr auto;
             align-items: center;
+            gap: 2rem;
         }
 
         .logo {
@@ -3151,7 +3190,8 @@ LANDING_HTML = """<!DOCTYPE html>
         nav {
             display: flex;
             align-items: center;
-            gap: 1.8rem;
+            justify-content: center;
+            gap: 2rem;
         }
 
         nav a {
@@ -4061,11 +4101,11 @@ LANDING_HTML = """<!DOCTYPE html>
             <p>A private 6-week interactive course hosted directly inside <strong>WhatsApp</strong> and <strong>Telegram</strong>. Develop positive character, discuss healthy relationships, and lead in your community.</p>
             
             <div class="hero-actions">
-                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp">
+                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" onclick="trackClick('WhatsApp')">
                     <span>Start on WhatsApp</span>
                 </a>
                 
-                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram">
+                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" onclick="trackClick('Telegram')">
                     <span>Start on Telegram</span>
                 </a>
 
@@ -4265,7 +4305,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     </ul>
                 </div>
 
-                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" style="width: 100%;">
+                <a href="https://wa.me/2349097644444?text=Hello%20Tobi!%20I%20want%20to%20start%20learning%20on%20The%20Brothers%27%20Room" target="_blank" class="btn btn-whatsapp" style="width: 100%;" onclick="trackClick('WhatsApp')">
                     <span>Launch on WhatsApp</span>
                 </a>
             </div>
@@ -4283,7 +4323,7 @@ LANDING_HTML = """<!DOCTYPE html>
                     </ul>
                 </div>
 
-                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" style="width: 100%;">
+                <a href="https://t.me/youthhubafrica_bot" target="_blank" class="btn btn-telegram" style="width: 100%;" onclick="trackClick('Telegram')">
                     <span>Launch on Telegram</span>
                 </a>
             </div>
@@ -4550,6 +4590,17 @@ LANDING_HTML = """<!DOCTYPE html>
             }
         }
 
+        // Track CTA button clicks
+        function trackClick(platform) {
+            try {
+                fetch('/api/track_click', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ platform: platform })
+                });
+            } catch(e) {}
+        }
+
         window.addEventListener("load", () => {
             initThemeToggle();
             initMobileNav();
@@ -4578,11 +4629,12 @@ def index_route():
     return render_template_string(DASHBOARD_HTML)
 
 @app.route("/api/vote", methods=["POST"])
+@app.route("/api/track_click", methods=["POST"])
 def submit_platform_vote():
     try:
-        data = request.get_json(silent=True) or request.form
-        name = data.get("name", "").strip()
-        contact = data.get("contact", "").strip()
+        data = request.get_json(silent=True) or request.form or {}
+        name = data.get("name", "Anonymous Learner").strip()
+        contact = data.get("contact", "Landing Page CTA Click").strip()
         platform = data.get("platform", "").strip()
         
         if not platform or platform not in ["Telegram", "WhatsApp"]:
@@ -4604,7 +4656,7 @@ def submit_platform_vote():
             except Exception as mail_err:
                 logger.error(f"Failed to start waitlist confirmation email thread: {mail_err}")
                 
-        return jsonify({"success": True, "message": "Thank you! Your platform vote and waitlist details have been recorded."})
+        return jsonify({"success": True, "message": "Platform interaction tracked successfully."})
     except Exception as e:
         logger.error(f"Error saving platform vote: {e}")
         return jsonify({"success": False, "error": "An error occurred while saving your vote."}), 500
@@ -4635,32 +4687,25 @@ def activity_log_api():
         return jsonify({"error": "Unauthorized"}), 401
     return jsonify(get_activity_log())
 
+@app.route("/api/platform-analytics")
 @app.route("/api/waitlist")
-def waitlist_api():
+def platform_analytics_api():
     token = request.args.get("token")
     if token != ADMIN_TOKEN and token != "admin123":
         return jsonify({"error": "Unauthorized"}), 401
     try:
-        from db_manager import get_connection
-        conn = get_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes WHERE platform = 'WhatsApp' ORDER BY timestamp DESC")
-        rows = cursor.fetchall()
-        conn.close()
-        
-        waitlist = []
-        for row in rows:
-            waitlist.append({
-                "name": row[0],
-                "contact": row[1],
-                "platform": row[2],
-                "timestamp": str(row[3])
-            })
-        return jsonify({"success": True, "waitlist": waitlist})
+        from db_manager import get_platform_analytics
+        data = get_platform_analytics()
+        return jsonify({
+            "success": True, 
+            "analytics": data, 
+            "waitlist": data.get("recent_logs", [])
+        })
     except Exception as e:
-        logger.error(f"Error fetching waitlist: {e}")
+        logger.error(f"Error fetching platform analytics: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route("/api/platform-analytics/export")
 @app.route("/api/waitlist/export")
 def export_waitlist_csv():
     token = request.args.get("token")
@@ -4671,27 +4716,27 @@ def export_waitlist_csv():
         from db_manager import get_connection
         conn = get_connection()
         cursor = conn.cursor()
-        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes WHERE platform = 'WhatsApp' ORDER BY timestamp DESC")
+        cursor.execute("SELECT name, contact, platform, timestamp FROM platform_votes ORDER BY timestamp DESC")
         rows = cursor.fetchall()
         conn.close()
         
         # Generate CSV
         si = io.StringIO()
         cw = csv.writer(si)
-        # Headers
-        cw.writerow(["Name", "Contact Details (Phone/Email)", "Preferred Platform", "Registered At"])
+        cw.writerow(["Visitor Name", "Channel Source", "Preferred Platform", "Interaction Time"])
         
         for r in rows:
             cw.writerow([r[0], r[1], r[2], str(r[3])])
             
         output = make_response(si.getvalue())
-        output.headers["Content-Disposition"] = "attachment; filename=waitlist_export.csv"
+        output.headers["Content-Disposition"] = "attachment; filename=platform_analytics_export.csv"
         output.headers["Content-type"] = "text/csv"
         return output
     except Exception as e:
-        logger.error(f"Error exporting waitlist CSV: {e}")
+        logger.error(f"Error exporting platform analytics CSV: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
+@app.route("/api/platform-analytics/clear")
 @app.route("/api/waitlist/clear", methods=["POST"])
 def clear_waitlist_api():
     token = request.args.get("token") or (request.json.get("token") if request.is_json else None)
@@ -4704,9 +4749,9 @@ def clear_waitlist_api():
         cursor.execute("DELETE FROM platform_votes")
         conn.commit()
         conn.close()
-        return jsonify({"success": True, "message": "Waitlist database table has been successfully cleared."})
+        return jsonify({"success": True, "message": "Platform analytics logs cleared."})
     except Exception as e:
-        logger.error(f"Error clearing waitlist: {e}")
+        logger.error(f"Error clearing platform analytics: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/learners")
