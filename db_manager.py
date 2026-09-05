@@ -1,6 +1,7 @@
 import os
 import psycopg2
 import logging
+import re
 from psycopg2 import sql
 from dotenv import load_dotenv
 
@@ -9,6 +10,64 @@ logger = logging.getLogger(__name__)
 
 # Load environment variables
 load_dotenv()
+
+def sanitize_learner_name(name: str) -> str:
+    """Clean and extract a valid single-line full name from raw input or corrupted strings."""
+    if not name:
+        return ""
+    
+    raw = str(name).strip()
+    
+    # If raw input contains multiple lines or key-value formats:
+    # e.g., "Full Name: Gbaeren, Tersoo James\nEmail Address: Gbaerenjames4God@Gmail.Com\nState Of Residence: Cross River State"
+    lines = [line.strip() for line in raw.splitlines() if line.strip()]
+    
+    extracted_name = None
+    for line in lines:
+        lower_line = line.lower()
+        if lower_line.startswith("full name:") or lower_line.startswith("full name :") or lower_line.startswith("name:") or lower_line.startswith("name :"):
+            extracted_name = line.split(":", 1)[1].strip()
+            break
+            
+    if not extracted_name:
+        first_line = lines[0] if lines else raw
+        if ":" in first_line:
+            parts = first_line.split(":", 1)
+            prefix = parts[0].strip().lower()
+            if prefix in ["full name", "name", "my name", "full_name", "learner name"]:
+                extracted_name = parts[1].strip()
+            else:
+                extracted_name = first_line
+        else:
+            extracted_name = first_line
+
+    # Remove any trailing "Email Address: ..." or "State Of Residence: ..." if appended on the same line
+    extracted_name = re.sub(r'(?i)\b(email|email address|state|state of residence):.*$', '', extracted_name).strip()
+    
+    # Collapse multiple spaces / internal newlines into a single space
+    clean_name = " ".join(extracted_name.split())
+    return clean_name
+
+def cleanup_corrupted_learner_names():
+    """Sanitize existing full_name entries in the database that contain newlines or label prefixes."""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT user_id, full_name FROM learners WHERE full_name IS NOT NULL")
+        rows = cursor.fetchall()
+        updated_count = 0
+        for user_id, full_name in rows:
+            if full_name:
+                cleaned = sanitize_learner_name(full_name)
+                if cleaned != full_name:
+                    cursor.execute("UPDATE learners SET full_name = %s WHERE user_id = %s", (cleaned, user_id))
+                    updated_count += 1
+        conn.commit()
+        conn.close()
+        if updated_count > 0:
+            logger.info(f"Cleaned up {updated_count} corrupted learner name records in database.")
+    except Exception as e:
+        logger.error(f"Error cleaning up learner names: {e}")
 
 # Get database URL from environment (Railway provides this automatically)
 DATABASE_URL = os.getenv("DATABASE_URL")
@@ -176,6 +235,9 @@ def init_db():
     
     conn.commit()
     conn.close()
+    
+    # Run name cleanup migration for existing records
+    cleanup_corrupted_learner_names()
 
 def enroll_learner(user_id, language='en', full_name=None):
     """Enroll a new learner or update language preference."""
@@ -379,14 +441,15 @@ def get_pre_test_score(user_id):
     return result[0] if result else -1
 
 def update_full_name(user_id, full_name):
-    """Update learner's registered full name."""
+    """Update learner's registered full name after sanitizing it."""
+    clean_name = sanitize_learner_name(full_name)
     conn = get_connection()
     cursor = conn.cursor()
     cursor.execute("""
         UPDATE learners 
         SET full_name = %s, last_activity = CURRENT_TIMESTAMP
         WHERE user_id = %s
-    """, (full_name, user_id))
+    """, (clean_name, user_id))
     conn.commit()
     conn.close()
 

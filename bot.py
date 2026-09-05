@@ -2241,6 +2241,12 @@ def generate_certificate_image(name, date_str, user_id):
     """Generate a highly aesthetic, premium, high-resolution certificate of completion using Pillow."""
     import hashlib
     from PIL import Image, ImageDraw, ImageFont
+    from db_manager import sanitize_learner_name
+    
+    clean_name = sanitize_learner_name(name)
+    if not clean_name:
+        clean_name = "Participant"
+    clean_name = clean_name.title()
     
     width, height = 2000, 1418
     
@@ -2280,9 +2286,7 @@ def generate_certificate_image(name, date_str, user_id):
     paste_transparent_pro("ford_logo.png", 120, 100, target_width=240)
     
     # Paste top-right organization logos side-by-side
-    # 1. YouthHub Africa logo on the right (target height = 130px, aspect is ~1.10, so width is ~118px)
     yh_w, yh_h = paste_transparent_pro("youthhub_africa_logo.png", 2000 - 120, 95, target_width=118, align_right=True)
-    # 2. Young Men's Foundation logo to the left (target height = 130px, aspect is ~0.84, so width is ~155px)
     ym_w, ym_h = paste_transparent_pro("young_mens_foundation_logo.png", 2000 - 120 - yh_w - 20, 95, target_width=155, align_right=True)
 
     # Outer navy border line
@@ -2303,7 +2307,23 @@ def generate_certificate_image(name, date_str, user_id):
         font_cert = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 115)
         font_of_completion = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 52)
         font_presented = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 38)
-        font_name = ImageFont.truetype(os.path.join(fonts_dir, "DancingScript-Bold.ttf"), 125)
+        
+        # Dynamic auto-scaling font size for recipient name (max width: 1400px)
+        max_name_w = 1400
+        font_name_path = os.path.join(fonts_dir, "DancingScript-Bold.ttf")
+        font_name = None
+        if os.path.exists(font_name_path):
+            for sz in range(120, 45, -5):
+                f_cand = ImageFont.truetype(font_name_path, sz)
+                bbox = draw.textbbox((0, 0), clean_name, font=f_cand)
+                if (bbox[2] - bbox[0]) <= max_name_w:
+                    font_name = f_cand
+                    break
+            if not font_name:
+                font_name = ImageFont.truetype(font_name_path, 45)
+        else:
+            font_name = ImageFont.truetype("Times New Roman.ttf", 115)
+            
         font_desc = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 32)
         font_course = ImageFont.truetype(os.path.join(fonts_dir, "NotoSerif-Bold.ttf"), 44)
         font_sig_name = ImageFont.truetype(os.path.join(fonts_dir, "Outfit-Regular.ttf"), 36)
@@ -2315,7 +2335,7 @@ def generate_certificate_image(name, date_str, user_id):
             font_cert = ImageFont.truetype("Arial.ttf", 115)
             font_of_completion = ImageFont.truetype("Arial.ttf", 52)
             font_presented = ImageFont.truetype("Arial.ttf", 38)
-            font_name = ImageFont.truetype("Times New Roman.ttf", 125)
+            font_name = ImageFont.truetype("Times New Roman.ttf", 115)
             font_desc = ImageFont.truetype("Arial.ttf", 32)
             font_course = ImageFont.truetype("Times New Roman.ttf", 44)
             font_sig_name = ImageFont.truetype("Arial.ttf", 36)
@@ -2331,7 +2351,7 @@ def generate_certificate_image(name, date_str, user_id):
     
     # Recipient Section
     draw.text((1000, 570), "Presented to", fill=c_gray, font=font_presented, anchor="mm")
-    draw.text((1000, 700), name.title(), fill=c_navy, font=font_name, anchor="mm")
+    draw.text((1000, 700), clean_name, fill=c_navy, font=font_name, anchor="mm")
     
     # Description Section
     draw.text((1000, 830), "for successfully completing the 6-week conversational course on", fill=c_gray, font=font_desc, anchor="mm")
@@ -2339,7 +2359,6 @@ def generate_certificate_image(name, date_str, user_id):
     
     # Bottom Left - Rotimi Olawale (Executive Director) Signatory
     sig_x = 480
-    # Paste actual transparent signature of Rotimi Olawale centered at sig_x, and placed nicely ABOVE the gold line (align_bottom=True)
     paste_transparent_pro("rotimi_signature.png", sig_x - 170, 1140, target_width=340, align_bottom=True)
     
     draw.line([(sig_x - 180, 1145), (sig_x + 180, 1145)], fill=c_gold, width=3)
@@ -2348,7 +2367,6 @@ def generate_certificate_image(name, date_str, user_id):
     
     # Bottom Right - Date of Issuance
     date_x = 2000 - 480
-    # Line removed as requested by the user!
     draw.text((date_x, 1190), date_str, fill=c_charcoal, font=font_sig_name, anchor="mm")
     draw.text((date_x, 1235), "DATE OF ISSUANCE", fill=c_gray, font=font_sig_title, anchor="mm")
     
@@ -3542,8 +3560,25 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
     # Intercept full name onboarding step
     if context.user_data.get("awaiting_full_name"):
         context.user_data.pop("awaiting_full_name", None)
-        full_name = user_message.strip()
-        update_full_name(user_id, full_name)
+        import re
+        from db_manager import sanitize_learner_name, update_email, update_state
+        
+        raw_input = user_message.strip()
+        clean_name = sanitize_learner_name(raw_input)
+        update_full_name(user_id, clean_name)
+        
+        # Smart extraction: check if the user pasted email or state in the block
+        email_match = re.search(r'(?i)\b(?:email|email address)\s*:\s*([^\s\n]+@[^\s\n]+)', raw_input)
+        if not email_match:
+            email_match = re.search(r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b', raw_input)
+        if email_match:
+            extracted_email = email_match.group(1 if email_match.groups() else 0).strip()
+            update_email(user_id, extracted_email)
+            
+        state_match = re.search(r'(?i)\b(?:state|state of residence)\s*:\s*([^\n]+)', raw_input)
+        if state_match:
+            extracted_state = state_match.group(1).strip()
+            update_state(user_id, extracted_state)
         
         # Move to age onboarding step
         context.user_data["awaiting_age"] = True
