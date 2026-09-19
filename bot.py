@@ -791,22 +791,9 @@ async def process_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE
 
 async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
     """Send a reply that works for both commands and callback queries, and handles accessibility voice notes if enabled."""
-    target_msg = None
-    if update.callback_query:
-        target_msg = await update.callback_query.message.reply_text(
-            text,
-            reply_markup=reply_markup,
-            parse_mode=parse_mode
-        )
-    elif update.message:
-        target_msg = await update.message.reply_text(
-            text,
-            reply_markup=reply_markup,
-            parse_mode=parse_mode
-        )
-        
-    # Check for voice accessibility preference (ENABLED)
     user_id = update.effective_user.id if update.effective_user else None
+    
+    # Check for voice accessibility preference (ENABLED)
     if user_id and get_voice_responses(user_id):
         # Clean text of raw markdown formatting for a natural audio reading experience
         clean_text = clean_text_for_tts(text)
@@ -820,8 +807,15 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
         if success:
             try:
                 chat_msg = update.callback_query.message if update.callback_query else update.message
-                with open(output_filename, "rb") as voice_file:
-                    await chat_msg.reply_voice(voice=voice_file)
+                if chat_msg:
+                    with open(output_filename, "rb") as voice_file:
+                        target_msg = await chat_msg.reply_voice(voice=voice_file, reply_markup=reply_markup)
+                    if update.callback_query:
+                        try:
+                            await update.callback_query.answer()
+                        except Exception:
+                            pass
+                    return target_msg
             except Exception as e:
                 logger.error(f"Error sending synthesized voice reply: {e}")
             finally:
@@ -830,6 +824,22 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
                         os.remove(output_filename)
                     except Exception:
                         pass
+
+    # Send text reply (when voice responses are disabled or synthesis failed)
+    target_msg = None
+    if update.callback_query:
+        target_msg = await update.callback_query.message.reply_text(
+            text,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode
+        )
+    elif update.message:
+        target_msg = await update.message.reply_text(
+            text,
+            reply_markup=reply_markup,
+            parse_mode=parse_mode
+        )
+    return target_msg
 
 
 # ============== GRADUATION HOOKS FOR A4 CERTIFICATE LIFECYCLE ==============
@@ -2898,8 +2908,8 @@ async def accessibility_command(update: Update, context: ContextTypes.DEFAULT_TY
     set_voice_responses(user_id, new_status)
     
     status_text = {
-        "en": f"Accessibility Voice Replies have been {'ENABLED' if new_status else 'DISABLED'}. The bot will now {'send audio voice notes alongside text messages' if new_status else 'only send text messages'}.",
-        "pcm": f"Accessibility Voice Replies don {'START' if new_status else 'STOP'}. Bot go now {'dey send voice notes as well' if new_status else 'dey send text only'}.",
+        "en": f"Accessibility Voice Replies have been {'ENABLED' if new_status else 'DISABLED'}. The bot will now {'send audio voice notes instead of text messages' if new_status else 'only send text messages'}.",
+        "pcm": f"Accessibility Voice Replies don {'START' if new_status else 'STOP'}. Bot go now {'dey send voice notes instead of text' if new_status else 'dey send text only'}.",
         "ha": f"Accessibility Voice Replies an {'KUNNA' if new_status else 'KASHE'}.",
         "yo": f"Accessibility Voice Replies ti jẹ́ {'MÚ KÚN' if new_status else 'MÚ KÚRÒ'}.",
         "ig": f"Accessibility Voice Replies abanyela {'MERE' if new_status else 'PAA'}."
@@ -2929,32 +2939,10 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
             
         if transcription:
             # Automatically enable voice replies since they are interacting via voice!
-            is_newly_enabled = False
             if not get_voice_responses(user_id):
                 set_voice_responses(user_id, True)
-                is_newly_enabled = True
                 
-            # Display transcribed text back for clarity
-            if is_newly_enabled:
-                heard_msg = {
-                    "en": f"🎤 *I heard:* \"{transcription}\"\n\n🔊 _Voice replies have been automatically enabled for you!_",
-                    "pcm": f"🎤 *Wetin I hear:* \"{transcription}\"\n\n🔊 _Voice replies don start automatically for you!_",
-                    "ha": f"🎤 *Abin da na ji:* \"{transcription}\"\n\n🔊 _An kunna amsoshin murya ta atomatik a gare ku!_",
-                    "yo": f"🎤 *Ohun tí mo gbọ́:* \"{transcription}\"\n\n🔊 _A ti mu ohun ṣiṣẹ laifọwọyi fun ọ!_",
-                    "ig": f"🎤 *Ihe m nụrụ:* \"{transcription}\"\n\n🔊 _Agbanyere olu azịza na-akpaghị aka maka gị!_"
-                }.get(lang, f"🎤 *I heard:* \"{transcription}\"")
-            else:
-                heard_msg = {
-                    "en": f"🎤 *I heard:* \"{transcription}\"",
-                    "pcm": f"🎤 *Wetin I hear:* \"{transcription}\"",
-                    "ha": f"🎤 *Abin da na ji:* \"{transcription}\"",
-                    "yo": f"🎤 *Ohun tí mo gbọ́:* \"{transcription}\"",
-                    "ig": f"🎤 *Ihe m nụrụ:* \"{transcription}\""
-                }.get(lang, f"🎤 *I heard:* \"{transcription}\"")
-            
-            await update.message.reply_text(heard_msg, parse_mode="Markdown")
-            
-            # Pipe transcription text straight into handle_message handler
+            # Pipe transcription text straight into handle_message handler (which handles sending the voice reply)
             await handle_message(update, context, user_message=transcription)
         else:
             fail_msg = {
@@ -3453,8 +3441,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
         if new_status:
             voice_status_full = {
-                "en": "Accessibility Voice Replies have been ENABLED. The bot will now send audio voice notes alongside text messages.",
-                "pcm": "Accessibility Voice Replies don START. Bot go now dey send voice notes as well.",
+                "en": "Accessibility Voice Replies have been ENABLED. The bot will now send audio voice notes instead of text messages.",
+                "pcm": "Accessibility Voice Replies don START. Bot go now dey send voice notes instead of text.",
                 "ha": "Accessibility Voice Replies an KUNNA.",
                 "yo": "Accessibility Voice Replies ti jẹ́ MÚ KÚN.",
                 "ig": "Accessibility Voice Replies abanyela MERE."

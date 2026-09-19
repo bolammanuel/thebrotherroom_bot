@@ -921,11 +921,11 @@
     "ig": "Agụchala m Modul {module_num} na The Brothers' Room! Nke a bụ ihe ọmụmụ dị mkpa: \"{quote}\"\n\nSoro anyị n'ije maka ịkwado ụmụ nwoke ebe a: https://t.me/youthhubafrica_bot"
   },
   "ask_voice_preference": {
-    "en": "Accessibility: Would you like to enable the Voice Version? 🔊\n\nIf enabled, the bot will send audio voice notes alongside all text lessons. This is helpful if you have difficulty reading, are visually impaired, or prefer listening.",
-    "pcm": "Accessibility: You wan make the bot dey read all lessons as voice notes? 🔊\n\nIf you click Yes, the bot go dey send audio voice notes follow the text messages. E good for brothers wey get small eye problem, or wey like to listen to audio.",
-    "ha": "Samun Dama: Kuna son kunna Muryar Darussa? 🔊\n\nIdan an kunna, bot zai aika da muryar saumi tare da duk darussan rubutu. Wannan yana da amfani idan kuna da wahalar karatu, rashin gani sosai, ko kuma kuka fi son saurare.",
-    "yo": "Irọrun: Ṣe o fẹ ki a fi ohun ranṣẹ si ọ? 🔊\n\nTi o ba mu bẹẹni, bot yoo ma fi ohun ranṣẹ pẹlu gbogbo awọn ẹkọ kikọ. Eyi wulo ti o ba nira lati kawe, ti o ba ni iṣoro oju, tabi ti o ba fẹran lati tẹtisi ohun.",
-    "ig": "Nnweta: Ị ga-achọ ka bot a na-agụpụta ihe ọmụmụ n'olu? 🔊\n\nỌ bụrụ na ị mee ya, bot ga-ezitere gị ndekọ olu yana ederede ihe ọmụmụ niile. Nke a na-enyere aka ma ọ bụrụ na ị na-enwe nsogbu ịgụ ihe, nsogbu anya, ma ọ bụ na-ahọrọ ịnụ olu."
+    "en": "Accessibility: Would you like to enable the Voice Version? 🔊\n\nIf enabled, the bot will send audio voice notes for all lessons instead of text messages. This is helpful if you have difficulty reading, are visually impaired, or prefer listening.",
+    "pcm": "Accessibility: You wan make the bot dey read all lessons as voice notes? 🔊\n\nIf you click Yes, the bot go dey send audio voice notes instead of text messages. E good for brothers wey get small eye problem, or wey like to listen to audio.",
+    "ha": "Samun Dama: Kuna son kunna Muryar Darussa? 🔊\n\nIdan an kunna, bot zai aika da muryar saumi maimakon rubutu. Wannan yana da amfani idan kuna da wahalar karatu, rashin gani sosai, ko kuma kuka fi son saurare.",
+    "yo": "Irọrun: Ṣe o fẹ ki a fi ohun ranṣẹ si ọ? 🔊\n\nTi o ba mu bẹẹni, bot yoo ma fi ohun ranṣẹ dipo awọn ẹkọ kikọ. Eyi wulo ti o ba nira lati kawe, ti o ba ni iṣoro oju, tabi ti o ba fẹran lati tẹtisi ohun.",
+    "ig": "Nnweta: Ị ga-achọ ka bot a na-agụpụta ihe ọmụmụ n'olu? 🔊\n\nỌ bụrụ na ị mee ya, bot ga-ezitere gị ndekọ olu kama ederede ihe ọmụmụ niile. Nke a na-enyere aka ma ọ bụrụ na ị na-enwe nsogbu ịgụ ihe, nsogbu anya, ma ọ bụ na-ahọrọ ịnụ olu."
   },
   "ask_data_consent": {
     "en": "Data Privacy Consent 🔒\n\nTo enroll you in the course, save your learning progress, and dynamically generate & email your Certificate of Completion, we need to collect and securely store your:\n• Full Name\n• Email Address\n• State of residence\n\nWe do not share your data with anyone. Do you consent to this?",
