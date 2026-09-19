@@ -4391,9 +4391,280 @@ LANDING_HTML = """<!DOCTYPE html>
             .safety-section,
             .testimonials-section,
             .faq-section,
+            .privacy-section,
             .cta-banner {
                 padding: 3rem 0;
             }
+        }
+
+        /* Privacy Policy Section & Modal Styling */
+        .privacy-section {
+            padding: 5rem 0;
+        }
+
+        .privacy-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-lg);
+            transition: var(--transition);
+        }
+
+        .privacy-card-header {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .privacy-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--brand-green-subtle);
+            color: var(--brand-green-hover);
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 0.35rem 0.85rem;
+            border-radius: 100px;
+            width: fit-content;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+        }
+
+        body.dark-mode .privacy-badge {
+            background: rgba(22, 163, 74, 0.2);
+            color: #4ade80;
+        }
+
+        .privacy-intro-text {
+            color: var(--text-secondary);
+            font-size: 1.05rem;
+            line-height: 1.7;
+        }
+
+        .privacy-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .privacy-principle-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .privacy-icon-box {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--brand-green);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .privacy-principle-card h4 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.35rem;
+        }
+
+        .privacy-principle-card p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        .privacy-accordion {
+            margin-top: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .privacy-acc-item {
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            overflow: hidden;
+            background: var(--bg-card);
+            transition: var(--transition);
+        }
+
+        .privacy-acc-trigger {
+            width: 100%;
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: left;
+        }
+
+        .privacy-acc-trigger:hover {
+            background: var(--bg-surface);
+        }
+
+        .privacy-acc-content {
+            display: none;
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.7;
+            border-top: 1px dashed var(--border-color);
+            margin-top: 0.5rem;
+            padding-top: 1rem;
+        }
+
+        .privacy-acc-item.active .privacy-acc-content {
+            display: block;
+        }
+
+        .privacy-acc-item.active .privacy-acc-icon {
+            transform: rotate(180deg);
+        }
+
+        .privacy-acc-icon {
+            transition: transform 0.25s ease;
+        }
+
+        .privacy-actions {
+            margin-top: 2.5rem;
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Modal Overlay Styling */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(8px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-window {
+            background: var(--bg-card);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 850px;
+            max-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35);
+            transform: scale(0.95);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-window {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-surface);
+        }
+
+        .modal-header h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+        }
+
+        .modal-close-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .modal-close-btn:hover {
+            color: var(--text-primary);
+            background: var(--border-color);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            font-size: 0.98rem;
+            line-height: 1.7;
+            color: var(--text-secondary);
+        }
+
+        .modal-body h4 {
+            font-size: 1.15rem;
+            color: var(--text-primary);
+            margin: 1.5rem 0 0.5rem 0;
+        }
+
+        .modal-body ul {
+            padding-left: 1.25rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-body li {
+            margin-bottom: 0.35rem;
+        }
+
+        .modal-footer {
+            padding: 1.25rem 2rem;
+            border-top: 1px solid var(--border-color);
+            background: var(--bg-surface);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
         }
     </style>
 </head>
@@ -4416,6 +4687,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 <a href="#platforms">Platforms</a>
                 <a href="#safety">Safety</a>
                 <a href="#faq">FAQ</a>
+                <a href="#privacy">Privacy Policy</a>
             </nav>
 
             <div class="header-actions">
@@ -4845,7 +5117,177 @@ LANDING_HTML = """<!DOCTYPE html>
                     <svg class="faq-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
                 </button>
                 <div class="faq-answer" id="faq-ans-4" role="region" aria-labelledby="faq-q-4">
-                    Absolutely. Your personal responses are private and confidential. You are never required to provide sensitive personal identification.
+                    Absolutely. Your personal responses are private and confidential. You are never required to provide sensitive personal identification. Read our complete <a href="#privacy" onclick="openPrivacyModal(); return false;" style="color: var(--brand-green); font-weight: 600; text-decoration: underline;">YouthHubAfrica Data Privacy Policy</a>.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Privacy Policy Section -->
+    <section class="privacy-section container" id="privacy">
+        <div class="section-header">
+            <span class="section-tag">YouthHubAfrica Policy</span>
+            <h2>Data Privacy Policy</h2>
+            <p>We are committed to protecting your personal information with full transparency, fairness, and security.</p>
+        </div>
+
+        <div class="privacy-card">
+            <div class="privacy-card-header">
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+                    <span class="privacy-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        YOUR DATA PRIVACY IS PROTECTED
+                    </span>
+                    <a href="https://youthhubafrica.org/data-privacy-policy/" target="_blank" rel="noopener noreferrer" style="font-weight: 600; font-size: 0.9rem; color: var(--brand-green); text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem;">
+                        View Official Link 
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                    </a>
+                </div>
+                <p class="privacy-intro-text" style="margin-top: 1rem;">
+                    YouthHubAfrica takes the privacy of all donors, beneficiaries, volunteers, consultants, vendors, and every stakeholder very seriously. This Data Privacy Policy stipulates the basis for the collection, use, and disclosure of personal data by YouthHubAfrica in line with applicable data protection laws (including NDPC guidelines).
+                </p>
+            </div>
+
+            <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;">Our Privacy Core Principles</h3>
+            <div class="privacy-grid">
+                <div class="privacy-principle-card">
+                    <div class="privacy-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    </div>
+                    <div>
+                        <h4>Fair & Transparent Processing</h4>
+                        <p>Your Personal Data is processed lawfully, fairly, and with total transparency.</p>
+                    </div>
+                </div>
+
+                <div class="privacy-principle-card">
+                    <div class="privacy-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                    </div>
+                    <div>
+                        <h4>Strict Data Security</h4>
+                        <p>We implement technical and organizational controls to protect against unauthorized access or theft.</p>
+                    </div>
+                </div>
+
+                <div class="privacy-principle-card">
+                    <div class="privacy-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"></line></svg>
+                    </div>
+                    <div>
+                        <h4>Zero Selling of Data</h4>
+                        <p>YouthHubAfrica will never sell your personal data or permit partners to sell your information.</p>
+                    </div>
+                </div>
+
+                <div class="privacy-principle-card">
+                    <div class="privacy-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <div>
+                        <h4>Protection of Minors</h4>
+                        <p>We respect children's privacy and require parent/guardian consent for participants under 18.</p>
+                    </div>
+                </div>
+
+                <div class="privacy-principle-card">
+                    <div class="privacy-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                    </div>
+                    <div>
+                        <h4>Respect for User Rights</h4>
+                        <p>You maintain full rights to access, rectify, request erasure, or withdraw your consent anytime.</p>
+                    </div>
+                </div>
+
+                <div class="privacy-principle-card">
+                    <div class="privacy-icon-box">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    </div>
+                    <div>
+                        <h4>72-Hour Breach Policy</h4>
+                        <p>Data breaches are reported to authorities within 72 hrs and affected subjects within 7 days.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Expandable Accordion for Policy Details -->
+            <div class="privacy-accordion">
+                <div class="privacy-acc-item">
+                    <button type="button" class="privacy-acc-trigger" onclick="togglePrivacyAcc(this)">
+                        <span>1. Scope & Definitions of Personal Data</span>
+                        <svg class="privacy-acc-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="privacy-acc-content">
+                        <p>Personal Data comprises all details we hold or collect directly or indirectly, including offline or online data that makes a person identifiable such as names, addresses, phone numbers, passport IDs, usernames, passwords, digital footprints, photographs, stories, and narrations.</p>
+                    </div>
+                </div>
+
+                <div class="privacy-acc-item">
+                    <button type="button" class="privacy-acc-trigger" onclick="togglePrivacyAcc(this)">
+                        <span>2. How & What Data We Collect</span>
+                        <svg class="privacy-acc-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="privacy-acc-content">
+                        <p>We collect data via registration forms, polls, surveys, application forms, recorded calls, live chat, chatbots, and web analytics tags.</p>
+                        <ul style="margin-top:0.5rem; padding-left:1.25rem;">
+                            <li><strong>Contact Details:</strong> Name, email address, home/office address, phone number.</li>
+                            <li><strong>Identification:</strong> Date of birth, national identity number, BVN, passport or driving licence details.</li>
+                            <li><strong>Financial Info:</strong> Bank details where relevant for vendors/consultants.</li>
+                            <li><strong>Sensitive Data:</strong> Health details, marital status, and narrative stories shared with consent.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="privacy-acc-item">
+                    <button type="button" class="privacy-acc-trigger" onclick="togglePrivacyAcc(this)">
+                        <span>3. How We Use & Share Your Data</span>
+                        <svg class="privacy-acc-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="privacy-acc-content">
+                        <p>We process your data to include you in our projects, advocacies, and programs, use secure cloud storage, comply with legal regulations (FIRS, NDPC, NFIU, EFCC), and fulfill public interest goals. We share data internally only with authorized personnel and externally strictly when required by law or regulatory directives.</p>
+                    </div>
+                </div>
+
+                <div class="privacy-acc-item">
+                    <button type="button" class="privacy-acc-trigger" onclick="togglePrivacyAcc(this)">
+                        <span>4. Contact Information & Data Protection Authority</span>
+                        <svg class="privacy-acc-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                    </button>
+                    <div class="privacy-acc-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.25rem; margin-top: 0.5rem;">
+                            <div style="background: var(--bg-surface); padding: 1rem; border-radius: 12px;">
+                                <strong style="color: var(--text-primary); display:block; margin-bottom: 0.25rem;">The Compliance Officer</strong>
+                                <span>YouthHubAfrica</span><br>
+                                <span>26 Messenya Street, off Cotonou Street, Wuse Zone 6, Abuja, Nigeria</span><br>
+                                <span>Phone: +234 (0) 9097544444</span><br>
+                                <span>Email: <a href="mailto:info@youthhubafrica.org" style="color: var(--brand-green);">info@youthhubafrica.org</a></span>
+                            </div>
+                            <div style="background: var(--bg-surface); padding: 1rem; border-radius: 12px;">
+                                <strong style="color: var(--text-primary); display:block; margin-bottom: 0.25rem;">Regulator (NDPC)</strong>
+                                <span>Nigeria Data Protection Commission</span><br>
+                                <span>12 DR Clement Isong Street, Abuja, Nigeria</span><br>
+                                <span>Tel: +234 (0) 916 061 5551</span><br>
+                                <span>Email: <a href="mailto:info@ndpc.gov.ng" style="color: var(--brand-green);">info@ndpc.gov.ng</a></span><br>
+                                <span>Web: <a href="https://www.ndpc.gov.ng" target="_blank" style="color: var(--brand-green);">www.ndpc.gov.ng</a></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="privacy-actions">
+                <div style="display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.88rem;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    <span>Last Updated: 2026</span>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-header-cta" style="padding: 0.6rem 1.25rem;" onclick="openPrivacyModal()">
+                        <span>Read Complete Privacy Policy Document</span>
+                    </button>
+                    <a href="https://youthhubafrica.org/data-privacy-policy/" target="_blank" rel="noopener noreferrer" class="btn" style="background: var(--bg-surface); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.6rem 1.25rem; border-radius: 12px; text-decoration: none;">
+                        <span>Open YouthHubAfrica Site ↗</span>
+                    </a>
                 </div>
             </div>
         </div>
@@ -4875,11 +5317,12 @@ LANDING_HTML = """<!DOCTYPE html>
             <div class="footer-copy">
                 <span>© 2026 The Brothers' Room. A YouthHubAfrica Initiative.</span>
             </div>
-            <nav aria-label="Footer Navigation" style="display:flex; gap:1.5rem;">
+            <nav aria-label="Footer Navigation" style="display:flex; gap:1.5rem; flex-wrap:wrap;">
                 <a href="#curriculum">Curriculum</a>
                 <a href="#platforms">Platforms</a>
                 <a href="#safety">Safety</a>
                 <a href="#faq">FAQ</a>
+                <a href="#privacy">Privacy Policy</a>
             </nav>
         </div>
     </footer>
@@ -5001,11 +5444,187 @@ LANDING_HTML = """<!DOCTYPE html>
             } catch(e) {}
         }
 
+        function togglePrivacyAcc(element) {
+            const item = element.parentElement;
+            const isExpanding = !item.classList.contains("active");
+            document.querySelectorAll(".privacy-acc-item").forEach(other => {
+                other.classList.remove("active");
+            });
+            if (isExpanding) {
+                item.classList.add("active");
+            }
+        }
+
+        function openPrivacyModal() {
+            const modal = document.getElementById("privacy-modal");
+            if (modal) {
+                modal.style.display = "flex";
+                setTimeout(() => modal.classList.add("active"), 10);
+                document.body.style.overflow = "hidden";
+            }
+        }
+
+        function closePrivacyModal() {
+            const modal = document.getElementById("privacy-modal");
+            if (modal) {
+                modal.classList.remove("active");
+                setTimeout(() => {
+                    modal.style.display = "none";
+                    document.body.style.overflow = "";
+                }, 300);
+            }
+        }
+
+        function handleModalOverlayClick(e) {
+            if (e.target.id === "privacy-modal") {
+                closePrivacyModal();
+            }
+        }
+
+        document.addEventListener("keydown", (e) => {
+            if (e.key === "Escape") {
+                closePrivacyModal();
+            }
+        });
+
         window.addEventListener("load", () => {
             initThemeToggle();
             initMobileNav();
         });
     </script>
+
+    <!-- Interactive Privacy Policy Modal -->
+    <div id="privacy-modal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="privacy-modal-title" onclick="handleModalOverlayClick(event)">
+        <div class="modal-window">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div class="privacy-icon-box" style="width: 32px; height: 32px;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    </div>
+                    <h3 id="privacy-modal-title">YouthHubAfrica Data Privacy Policy</h3>
+                </div>
+                <button type="button" class="modal-close-btn" onclick="closePrivacyModal()" aria-label="Close modal">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <div style="background: var(--brand-green-subtle); color: var(--brand-green-hover); padding: 0.85rem 1.25rem; border-radius: 12px; margin-bottom: 1.5rem; font-weight: 700; font-size: 0.9rem;">
+                    YOUR DATA PRIVACY IS PROTECTED
+                </div>
+
+                <p>YouthHubAfrica takes the privacy of all donors, beneficiaries, volunteers, consultants, vendors and every other stakeholder with which we interact very seriously. This Data Privacy Policy stipulates the basis for the collection, use and disclosure of personal data by YouthHubAfrica in line with applicable data protection laws.</p>
+                
+                <p style="margin-top: 0.75rem;">Personal Data comprises all the details we hold or collect on all parties directly or indirectly and includes any offline or online data that makes a person identifiable such as names, addresses, phone number, passport ID, usernames, passwords, digital footprints, photographs, stories, narrations (hereinafter collectively referred to as “Personal Data”). These data may be received from third parties or collected using our website(s), online forms and other digital channels.</p>
+                
+                <p style="margin-top: 0.75rem;">With this policy, we ensure that we gather, store and handle data fairly, transparently and with respect towards individual rights. For the purposes of this Privacy Policy, references to "we" or "us" shall refer to YouthHubAfrica as an organisation.</p>
+
+                <p style="margin-top: 0.75rem;">From time to time, we may need to make changes to this privacy policy, for example, as a result of government regulations, new technologies, or other developments in data protection laws or privacy generally. You should check the YouthHubAfrica website periodically to view the most up to date privacy policy.</p>
+
+                <h4>Our Privacy Principles</h4>
+                <ul>
+                    <li>Personal Data you provide is processed fairly, lawfully and in a transparent manner.</li>
+                    <li>Personal Data you provide is collected for a specific purpose and is not processed in a way which is incompatible with the purpose which YouthHubAfrica collected it.</li>
+                    <li>Your Personal Data is adequate, relevant and limited to what is necessary in relation to the purposes for which it is processed.</li>
+                    <li>Your Personal Data is kept accurate and, where necessary, kept up to date.</li>
+                    <li>Your Personal Data is kept no longer than is necessary for the purposes for which it is processed.</li>
+                    <li>We will take appropriate steps to keep your Personal Data secure.</li>
+                    <li>Your Personal Data is processed in accordance with your rights.</li>
+                    <li>We will only transfer your Personal Data outside Nigeria where required steps have been taken to ensure protection.</li>
+                    <li>YouthHubAfrica will not sell your Personal Data and will not permit the selling of your data by any organisation that partners with us.</li>
+                </ul>
+
+                <h4>How Do We Collect Your Personal Data?</h4>
+                <p>We collect Personal Data directly from you:</p>
+                <ul>
+                    <li>Via enquiry, registration, feedback forms and forums</li>
+                    <li>When you fill out a survey or vote in a poll on our website</li>
+                    <li>Through quotes and application forms</li>
+                    <li>Via telephone calls (which may be recorded)</li>
+                    <li>When you provide your details to us either online or offline</li>
+                    <li>Via live chat, chatbot and profilers</li>
+                    <li>Through web analytics tags</li>
+                </ul>
+
+                <h4>What Personal Data Do We Collect?</h4>
+                <p>The information we collect depends on our relationship with you.</p>
+                <ul>
+                    <li>Contact details such as name, email address, home/office address and telephone number</li>
+                    <li>Identification information such as date of birth, national identity number, BVN, passport or driving licence details</li>
+                    <li>Financial information such as bank details</li>
+                    <li>Sensitive Personal Data including health details, sexual orientation, marital status and other personal details that may enable us to tell a story</li>
+                </ul>
+
+                <h4>Privacy of Children</h4>
+                <p>We respect the privacy of children. We do not knowingly collect Personal Data from children except where required to register them as beneficiaries for ongoing projects. We take the personal data of minors under 18 seriously and may contact parents or guardians for consent.</p>
+
+                <h4>How Do We Use Your Personal Data?</h4>
+                <p>Under applicable data protection laws, we require a legal ground to process your Personal Data. We may process your data:</p>
+                <ul>
+                    <li>To incorporate you in our projects, advocacies and programs</li>
+                    <li>To use cloud storage solutions within or outside Nigeria</li>
+                    <li>To comply with legal or regulatory obligations</li>
+                    <li>To comply with directives from authorities such as FIRS, NDPC, NFIU and EFCC</li>
+                    <li>To establish, exercise or defend legal rights</li>
+                    <li>For substantial public interest purposes such as anti-money laundering checks</li>
+                    <li>To resolve complaints or other issues</li>
+                    <li>Where you have provided your consent</li>
+                </ul>
+
+                <h4>Who Do We Share Your Personal Data With?</h4>
+                <p>We may share your Personal Data with employees who need it for legitimate purposes. We do not share Personal Data outside YouthHubAfrica except:</p>
+                <ul>
+                    <li>Where required by law or regulatory bodies</li>
+                    <li>To prevent or detect criminal activity</li>
+                    <li>Where exemptions under data protection legislation apply</li>
+                </ul>
+
+                <h4>How Long Do We Keep Records?</h4>
+                <p>We retain Personal Data for as long as reasonably necessary to fulfil the purposes outlined in this policy and to comply with legal and regulatory obligations.</p>
+
+                <h4>Your Rights</h4>
+                <ul>
+                    <li>The right to access your Personal Data</li>
+                    <li>The right to rectification</li>
+                    <li>The right to erasure</li>
+                    <li>The right to restriction of processing</li>
+                    <li>The right to data portability</li>
+                    <li>The right to withdraw consent</li>
+                </ul>
+                <p>You may request access, updates, corrections, deletion or restriction of your Personal Data. We will respond within timelines required by applicable law.</p>
+
+                <h4>How We Protect Personal Data</h4>
+                <ul>
+                    <li>We implement strict measures and technologies to prevent data theft and intrusion.</li>
+                    <li>Our employees are trained in data protection and security.</li>
+                </ul>
+
+                <h4>Breach / Privacy Violation</h4>
+                <p>In the event of a data breach, YouthHubAfrica will report the breach to relevant authorities within 72 hours and notify affected Data Subjects within 7 days, in accordance with applicable law.</p>
+
+                <h4>Contact Information</h4>
+                <p><strong>The Compliance Officer</strong><br>
+                YouthHubAfrica<br>
+                26, Messenya Street, off Cotonou Street,<br>
+                Wuse Zone 6, Abuja, Nigeria<br>
+                General Enquiries: +234 (0) 9097544444<br>
+                Email: <a href="mailto:info@youthhubafrica.org" style="color: var(--brand-green);">info@youthhubafrica.org</a></p>
+
+                <p style="margin-top: 1rem;"><strong>Nigeria Data Protection Commission (NDPC)</strong><br>
+                12, DR Clement Isong Street, Abuja, Nigeria<br>
+                Tel: +234 (0) 916 061 5551<br>
+                Email: <a href="mailto:info@ndpc.gov.ng" style="color: var(--brand-green);">info@ndpc.gov.ng</a><br>
+                Website: <a href="https://www.ndpc.gov.ng" target="_blank" rel="noopener noreferrer" style="color: var(--brand-green);">www.ndpc.gov.ng</a></p>
+            </div>
+
+            <div class="modal-footer">
+                <span style="font-size: 0.85rem; color: var(--text-muted);">Source: <a href="https://youthhubafrica.org/data-privacy-policy/" target="_blank" rel="noopener noreferrer" style="color: var(--brand-green);">youthhubafrica.org/data-privacy-policy/</a></span>
+                <button type="button" class="btn btn-header-cta" style="padding: 0.5rem 1.25rem;" onclick="closePrivacyModal()">
+                    <span>Close Window</span>
+                </button>
+            </div>
+        </div>
+    </div>
 </body>
 </html>"""
 
@@ -5022,6 +5641,17 @@ def favicon():
 @app.route("/")
 def landing_route():
     return render_template_string(LANDING_HTML)
+
+@app.route("/privacy")
+@app.route("/data-privacy-policy")
+def privacy_route():
+    return render_template_string(LANDING_HTML + """
+    <script>
+        window.addEventListener("load", () => {
+            setTimeout(openPrivacyModal, 200);
+        });
+    </script>
+    """)
 
 
 @app.route("/dashboard")
