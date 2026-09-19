@@ -3127,6 +3127,43 @@ LANDING_HTML = """<!DOCTYPE html>
             text-decoration: none;
         }
 
+        .skip-link {
+            position: absolute;
+            top: -100px;
+            left: 1rem;
+            z-index: 1000;
+            background: var(--brand-green);
+            color: #ffffff;
+            padding: 0.75rem 1.25rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+            transition: top 0.2s ease;
+        }
+
+        .skip-link:focus {
+            top: 1rem;
+            outline: 3px solid var(--accent-lime);
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+
+        :focus-visible {
+            outline: 3px solid var(--brand-green);
+            outline-offset: 3px;
+        }
+
         .container {
             width: 100%;
             max-width: 1200px;
@@ -4071,6 +4108,11 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            font-family: inherit;
+            text-align: left;
             padding: 1.15rem 1.4rem;
             display: flex;
             justify-content: space-between;
@@ -4258,17 +4300,18 @@ LANDING_HTML = """<!DOCTYPE html>
     </style>
 </head>
 <body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
     <header>
         <div class="container nav-wrapper">
-            <a href="#" class="logo">
+            <a href="#" class="logo" aria-label="The Brothers' Room home">
                 <div class="logo-text-group">
                     <span class="logo-title">The Brothers' Room</span>
                     <span class="logo-sub">by YouthHubAfrica</span>
                 </div>
             </a>
 
-            <nav class="nav-menu" id="nav-menu">
+            <nav class="nav-menu" id="nav-menu" aria-label="Main Navigation">
                 <a href="#features">Features</a>
                 <a href="#curriculum">Curriculum</a>
                 <a href="#simulator">Live Demo</a>
@@ -4278,12 +4321,12 @@ LANDING_HTML = """<!DOCTYPE html>
             </nav>
 
             <div class="header-actions">
-                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Toggle Theme">
-                    <svg class="sun-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
-                    <svg class="moon-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                <button id="theme-toggle" class="theme-toggle-btn" aria-label="Switch to Dark Theme" aria-pressed="false">
+                    <svg class="sun-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+                    <svg class="moon-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:none;"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
                 </button>
                 <a href="#platforms" class="btn btn-header-cta">Start Learning</a>
-                <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle Navigation">
+                <button class="menu-toggle-btn" id="menu-toggle" aria-label="Toggle Navigation Menu" aria-expanded="false" aria-controls="nav-menu">
                     <span class="bar"></span>
                     <span class="bar"></span>
                     <span class="bar"></span>
@@ -4291,6 +4334,8 @@ LANDING_HTML = """<!DOCTYPE html>
             </div>
         </div>
     </header>
+
+    <main id="main-content" tabindex="-1">
 
     <section class="hero-wrapper">
         <div class="container hero-grid">
@@ -4312,8 +4357,8 @@ LANDING_HTML = """<!DOCTYPE html>
                 </div>
 
                 <div class="hero-trust-row">
-                    <div class="trust-item"><span class="check">✓</span> <span>No App Download Required</span></div>
-                    <div class="trust-item"><span class="check">✓</span> <span>Self-Paced & Private</span></div>
+                    <div class="trust-item"><span class="check" aria-hidden="true">✓</span> <span>No App Download Required</span></div>
+                    <div class="trust-item"><span class="check" aria-hidden="true">✓</span> <span>Self-Paced & Private</span></div>
                 </div>
             </div>
 
@@ -4321,14 +4366,14 @@ LANDING_HTML = """<!DOCTYPE html>
                 <div class="phone-mockup">
                     <div class="phone-screen">
                         <div class="phone-header">
-                            <div class="phone-avatar">T</div>
+                            <div class="phone-avatar" aria-hidden="true">T</div>
                             <div class="phone-bot-info">
                                 <span class="phone-bot-name">Tobi (The Brothers' Room)</span>
                                 <span class="phone-bot-status">Active Learning Facilitator</span>
                             </div>
                         </div>
                         
-                        <div class="phone-chat-body" id="hero-chat-body">
+                        <div class="phone-chat-body" id="hero-chat-body" aria-live="polite" aria-atomic="false" role="log" aria-label="Hero Chat Simulation">
                             <div class="chat-bubble bubble-bot">
                                 Welcome brother! Ready to explore Module 1: <strong>Understanding Masculinity</strong>?
                                 <div class="chat-option-pills">
@@ -4363,7 +4408,7 @@ LANDING_HTML = """<!DOCTYPE html>
             <div class="cards-2x2-grid">
                 <div class="feature-card dark-card">
                     <div class="card-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                        <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                     </div>
                     <h3>Instant App Access</h3>
                     <p>Start directly in WhatsApp or Telegram without downloading new apps or remembering passwords.</p>
@@ -4371,7 +4416,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
                 <div class="feature-card">
                     <div class="card-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                        <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                     </div>
                     <h3>100% Confidential</h3>
                     <p>Complete modules anonymously. No real names or sensitive personal data required.</p>
@@ -4379,7 +4424,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
                 <div class="feature-card">
                     <div class="card-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                     </div>
                     <h3>Self-Paced Learning</h3>
                     <p>Only 15 minutes a week. Pause, resume, and review lessons whenever convenient for you.</p>
@@ -4387,7 +4432,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
                 <div class="feature-card">
                     <div class="card-icon">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 1 0 7.75"></path></svg>
+                        <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 1 0 7.75"></path></svg>
                     </div>
                     <h3>GBV Allyship</h3>
                     <p>Practical guidance on bystander intervention, healthy consent, and positive male leadership.</p>
@@ -4502,25 +4547,25 @@ LANDING_HTML = """<!DOCTYPE html>
                     <div class="sim-prompts">
                         <button class="sim-prompt-btn" onclick="sendSimPrompt('What will I learn in Week 1?')">
                             <span>What will I learn in Week 1?</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
                         <button class="sim-prompt-btn" onclick="sendSimPrompt('Is my identity really private?')">
                             <span>Is my identity really private?</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
                         <button class="sim-prompt-btn" onclick="sendSimPrompt('How do I start on WhatsApp?')">
                             <span>How do I start on WhatsApp?</span>
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                            <svg aria-hidden="true" focusable="false" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"></polyline></svg>
                         </button>
                     </div>
                 </div>
 
                 <div class="sim-window">
                     <div class="sim-window-header">
-                        <span class="phone-avatar" style="width:24px; height:24px; font-size:0.7rem;">T</span>
+                        <span class="phone-avatar" aria-hidden="true" style="width:24px; height:24px; font-size:0.7rem;">T</span>
                         <span>Tobi Live Simulator</span>
                     </div>
-                    <div class="sim-window-body" id="sim-window-body">
+                    <div class="sim-window-body" id="sim-window-body" aria-live="polite" aria-atomic="false" role="log" aria-label="Tobi Live Simulator Chat">
                         <div class="chat-bubble bubble-bot">
                             Hello brother! Click any sample question on the left to test how I facilitate course lessons.
                         </div>
@@ -4586,7 +4631,7 @@ LANDING_HTML = """<!DOCTYPE html>
         <div class="safety-grid">
             <div class="safety-card">
                 <div class="safety-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
                 </div>
                 <h4>100% Confidential</h4>
                 <p>You never have to disclose your real name or personal identity to complete modules.</p>
@@ -4594,7 +4639,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
             <div class="safety-card">
                 <div class="safety-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
                 </div>
                 <h4>Non-Judgmental</h4>
                 <p>Designed for honest self-reflection without shame, preaching, or stigma.</p>
@@ -4602,7 +4647,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
             <div class="safety-card">
                 <div class="safety-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 1 0 7.75"></path></svg>
+                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 1 0 7.75"></path></svg>
                 </div>
                 <h4>Peer Mentorship</h4>
                 <p>Curated content guided by experienced youth development specialists and male allies.</p>
@@ -4610,7 +4655,7 @@ LANDING_HTML = """<!DOCTYPE html>
 
             <div class="safety-card">
                 <div class="safety-icon">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
+                    <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path></svg>
                 </div>
                 <h4>Helpline Referrals</h4>
                 <p>Instant access to professional counseling and GBV support services when requested.</p>
@@ -4630,7 +4675,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 <div class="testimonial-card">
                     <p class="testimonial-text">"The Brothers' Room gave me a safe space to challenge things I thought were normal about being a guy. Week 2 on emotional health completely shifted how I handle stress and anger."</p>
                     <div class="testimonial-author">
-                        <div class="author-avatar">A</div>
+                        <div class="author-avatar" aria-hidden="true">A</div>
                         <div class="author-info">
                             <h5>Ademola O.</h5>
                             <p>Learner on Telegram</p>
@@ -4641,7 +4686,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 <div class="testimonial-card">
                     <p class="testimonial-text">"I love that it happens right inside WhatsApp. 15 minutes a week, no heavy data downloads, and the lessons on consent and boundaries were straightforward."</p>
                     <div class="testimonial-author">
-                        <div class="author-avatar">C</div>
+                        <div class="author-avatar" aria-hidden="true">C</div>
                         <div class="author-info">
                             <h5>Chinedu K.</h5>
                             <p>Learner on WhatsApp</p>
@@ -4652,7 +4697,7 @@ LANDING_HTML = """<!DOCTYPE html>
                 <div class="testimonial-card">
                     <p class="testimonial-text">"Every young man needs this course. It opened my eyes to how we can actively prevent violence and support women and girls in our communities."</p>
                     <div class="testimonial-author">
-                        <div class="author-avatar">I</div>
+                        <div class="author-avatar" aria-hidden="true">I</div>
                         <div class="author-info">
                             <h5>Ibrahim M.</h5>
                             <p>Learner on Telegram</p>
@@ -4672,41 +4717,41 @@ LANDING_HTML = """<!DOCTYPE html>
 
         <div class="faq-list">
             <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
+                <button type="button" class="faq-question" id="faq-q-1" aria-expanded="false" aria-controls="faq-ans-1" onclick="toggleFaq(this)">
                     <span>Is The Brothers' Room really 100% free?</span>
-                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="faq-answer">
+                    <svg class="faq-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="faq-answer" id="faq-ans-1" role="region" aria-labelledby="faq-q-1">
                     Yes! The entire 6-week course is completely free of charge, brought to you by YouthHubAfrica to empower young men across communities.
                 </div>
             </div>
 
             <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
+                <button type="button" class="faq-question" id="faq-q-2" aria-expanded="false" aria-controls="faq-ans-2" onclick="toggleFaq(this)">
                     <span>How much time do I need per week?</span>
-                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="faq-answer">
+                    <svg class="faq-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="faq-answer" id="faq-ans-2" role="region" aria-labelledby="faq-q-2">
                     Each weekly module takes approximately 15 to 20 minutes. Because it is self-paced inside WhatsApp and Telegram, you can pause and resume whenever it fits your schedule.
                 </div>
             </div>
 
             <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
+                <button type="button" class="faq-question" id="faq-q-3" aria-expanded="false" aria-controls="faq-ans-3" onclick="toggleFaq(this)">
                     <span>Do I need to download a new app?</span>
-                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="faq-answer">
+                    <svg class="faq-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="faq-answer" id="faq-ans-3" role="region" aria-labelledby="faq-q-3">
                     No new apps required! You can complete the full course directly inside your existing WhatsApp or Telegram application.
                 </div>
             </div>
 
             <div class="faq-item">
-                <div class="faq-question" onclick="toggleFaq(this)">
+                <button type="button" class="faq-question" id="faq-q-4" aria-expanded="false" aria-controls="faq-ans-4" onclick="toggleFaq(this)">
                     <span>Is my privacy and responses protected?</span>
-                    <svg class="faq-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
-                </div>
-                <div class="faq-answer">
+                    <svg class="faq-icon" aria-hidden="true" focusable="false" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"></polyline></svg>
+                </button>
+                <div class="faq-answer" id="faq-ans-4" role="region" aria-labelledby="faq-q-4">
                     Absolutely. Your personal responses are private and confidential. You are never required to provide sensitive personal identification.
                 </div>
             </div>
@@ -4730,17 +4775,19 @@ LANDING_HTML = """<!DOCTYPE html>
         </div>
     </section>
 
+    </main>
+
     <footer>
         <div class="container footer-wrapper">
             <div class="footer-copy">
                 <span>© 2026 The Brothers' Room. A YouthHubAfrica Initiative.</span>
             </div>
-            <div style="display:flex; gap:1.5rem;">
+            <nav aria-label="Footer Navigation" style="display:flex; gap:1.5rem;">
                 <a href="#curriculum">Curriculum</a>
                 <a href="#platforms">Platforms</a>
                 <a href="#safety">Safety</a>
                 <a href="#faq">FAQ</a>
-            </div>
+            </nav>
         </div>
     </footer>
 
@@ -4791,28 +4838,46 @@ LANDING_HTML = """<!DOCTYPE html>
 
         function toggleFaq(element) {
             const item = element.parentElement;
+            const isExpanding = !item.classList.contains("active");
             document.querySelectorAll(".faq-item").forEach(other => {
-                if (other !== item) other.classList.remove("active");
+                other.classList.remove("active");
+                const btn = other.querySelector(".faq-question");
+                if (btn) btn.setAttribute("aria-expanded", "false");
             });
-            item.classList.toggle("active");
+            if (isExpanding) {
+                item.classList.add("active");
+                element.setAttribute("aria-expanded", "true");
+            }
         }
 
         function initThemeToggle() {
             const toggleBtn = document.getElementById("theme-toggle");
+            if (!toggleBtn) return;
             const sunIcon = toggleBtn.querySelector(".sun-icon");
             const moonIcon = toggleBtn.querySelector(".moon-icon");
             const savedTheme = localStorage.getItem("theme");
+            
+            const updateAria = (isDark) => {
+                toggleBtn.setAttribute("aria-pressed", isDark ? "true" : "false");
+                toggleBtn.setAttribute("aria-label", isDark ? "Switch to Light Theme" : "Switch to Dark Theme");
+            };
+
             if (savedTheme === "dark") {
                 document.body.classList.add("dark-mode");
                 sunIcon.style.display = "block";
                 moonIcon.style.display = "none";
+                updateAria(true);
+            } else {
+                updateAria(false);
             }
+
             toggleBtn.addEventListener("click", () => {
                 document.body.classList.toggle("dark-mode");
                 const isDark = document.body.classList.contains("dark-mode");
                 localStorage.setItem("theme", isDark ? "dark" : "light");
                 sunIcon.style.display = isDark ? "block" : "none";
                 moonIcon.style.display = isDark ? "none" : "block";
+                updateAria(isDark);
             });
         }
 
@@ -4821,10 +4886,14 @@ LANDING_HTML = """<!DOCTYPE html>
             const navMenu = document.getElementById("nav-menu");
             if (menuToggle && navMenu) {
                 menuToggle.addEventListener("click", () => {
-                    navMenu.classList.toggle("active");
+                    const isOpen = navMenu.classList.toggle("active");
+                    menuToggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
                 });
                 navMenu.querySelectorAll("a").forEach(link => {
-                    link.addEventListener("click", () => navMenu.classList.remove("active"));
+                    link.addEventListener("click", () => {
+                        navMenu.classList.remove("active");
+                        menuToggle.setAttribute("aria-expanded", "false");
+                    });
                 });
             }
         }
