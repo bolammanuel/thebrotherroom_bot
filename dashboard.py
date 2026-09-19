@@ -4197,30 +4197,37 @@ LANDING_HTML = """<!DOCTYPE html>
         }
 
         @media (max-width: 992px) {
+            .hero-wrapper {
+                padding: 3.5rem 0 4rem 0;
+            }
+
             .hero-grid {
                 grid-template-columns: 1fr;
                 text-align: center;
-                gap: 2.5rem;
+                gap: 3rem;
             }
 
             .hero-left p {
                 margin-left: auto;
                 margin-right: auto;
+                max-width: 580px;
             }
 
-            .hero-ctas,
-            .hero-trust-row,
-            .rating-badge {
+            .hero-ctas {
                 justify-content: center;
                 margin-left: auto;
                 margin-right: auto;
             }
 
-            .hero-right-stats {
-                flex-direction: row;
-                justify-content: center;
-                gap: 2.5rem;
-                text-align: center;
+            .features-section,
+            .curriculum-section,
+            .simulator-section,
+            .platforms-section,
+            .safety-section,
+            .testimonials-section,
+            .faq-section,
+            .cta-banner {
+                padding: 4rem 0;
             }
 
             .features-layout,
@@ -4228,11 +4235,19 @@ LANDING_HTML = """<!DOCTYPE html>
                 grid-template-columns: 1fr;
                 gap: 2.5rem;
             }
+
+            .section-header {
+                margin-bottom: 2.5rem;
+            }
         }
 
         @media (max-width: 768px) {
             .container {
-                padding: 0 1rem;
+                padding: 0 1.25rem;
+            }
+
+            .hero-wrapper {
+                padding: 3rem 0 3.5rem 0;
             }
 
             nav.nav-menu {
@@ -4267,17 +4282,52 @@ LANDING_HTML = """<!DOCTYPE html>
             }
 
             .hero-left h1 {
-                font-size: 2.2rem;
+                font-size: 2.1rem;
+                line-height: 1.2;
             }
 
-            .features-left h2 {
-                font-size: 2rem;
+            .hero-left p {
+                font-size: 1rem;
+                margin-bottom: 1.5rem;
             }
 
-            .hero-right-stats {
+            .hero-ctas {
                 flex-direction: column;
-                gap: 1.25rem;
-                align-items: center;
+                width: 100%;
+                gap: 0.75rem;
+            }
+
+            .hero-ctas .btn {
+                width: 100%;
+            }
+
+            .phone-mockup {
+                width: 100%;
+                max-width: 320px;
+                height: 480px;
+                margin: 0 auto;
+            }
+
+            .features-section,
+            .curriculum-section,
+            .simulator-section,
+            .platforms-section,
+            .safety-section,
+            .testimonials-section,
+            .faq-section,
+            .cta-banner {
+                padding: 3.5rem 0;
+            }
+
+            .section-header {
+                margin-bottom: 2rem;
+            }
+
+            .section-header h2,
+            .features-left h2,
+            .cta-box h2 {
+                font-size: 1.85rem;
+                line-height: 1.25;
             }
 
             .cards-2x2-grid,
@@ -4286,7 +4336,7 @@ LANDING_HTML = """<!DOCTYPE html>
             .safety-grid,
             .testimonials-grid {
                 grid-template-columns: 1fr !important;
-                gap: 1.1rem !important;
+                gap: 1.5rem !important;
             }
 
             .feature-card,
@@ -4295,6 +4345,54 @@ LANDING_HTML = """<!DOCTYPE html>
             .safety-card,
             .testimonial-card {
                 width: 100% !important;
+                padding: 1.4rem;
+            }
+
+            .sim-container {
+                padding: 1.5rem;
+                gap: 2rem;
+            }
+
+            .sim-window {
+                height: 380px;
+            }
+
+            .cta-box {
+                padding: 2.5rem 1.25rem;
+                border-radius: 20px;
+            }
+
+            footer {
+                padding: 2.5rem 0 2rem 0;
+            }
+
+            .footer-wrapper {
+                flex-direction: column;
+                text-align: center;
+                gap: 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-left h1 {
+                font-size: 1.8rem;
+            }
+
+            .section-header h2,
+            .features-left h2,
+            .cta-box h2 {
+                font-size: 1.6rem;
+            }
+
+            .features-section,
+            .curriculum-section,
+            .simulator-section,
+            .platforms-section,
+            .safety-section,
+            .testimonials-section,
+            .faq-section,
+            .cta-banner {
+                padding: 3rem 0;
             }
         }
     </style>
@@ -4354,11 +4452,6 @@ LANDING_HTML = """<!DOCTYPE html>
                     </a>
 
                     <a href="#simulator" class="btn btn-outline-dark">Try Live Demo</a>
-                </div>
-
-                <div class="hero-trust-row">
-                    <div class="trust-item"><span class="check" aria-hidden="true">✓</span> <span>No App Download Required</span></div>
-                    <div class="trust-item"><span class="check" aria-hidden="true">✓</span> <span>Self-Paced & Private</span></div>
                 </div>
             </div>
 
