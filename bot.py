@@ -2292,12 +2292,15 @@ def generate_certificate_image(name, date_str, user_id):
     paste_transparent_pro("top_right_corner.png", 2000, 0, target_width=180, align_right=True)
     paste_transparent_pro("bottom_left_corner.png", 0, 1418, target_width=250, align_bottom=True)
     
-    # Paste top-left Ford Foundation logo (scale to width = 240)
-    paste_transparent_pro("ford_logo.png", 120, 100, target_width=240)
+    # Paste top-left Young Men's Network / Foundation logo (scale to width = 155)
+    paste_transparent_pro("young_mens_foundation_logo.png", 120, 85, target_width=155)
     
-    # Paste top-right organization logos side-by-side
-    yh_w, yh_h = paste_transparent_pro("youthhub_africa_logo.png", 2000 - 120, 95, target_width=118, align_right=True)
-    ym_w, ym_h = paste_transparent_pro("young_mens_foundation_logo.png", 2000 - 120 - yh_w - 20, 95, target_width=155, align_right=True)
+    # Paste top-right YouthHub Africa logo
+    paste_transparent_pro("youthhub_africa_logo.png", 2000 - 120, 85, target_width=118, align_right=True)
+
+    # Paste bottom-left 'Supported by Ford Foundation' logo (maintaining left alignment at x=120, bottom baseline y=1245)
+    ford_logo_filename = "supported_by_ford.png" if os.path.exists(os.path.join(assets_dir, "supported_by_ford.png")) else "ford_logo.png"
+    paste_transparent_pro(ford_logo_filename, 120, 1245, target_width=220, align_bottom=True)
 
     # Outer navy border line
     draw.rectangle([40, 40, width - 40, height - 40], outline=(15, 32, 67), width=6)
@@ -2367,18 +2370,18 @@ def generate_certificate_image(name, date_str, user_id):
     draw.text((1000, 830), "for successfully completing the 6-week conversational course on", fill=c_gray, font=font_desc, anchor="mm")
     draw.text((1000, 910), "Positive Masculinity & Gender-Based Violence (GBV) Prevention", fill=c_navy, font=font_course, anchor="mm")
     
-    # Bottom Left - Rotimi Olawale (Executive Director) Signatory
-    sig_x = 480
-    paste_transparent_pro("rotimi_signature.png", sig_x - 170, 1140, target_width=340, align_bottom=True)
+    # Bottom Center - Rotimi Olawale (Executive Director) Signatory
+    sig_x = 1000
+    paste_transparent_pro("rotimi_signature.png", sig_x - 170, 1155, target_width=340, align_bottom=True)
     
-    draw.line([(sig_x - 180, 1145), (sig_x + 180, 1145)], fill=c_gold, width=3)
-    draw.text((sig_x, 1190), "Rotimi Olawale", fill=c_charcoal, font=font_sig_name, anchor="mm")
-    draw.text((sig_x, 1235), "Executive Director", fill=c_green, font=font_sig_title, anchor="mm")
+    draw.line([(sig_x - 180, 1160), (sig_x + 180, 1160)], fill=c_gold, width=3)
+    draw.text((sig_x, 1200), "Rotimi Olawale", fill=c_charcoal, font=font_sig_name, anchor="mm")
+    draw.text((sig_x, 1245), "Executive Director", fill=c_green, font=font_sig_title, anchor="mm")
     
     # Bottom Right - Date of Issuance
-    date_x = 2000 - 480
-    draw.text((date_x, 1190), date_str, fill=c_charcoal, font=font_sig_name, anchor="mm")
-    draw.text((date_x, 1235), "DATE OF ISSUANCE", fill=c_gray, font=font_sig_title, anchor="mm")
+    date_x = 2000 - 280
+    draw.text((date_x, 1200), date_str, fill=c_charcoal, font=font_sig_name, anchor="mm")
+    draw.text((date_x, 1245), "DATE OF ISSUANCE", fill=c_gray, font=font_sig_title, anchor="mm")
     
     # Verification ID at the very bottom
     v_hash = hashlib.sha256(f"TBR-{user_id}-{date_str}".encode()).hexdigest()[:12].upper()
