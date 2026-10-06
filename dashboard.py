@@ -190,38 +190,44 @@ def get_stats_data(start_date=None, end_date=None):
         sum_ai = cursor.fetchone()[0]
         stats["total_ai_queries"] = sum_ai if sum_ai is not None else 0
 
-        # 8. Daily Insights (Today vs. Last 7 Days)
+        # 8. Daily Insights & Filtered Period Metrics
         import datetime
         now = datetime.datetime.now()
         today_start = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        seven_days_ago = now - datetime.timedelta(days=7)
-        
         today_start_str = today_start.strftime("%Y-%m-%d %H:%M:%S")
-        seven_days_ago_str = seven_days_ago.strftime("%Y-%m-%d %H:%M:%S")
         
-        # Enrollments Today
+        # Today metrics (always measured for today 00:00:00 to now)
         cursor.execute("SELECT COUNT(*) FROM learners WHERE enrollment_date >= %s", (today_start_str,))
         stats["enrollments_today"] = cursor.fetchone()[0]
         
-        # Enrollments Week
-        cursor.execute("SELECT COUNT(*) FROM learners WHERE enrollment_date >= %s", (seven_days_ago_str,))
-        stats["enrollments_week"] = cursor.fetchone()[0]
-        
-        # Active Today
         cursor.execute("SELECT COUNT(*) FROM learners WHERE last_activity >= %s", (today_start_str,))
         stats["active_today"] = cursor.fetchone()[0]
         
-        # Active Week
-        cursor.execute("SELECT COUNT(*) FROM learners WHERE last_activity >= %s", (seven_days_ago_str,))
-        stats["active_week"] = cursor.fetchone()[0]
-        
-        # Reflections Today
         cursor.execute("SELECT COUNT(*) FROM reflections WHERE timestamp >= %s", (today_start_str,))
         stats["reflections_today"] = cursor.fetchone()[0]
-        
-        # Reflections Week
-        cursor.execute("SELECT COUNT(*) FROM reflections WHERE timestamp >= %s", (seven_days_ago_str,))
-        stats["reflections_week"] = cursor.fetchone()[0]
+
+        # Filtered Period metrics
+        if start_date or end_date:
+            period_start_ts = start_date if (start_date and " " in start_date) else (f"{start_date} 00:00:00" if start_date else "1970-01-01 00:00:00")
+            period_end_ts = end_date if (end_date and " " in end_date) else (f"{end_date} 23:59:59" if end_date else now.strftime("%Y-%m-%d %H:%M:%S"))
+        else:
+            seven_days_ago = now - datetime.timedelta(days=7)
+            period_start_ts = seven_days_ago.strftime("%Y-%m-%d %H:%M:%S")
+            period_end_ts = now.strftime("%Y-%m-%d %H:%M:%S")
+
+        cursor.execute("SELECT COUNT(*) FROM learners WHERE enrollment_date >= %s AND enrollment_date <= %s", (period_start_ts, period_end_ts))
+        stats["enrollments_period"] = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM learners WHERE last_activity >= %s AND last_activity <= %s", (period_start_ts, period_end_ts))
+        stats["active_period"] = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM reflections WHERE timestamp >= %s AND timestamp <= %s", (period_start_ts, period_end_ts))
+        stats["reflections_period"] = cursor.fetchone()[0]
+
+        # Aliases for backward compatibility
+        stats["enrollments_week"] = stats["enrollments_period"]
+        stats["active_week"] = stats["active_period"]
+        stats["reflections_week"] = stats["reflections_period"]
 
         # 10. Age Distribution
         if start_date or end_date:
@@ -1588,7 +1594,7 @@ DASHBOARD_HTML = """
 
             <!-- Section 1: Dashboard Overview Tab -->
             <div id="sectionDashboard" class="tab-content active">
-                <h3 style="font-size: 0.95rem; color: var(--text-color); margin-bottom: 0.75rem; letter-spacing: 0.5px; font-weight: 400;">Today's readings</h3>
+                <h3 id="readingsHeader" style="font-size: 0.95rem; color: var(--text-color); margin-bottom: 0.75rem; letter-spacing: 0.5px; font-weight: 400;">Today's readings</h3>
                 <div class="kpi-grid" style="margin-bottom: 2rem;">
                     <div class="card kpi-card">
                         <div class="kpi-label">New registrations</div>
@@ -2290,6 +2296,35 @@ DASHBOARD_HTML = """
 
         // Stats & Reflections Loading
         async function loadDashboardData(startDate = '', endDate = '') {
+            const dateSelectEl = document.getElementById("dateRangeSelect");
+            const selectedVal = dateSelectEl ? dateSelectEl.value : "week";
+
+            if (!startDate && !endDate && selectedVal) {
+                const today = new Date();
+                if (selectedVal === "today") {
+                    startDate = formatDateString(today);
+                    endDate = formatDateString(today);
+                } else if (selectedVal === "yesterday") {
+                    const yesterday = new Date();
+                    yesterday.setDate(today.getDate() - 1);
+                    startDate = formatDateString(yesterday);
+                    endDate = formatDateString(yesterday);
+                } else if (selectedVal === "week") {
+                    const weekAgo = new Date();
+                    weekAgo.setDate(today.getDate() - 7);
+                    startDate = formatDateString(weekAgo);
+                    endDate = formatDateString(today);
+                } else if (selectedVal === "month") {
+                    const monthAgo = new Date();
+                    monthAgo.setDate(today.getDate() - 30);
+                    startDate = formatDateString(monthAgo);
+                    endDate = formatDateString(today);
+                } else if (selectedVal === "all") {
+                    startDate = "1970-01-01";
+                    endDate = formatDateString(today);
+                }
+            }
+
             currentStartDate = startDate;
             currentEndDate = endDate;
             try {
@@ -2379,18 +2414,53 @@ DASHBOARD_HTML = """
                     bottleneckWidget.style.display = "none";
                 }
 
-                // Populate Today's Readings
-                document.getElementById("kpiNewToday").innerText = stats.enrollments_today !== undefined ? stats.enrollments_today : 0;
+                // Dynamic label determination based on date filter selection
+                let periodLabel = "Last 7 days";
+                if (selectedVal === "today") periodLabel = "Today";
+                else if (selectedVal === "yesterday") periodLabel = "Yesterday";
+                else if (selectedVal === "week") periodLabel = "Last 7 days";
+                else if (selectedVal === "month") periodLabel = "Last 30 days";
+                else if (selectedVal === "all") periodLabel = "All time";
+                else if (selectedVal === "custom") {
+                    if (startDate && endDate) {
+                        periodLabel = `${startDate} to ${endDate}`;
+                    } else {
+                        periodLabel = "Custom range";
+                    }
+                }
+
+                // Update section header and split labels dynamically
+                const readingsHeader = document.getElementById("readingsHeader");
+                if (readingsHeader) {
+                    readingsHeader.innerText = selectedVal === "today" ? "Today's readings & activity" : `Activity & engagement metrics (${periodLabel})`;
+                }
+
+                const splitRegLabel = document.getElementById("splitRegLabel");
+                if (splitRegLabel) splitRegLabel.innerText = periodLabel;
+
+                const splitActLabel = document.getElementById("splitActLabel");
+                if (splitActLabel) splitActLabel.innerText = periodLabel;
+
+                const splitRefLabel = document.getElementById("splitRefLabel");
+                if (splitRefLabel) splitRefLabel.innerText = periodLabel;
+
+                // Determine counts for period metrics
+                const activePeriodCount = stats.active_period !== undefined ? stats.active_period : (stats.active_week !== undefined ? stats.active_week : stats.active_today);
+                const regPeriodCount = stats.enrollments_period !== undefined ? stats.enrollments_period : (stats.enrollments_week !== undefined ? stats.enrollments_week : stats.enrollments_today);
+                const refPeriodCount = stats.reflections_period !== undefined ? stats.reflections_period : (stats.reflections_week !== undefined ? stats.reflections_week : stats.reflections_today);
+
+                // Populate KPI cards
+                document.getElementById("kpiNewToday").innerText = regPeriodCount;
                 document.getElementById("splitRegToday").innerText = stats.enrollments_today !== undefined ? stats.enrollments_today : 0;
-                document.getElementById("splitRegWeek").innerText = stats.enrollments_week !== undefined ? stats.enrollments_week : 0;
+                document.getElementById("splitRegWeek").innerText = regPeriodCount;
 
-                document.getElementById("kpiActiveToday").innerText = stats.active_today !== undefined ? stats.active_today : 0;
+                document.getElementById("kpiActiveToday").innerText = activePeriodCount;
                 document.getElementById("splitActToday").innerText = stats.active_today !== undefined ? stats.active_today : 0;
-                document.getElementById("splitActWeek").innerText = stats.active_week !== undefined ? stats.active_week : 0;
+                document.getElementById("splitActWeek").innerText = activePeriodCount;
 
-                document.getElementById("kpiReflectionsToday").innerText = stats.reflections_today !== undefined ? stats.reflections_today : 0;
+                document.getElementById("kpiReflectionsToday").innerText = refPeriodCount;
                 document.getElementById("splitRefToday").innerText = stats.reflections_today !== undefined ? stats.reflections_today : 0;
-                document.getElementById("splitRefWeek").innerText = stats.reflections_week !== undefined ? stats.reflections_week : 0;
+                document.getElementById("splitRefWeek").innerText = refPeriodCount;
 
                 // Render Visualizations
                 renderCharts(stats);
@@ -2921,14 +2991,14 @@ DASHBOARD_HTML = """
         // Dropdown range change triggers
         function onDateRangeChange() {
             const select = document.getElementById("dateRangeSelect");
-            const val = select.value;
+            const val = select ? select.value : "week";
             const customContainer = document.getElementById("customDateRangeContainer");
             
             if (val === "custom") {
-                customContainer.style.display = "flex";
+                if (customContainer) customContainer.style.display = "flex";
                 return;
             } else {
-                customContainer.style.display = "none";
+                if (customContainer) customContainer.style.display = "none";
             }
             
             const today = new Date();
@@ -2952,6 +3022,9 @@ DASHBOARD_HTML = """
                 const monthAgo = new Date();
                 monthAgo.setDate(today.getDate() - 30);
                 startDate = formatDateString(monthAgo);
+                endDate = formatDateString(today);
+            } else if (val === "all") {
+                startDate = "1970-01-01";
                 endDate = formatDateString(today);
             }
             
