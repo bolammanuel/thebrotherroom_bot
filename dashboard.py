@@ -144,6 +144,140 @@ def get_stats_data(start_date=None, end_date=None):
             
         stats["bottleneck_recommendation"] = recommendation
             
+        # 3.6 Inactivity & Drop-Off Diagnostics for Unfinished Learners
+        import datetime
+        thirty_days_ago_dt = datetime.datetime.now() - datetime.timedelta(days=30)
+        thirty_days_ago_str = thirty_days_ago_dt.strftime("%Y-%m-%d %H:%M:%S")
+
+        if start_date or end_date:
+            cursor.execute("""
+                SELECT 
+                    current_module_id, 
+                    current_lesson_id, 
+                    last_activity,
+                    enrollment_date
+                FROM learners 
+                WHERE (post_test_score IS NULL OR post_test_score < 0)
+                  AND enrollment_date >= %s AND enrollment_date <= %s
+            """, params)
+        else:
+            cursor.execute("""
+                SELECT 
+                    current_module_id, 
+                    current_lesson_id, 
+                    last_activity,
+                    enrollment_date
+                FROM learners 
+                WHERE (post_test_score IS NULL OR post_test_score < 0)
+            """)
+        
+        unfinished_rows = cursor.fetchall()
+        total_unfinished = len(unfinished_rows)
+        active_30d_count = 0
+        silent_count = 0
+        onboarding_count = 0
+
+        module_topics_full = {
+            "module_1": "Module 1: Healthy Masculinity Intro",
+            "module_2": "Module 2: Gender Roles & Expectations",
+            "module_3": "Module 3: Violence & Power Dynamics",
+            "module_4": "Module 4: Emotional Expression",
+            "module_5": "Module 5: Healthy Relationships & Consent",
+            "module_6": "Module 6: Peer Accountability",
+            "module_7": "Module 7: Community GBV Prevention",
+            "module_8": "Module 8: Self-Reflection & Action Plan",
+            "module_9": "Module 9: Mirror Moments Reflections",
+            "module_10": "Module 10: Pledge & Commitment",
+            "module_11": "Module 11: Graduation & Certificate Wrap"
+        }
+
+        stage_breakdown = {
+            "onboarding": {
+                "stage_key": "onboarding",
+                "stage_name": "Onboarding & Pre-Test",
+                "total": 0,
+                "active_30d": 0,
+                "silent": 0,
+                "advice": "Opening Friction: Simplify registration questions & initial welcome steps."
+            }
+        }
+        for i in range(1, 12):
+            m_key = f"module_{i}"
+            stage_name = module_topics_full.get(m_key, f"Module {i}")
+            if i <= 3:
+                advice = "Early Friction: Review reading length and initial quiz complexity."
+            elif i <= 7:
+                advice = "Middle Curriculum Drop: Send milestone motivation & prompt reminders."
+            else:
+                advice = "Late Stage Drop: Send target nudge to complete pledge & final test."
+
+            stage_breakdown[m_key] = {
+                "stage_key": m_key,
+                "stage_name": stage_name,
+                "total": 0,
+                "active_30d": 0,
+                "silent": 0,
+                "advice": advice
+            }
+
+        for row in unfinished_rows:
+            mod_id, lesson_id, last_act, enr_date = row
+            
+            is_active = False
+            if last_act:
+                last_act_str = str(last_act).split(".")[0]
+                if last_act_str >= thirty_days_ago_str:
+                    is_active = True
+
+            if is_active:
+                active_30d_count += 1
+            else:
+                silent_count += 1
+
+            mod_clean = str(mod_id).strip().lower() if mod_id else ""
+            lesson_clean = str(lesson_id).strip().lower() if lesson_id else ""
+
+            is_onboarding = False
+            if not mod_clean or mod_clean in ["", "none", "null", "onboarding", "welcome", "start"]:
+                is_onboarding = True
+            elif lesson_clean in ["start", "welcome", "pre_test", "register", "onboarding", ""]:
+                is_onboarding = True
+            elif mod_clean == "module_1" and lesson_clean in ["start", "welcome", "lesson_0"]:
+                is_onboarding = True
+
+            if is_onboarding:
+                onboarding_count += 1
+                stage = stage_breakdown["onboarding"]
+            elif mod_clean in stage_breakdown:
+                stage = stage_breakdown[mod_clean]
+            else:
+                stage = stage_breakdown["onboarding"]
+
+            stage["total"] += 1
+            if is_active:
+                stage["active_30d"] += 1
+            else:
+                stage["silent"] += 1
+
+        drop_off_stages = []
+        if stage_breakdown["onboarding"]["total"] > 0 or total_unfinished == 0:
+            drop_off_stages.append(stage_breakdown["onboarding"])
+        for i in range(1, 12):
+            m_key = f"module_{i}"
+            if stage_breakdown[m_key]["total"] > 0:
+                drop_off_stages.append(stage_breakdown[m_key])
+
+        stats["inactivity_analysis"] = {
+            "total_unfinished": total_unfinished,
+            "active_30d_count": active_30d_count,
+            "silent_count": silent_count,
+            "onboarding_count": onboarding_count,
+            "active_30d_pct": round((active_30d_count / total_unfinished * 100), 1) if total_unfinished > 0 else 0,
+            "silent_pct": round((silent_count / total_unfinished * 100), 1) if total_unfinished > 0 else 0,
+            "onboarding_pct": round((onboarding_count / total_unfinished * 100), 1) if total_unfinished > 0 else 0,
+            "stages": drop_off_stages
+        }
+            
         # 4. Graduates (post_test_score >= 0)
         if start_date or end_date:
             cursor.execute("""
@@ -1683,6 +1817,75 @@ DASHBOARD_HTML = """
                     </div>
                 </div>
 
+                <!-- Section 1.5: Inactivity & Learner Drop-Off Analysis Panel -->
+                <div class="card" style="margin-bottom: 2rem; padding: 1.5rem; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: var(--border-radius);">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.25rem;">
+                        <div>
+                            <h3 style="font-size: 1rem; color: var(--text-color); margin: 0 0 0.25rem 0; font-weight: 600; display: flex; align-items: center; gap: 0.5rem;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accent-orange, #f97316)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <polyline points="12 6 12 12 16 14"></polyline>
+                                </svg>
+                                <span>Inactivity & Drop-Off Diagnostics (Unfinished Learners)</span>
+                            </h3>
+                            <p style="font-size: 0.8rem; color: var(--text-muted); margin: 0;">
+                                Tracking where unfinished participants stopped (onboarding vs specific modules) and how many are active vs gone silent (&gt;30 days inactive).
+                            </p>
+                        </div>
+                        <button onclick="filterLearnersTab('silent')" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.35rem; white-space: nowrap;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            <span>View Silent Learners Register</span>
+                        </button>
+                    </div>
+
+                    <!-- KPI Metric Mini-Cards -->
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                        <div style="background: rgba(255,255,255,0.02); border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem;">
+                            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Unfinished Learners</div>
+                            <div style="font-size: 1.4rem; font-weight: 700; color: var(--text-color); margin: 0.25rem 0;" id="diagUnfinishedCount">-</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);">Have not completed Module 11</div>
+                        </div>
+                        <div style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2); border-radius: 8px; padding: 1rem;">
+                            <div style="font-size: 0.72rem; color: #ef4444; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Gone Silent (&gt;30 Days)</div>
+                            <div style="font-size: 1.4rem; font-weight: 700; color: #ef4444; margin: 0.25rem 0;" id="diagSilentCount">-</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);" id="diagSilentSub">Inactive for over 30 days</div>
+                        </div>
+                        <div style="background: rgba(16, 185, 129, 0.05); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 8px; padding: 1rem;">
+                            <div style="font-size: 0.72rem; color: #10b981; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Active in Last 30 Days</div>
+                            <div style="font-size: 1.4rem; font-weight: 700; color: #10b981; margin: 0.25rem 0;" id="diagActive30dCount">-</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);" id="diagActive30dSub">Interacted within 30 days</div>
+                        </div>
+                        <div style="background: rgba(245, 158, 11, 0.05); border: 1px solid rgba(245, 158, 11, 0.2); border-radius: 8px; padding: 1rem;">
+                            <div style="font-size: 0.72rem; color: #f59e0b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Stopped at Onboarding</div>
+                            <div style="font-size: 1.4rem; font-weight: 700; color: #f59e0b; margin: 0.25rem 0;" id="diagOnboardingCount">-</div>
+                            <div style="font-size: 0.72rem; color: var(--text-muted);" id="diagOnboardingSub">Pre-test / Initial welcome stop</div>
+                        </div>
+                    </div>
+
+                    <!-- Diagnostic Stage Breakdown Table -->
+                    <div style="overflow-x: auto;">
+                        <table style="width: 100%; border-collapse: collapse; font-size: 0.82rem;">
+                            <thead>
+                                <tr style="background: rgba(255,255,255,0.03); border-bottom: 1px solid var(--border-color); text-align: left;">
+                                    <th style="padding: 0.65rem 0.75rem; color: var(--text-muted); font-weight: 500;">Stop Stage / Curriculum Level</th>
+                                    <th style="padding: 0.65rem 0.75rem; text-align: center; color: var(--text-muted); font-weight: 500;">Total Stopped</th>
+                                    <th style="padding: 0.65rem 0.75rem; text-align: center; color: var(--text-muted); font-weight: 500;">Active (Last 30 Days)</th>
+                                    <th style="padding: 0.65rem 0.75rem; text-align: center; color: var(--text-muted); font-weight: 500;">Gone Silent (&gt;30 Days)</th>
+                                    <th style="padding: 0.65rem 0.75rem; color: var(--text-muted); font-weight: 500;">Reporting Insight &amp; Action Advice</th>
+                                </tr>
+                            </thead>
+                            <tbody id="diagStagesTbody">
+                                <!-- Dynamic rows injected by JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
                 <div class="main-grid" style="margin-bottom: 2rem;">
                     <div class="card">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
@@ -2462,6 +2665,57 @@ DASHBOARD_HTML = """
                 document.getElementById("splitRefToday").innerText = stats.reflections_today !== undefined ? stats.reflections_today : 0;
                 document.getElementById("splitRefWeek").innerText = refPeriodCount;
 
+                // Populate Inactivity & Drop-Off Diagnostics
+                const inact = stats.inactivity_analysis || {};
+
+                document.getElementById("diagUnfinishedCount").innerText = inact.total_unfinished !== undefined ? inact.total_unfinished : 0;
+
+                document.getElementById("diagSilentCount").innerText = `${inact.silent_count || 0}`;
+                document.getElementById("diagSilentSub").innerText = `${inact.silent_pct || 0}% of unfinished participants`;
+
+                document.getElementById("diagActive30dCount").innerText = `${inact.active_30d_count || 0}`;
+                document.getElementById("diagActive30dSub").innerText = `${inact.active_30d_pct || 0}% of unfinished participants`;
+
+                document.getElementById("diagOnboardingCount").innerText = `${inact.onboarding_count || 0}`;
+                document.getElementById("diagOnboardingSub").innerText = `${inact.onboarding_pct || 0}% stopped during onboarding`;
+
+                const stagesTbody = document.getElementById("diagStagesTbody");
+                if (stagesTbody) {
+                    const stages = inact.stages || [];
+                    if (stages.length === 0) {
+                        stagesTbody.innerHTML = `<tr><td colspan="5" style="text-align: center; padding: 1.5rem; color: var(--text-muted);">No unfinished learners detected. All participants have completed the curriculum!</td></tr>`;
+                    } else {
+                        stagesTbody.innerHTML = stages.map(stg => {
+                            const tot = stg.total || 0;
+                            const act = stg.active_30d || 0;
+                            const sil = stg.silent || 0;
+                            const actPct = tot > 0 ? Math.round((act / tot) * 100) : 0;
+                            const silPct = tot > 0 ? Math.round((sil / tot) * 100) : 0;
+
+                            const isLight = document.body.classList.contains("light-theme");
+                            const rowBorder = isLight ? "1px solid #f0f0f0" : "1px solid rgba(255,255,255,0.05)";
+
+                            return `
+                                <tr style="border-bottom: ${rowBorder};">
+                                    <td style="padding: 0.65rem 0.75rem; font-weight: 500; color: var(--text-color);">${escapeHtml(stg.stage_name)}</td>
+                                    <td style="padding: 0.65rem 0.75rem; text-align: center; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text-color);">${tot}</td>
+                                    <td style="padding: 0.65rem 0.75rem; text-align: center;">
+                                        <span style="display: inline-flex; align-items: center; padding: 0.2rem 0.55rem; border-radius: 99px; background: rgba(16, 185, 129, 0.1); color: #10b981; font-weight: 600; font-size: 0.75rem;">
+                                            ${act} (${actPct}%)
+                                        </span>
+                                    </td>
+                                    <td style="padding: 0.65rem 0.75rem; text-align: center;">
+                                        <span style="display: inline-flex; align-items: center; padding: 0.2rem 0.55rem; border-radius: 99px; background: rgba(239, 68, 68, 0.1); color: #ef4444; font-weight: 600; font-size: 0.75rem;">
+                                            ${sil} (${silPct}%)
+                                        </span>
+                                    </td>
+                                    <td style="padding: 0.65rem 0.75rem; font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(stg.advice)}</td>
+                                </tr>
+                            `;
+                        }).join("");
+                    }
+                }
+
                 // Render Visualizations
                 renderCharts(stats);
 
@@ -3029,6 +3283,19 @@ DASHBOARD_HTML = """
             }
             
             loadDashboardData(startDate, endDate);
+        }
+
+        function filterLearnersTab(filterType) {
+            showSection("learners");
+            if (filterType === "silent") {
+                const searchInput = document.getElementById("learnerSearch");
+                if (searchInput) {
+                    searchInput.value = "Stalled";
+                    currentSearchQuery = "Stalled";
+                    currentLearnersPage = 0;
+                    loadLearnersList();
+                }
+            }
         }
 
         function applyCustomDateFilters() {
