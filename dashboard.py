@@ -1605,7 +1605,7 @@ DASHBOARD_HTML = """
                                 <span class="split-value" id="splitRegToday">-</span>
                             </div>
                             <div class="split-item" style="text-align: right;">
-                                <span class="split-label">Last 7 days</span>
+                                <span class="split-label" id="splitRegLabel">Last 7 days</span>
                                 <span class="split-value" id="splitRegWeek">-</span>
                             </div>
                         </div>
@@ -1619,7 +1619,7 @@ DASHBOARD_HTML = """
                                 <span class="split-value" id="splitActToday">-</span>
                             </div>
                             <div class="split-item" style="text-align: right;">
-                                <span class="split-label">Last 7 days</span>
+                                <span class="split-label" id="splitActLabel">Last 7 days</span>
                                 <span class="split-value" id="splitActWeek">-</span>
                             </div>
                         </div>
@@ -1633,7 +1633,7 @@ DASHBOARD_HTML = """
                                 <span class="split-value" id="splitRefToday">-</span>
                             </div>
                             <div class="split-item" style="text-align: right;">
-                                <span class="split-label">Last 7 days</span>
+                                <span class="split-label" id="splitRefLabel">Last 7 days</span>
                                 <span class="split-value" id="splitRefWeek">-</span>
                             </div>
                         </div>
