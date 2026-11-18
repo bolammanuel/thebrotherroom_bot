@@ -4056,7 +4056,17 @@ async def post_init(application: Application) -> None:
         logger.error(f"Error clearing default command scope: {e}")
         
     # Start background reminder and nudge scheduler clock
-    asyncio.create_task(reminder_scheduler(application))
+    application.bot_data["reminder_task"] = asyncio.create_task(reminder_scheduler(application))
+
+async def post_shutdown(application: Application) -> None:
+    """Cleanly cancel background tasks when the application shuts down."""
+    task = application.bot_data.pop("reminder_task", None)
+    if task and not task.done():
+        task.cancel()
+        try:
+            await task
+        except asyncio.CancelledError:
+            pass
 
 async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Log unhandled Telegram handler exceptions cleanly instead of failing silently."""
@@ -4064,7 +4074,14 @@ async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> N
 
 def build_application(token: str) -> Application:
     """Build and configure the Telegram Bot Application with all handlers."""
-    application = Application.builder().token(token).post_init(post_init).build()
+    application = (
+        Application.builder()
+        .token(token)
+        .concurrent_updates(True)
+        .post_init(post_init)
+        .post_shutdown(post_shutdown)
+        .build()
+    )
 
     # Command handlers
     application.add_handler(CommandHandler("start", start, filters=filters.ChatType.PRIVATE))
@@ -4092,6 +4109,43 @@ def build_application(token: str) -> Application:
     application.add_error_handler(error_handler)
     return application
 
+def run_bot_with_recovery(token: str, initial_retry_delay: float = 5.0, max_retry_delay: float = 60.0) -> None:
+    """Run Telegram polling with automatic fresh-event-loop recovery after crashes."""
+    retry_delay = initial_retry_delay
+
+    while True:
+        started_at = time.time()
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            application = build_application(token)
+            application.run_polling(
+                allowed_updates=Update.ALL_TYPES,
+                bootstrap_retries=5,
+                close_loop=True,
+            )
+            # Clean shutdown (e.g., SIGTERM / SIGINT)
+            logger.info("Telegram polling stopped cleanly.")
+            break
+        except KeyboardInterrupt:
+            logger.info("Shutting down...")
+            break
+        except Exception as e:
+            uptime = time.time() - started_at
+            if uptime > 60:
+                retry_delay = initial_retry_delay
+            logger.error(f"Telegram Bot Polling Error: {e}. Retrying in {retry_delay}s...")
+            try:
+                time.sleep(retry_delay)
+            except KeyboardInterrupt:
+                logger.info("Shutting down...")
+                break
+            retry_delay = min(retry_delay * 2, max_retry_delay)
+        finally:
+            if not loop.is_closed():
+                loop.close()
+            asyncio.set_event_loop(None)
+
 def main() -> None:
     """Start the bot with automatic polling recovery."""
     init_db()
@@ -4110,34 +4164,7 @@ def main() -> None:
         logger.error("TELEGRAM_BOT_TOKEN environment variable not set.")
         return
 
-    retry_delay = 5
-    max_retry_delay = 60
-
-    while True:
-        started_at = time.time()
-        try:
-            application = build_application(token)
-            application.run_polling(
-                allowed_updates=Update.ALL_TYPES,
-                bootstrap_retries=5,
-            )
-            # Clean shutdown (e.g., SIGTERM / SIGINT)
-            logger.info("Telegram polling stopped cleanly.")
-            break
-        except KeyboardInterrupt:
-            logger.info("Shutting down...")
-            break
-        except Exception as e:
-            uptime = time.time() - started_at
-            if uptime > 60:
-                retry_delay = 5
-            logger.error(f"Telegram Bot Polling Error: {e}. Retrying in {retry_delay}s...")
-            try:
-                time.sleep(retry_delay)
-            except KeyboardInterrupt:
-                logger.info("Shutting down...")
-                break
-            retry_delay = min(retry_delay * 2, max_retry_delay)
+    run_bot_with_recovery(token)
 
 if __name__ == "__main__":
     main()
