@@ -5,6 +5,7 @@ import asyncio
 import csv
 import re
 import time
+import uuid
 from dotenv import load_dotenv
 
 
@@ -12,6 +13,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, BotCommand
+from telegram.error import BadRequest, Forbidden, TelegramError
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters, ContextTypes
 from db_manager import (
     init_db, enroll_learner, get_learner_progress, update_learner_progress, 
@@ -486,39 +488,53 @@ def extract_option_letter(text):
     return None
 
 def extract_module_number(text):
-    """Normalize and extract a module number (1 to 6) from message/transcription."""
+    """Normalize and extract a module number (1 to 11) from message/transcription."""
     if not text:
         return None
     text_lower = text.lower()
     
     num_map = {
-        "one": 1, "first": 1, "1": 1, "dáya": 1, "daya": 1, "kín-in-ní": 1, "kininni": 1, "mbụ": 1, "mbu": 1,
-        "two": 2, "second": 2, "2": 2, "biyu": 2, "kejì": 2, "keji": 2, "abụọ": 2, "abuo": 2,
-        "three": 3, "third": 3, "3": 3, "uku": 3, "kẹta": 3, "keta": 3, "atọ": 3, "ato": 3,
-        "four": 4, "fourth": 4, "4": 4, "hudu": 4, "kẹrin": 4, "kerin": 4, "anọ": 4, "ano": 4,
-        "five": 5, "fifth": 5, "5": 5, "biyar": 5, "kàrún-ún": 5, "karun": 5, "ise": 5, "íse": 5,
-        "six": 6, "sixth": 6, "6": 6, "shida": 6, "kẹfà": 6, "kefa": 6, "isii": 6
+        "one": 1, "first": 1, "1": 1, "1st": 1, "dáya": 1, "daya": 1, "kín-in-ní": 1, "kininni": 1, "mbụ": 1, "mbu": 1,
+        "two": 2, "second": 2, "2": 2, "2nd": 2, "biyu": 2, "kejì": 2, "keji": 2, "abụọ": 2, "abuo": 2,
+        "three": 3, "third": 3, "3": 3, "3rd": 3, "uku": 3, "kẹta": 3, "keta": 3, "atọ": 3, "ato": 3,
+        "four": 4, "fourth": 4, "4": 4, "4th": 4, "hudu": 4, "kẹrin": 4, "kerin": 4, "anọ": 4, "ano": 4,
+        "five": 5, "fifth": 5, "5": 5, "5th": 5, "biyar": 5, "kàrún-ún": 5, "karun": 5, "ise": 5, "íse": 5,
+        "six": 6, "sixth": 6, "6": 6, "6th": 6, "shida": 6, "kẹfà": 6, "kefa": 6, "isii": 6,
+        "seven": 7, "seventh": 7, "7": 7, "7th": 7, "bakwai": 7, "keje": 7, "kèje": 7, "asaa": 7,
+        "eight": 8, "eighth": 8, "8": 8, "8th": 8, "takwas": 8, "kẹjọ": 8, "kejo": 8, "asatọ": 8, "asato": 8,
+        "nine": 9, "ninth": 9, "9": 9, "9th": 9, "tara": 9, "kẹsàn-án": 9, "kesan": 9, "itoolu": 9,
+        "ten": 10, "tenth": 10, "10": 10, "10th": 10, "goma": 10, "kẹwàá": 10, "kewaa": 10, "iri": 10,
+        "eleven": 11, "eleventh": 11, "11": 11, "11th": 11, "goma sha daya": 11, "kọkànlá": 11, "kokanla": 11, "iri na otu": 11
     }
     
     module_synonyms = ["module", "modul", "modulo", "modulu", "mọdulu", "modúlu"]
     
-    # Split into words/tokens
+    # Split into words/tokens (keeping hyphenated words intact too)
     tokens = re.findall(r'\w+', text_lower)
+    
+    # 1. Check multi-word number phrases adjacent to module keywords (longest first)
+    multi_word_nums = sorted(
+        [(w, n) for w, n in num_map.items() if " " in w or "-" in w],
+        key=lambda x: len(x[0]),
+        reverse=True,
+    )
+    for syn in module_synonyms:
+        for word, num in multi_word_nums:
+            pattern = rf'(?<!\w)(?:{re.escape(syn)}\s+{re.escape(word)}|{re.escape(word)}\s+{re.escape(syn)})(?!\w)'
+            if re.search(pattern, text_lower):
+                return num
     
     has_module_keyword = any(syn in tokens for syn in module_synonyms)
     
+    # 2. Check directly adjacent tokens: "module 11", "11 module", "eleventh module"
     for i, token in enumerate(tokens):
         if token in module_synonyms:
-            if i + 1 < len(tokens) and tokens[i+1] in num_map:
-                return num_map[tokens[i+1]]
-            if i - 1 >= 0 and tokens[i-1] in num_map:
-                return num_map[tokens[i-1]]
+            if i + 1 < len(tokens) and tokens[i + 1] in num_map:
+                return num_map[tokens[i + 1]]
+            if i - 1 >= 0 and tokens[i - 1] in num_map:
+                return num_map[tokens[i - 1]]
                 
-    if has_module_keyword:
-        for token in tokens:
-            if token in num_map:
-                return num_map[token]
-                
+    # 3. Check concatenated forms like "module11" or "module7"
     for syn in module_synonyms:
         for token in tokens:
             if token.startswith(syn) and len(token) > len(syn):
@@ -526,11 +542,12 @@ def extract_module_number(text):
                 if num_part in num_map:
                     return num_map[num_part]
                     
-    for syn in module_synonyms:
-        for word, num in num_map.items():
-            if f"{syn} {word}" in text_lower or f"{word} {syn}" in text_lower:
-                return num
-                
+    # 4. If a module keyword is present anywhere, check for an exact number token
+    if has_module_keyword:
+        for token in tokens:
+            if token in num_map:
+                return num_map[token]
+                    
     return None
 
 async def jump_to_module(update: Update, context: ContextTypes.DEFAULT_TYPE, module_idx: int) -> None:
@@ -634,7 +651,7 @@ async def process_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE
     module = get_module_by_id(module_id)
     if not module or "quiz" not in module:
         if query:
-            await query.edit_message_text(get_text("error_generic", lang))
+            await safe_edit_or_reply(update, get_text("error_generic", lang))
         else:
             await send_reply(update, get_text("error_generic", lang))
         return
@@ -682,7 +699,7 @@ async def process_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE
         ]
         reply_markup = InlineKeyboardMarkup(buttons)
         if query:
-            await query.edit_message_text(feedback_text, reply_markup=reply_markup, parse_mode="Markdown")
+            await safe_edit_or_reply(update, feedback_text, reply_markup=reply_markup, parse_mode="Markdown")
         else:
             await send_reply(update, feedback_text, reply_markup=reply_markup, parse_mode="Markdown")
     else:
@@ -717,10 +734,10 @@ async def process_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE
                 logger.error(f"Error generating badge image on perfect score: {e}")
             
             if query:
-                await query.delete_message()
+                await safe_delete_message(query)
             
             chat_msg = query.message if query else update.message
-            if badge_path and os.path.exists(badge_path):
+            if badge_path and os.path.exists(badge_path) and chat_msg:
                 try:
                     with open(badge_path, "rb") as bf:
                         await chat_msg.reply_photo(
@@ -730,11 +747,11 @@ async def process_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE
                             parse_mode="Markdown"
                         )
                         if get_voice_responses(user_id):
-                            output_filename = f"assets/voice_reply_{user_id}.ogg"
+                            output_filename = f"assets/voice_reply_{user_id}_{uuid.uuid4().hex[:8]}.ogg"
                             clean_txt = clean_text_for_tts(completion_text)
                             if len(clean_txt) > 800:
                                 clean_txt = clean_txt[:800] + "..."
-                            if synthesize_speech(clean_txt, output_filename):
+                            if await asyncio.to_thread(synthesize_speech, clean_txt, output_filename):
                                 try:
                                     with open(output_filename, "rb") as vf:
                                         await chat_msg.reply_voice(voice=vf)
@@ -783,11 +800,66 @@ async def process_quiz_answer(update: Update, context: ContextTypes.DEFAULT_TYPE
             ]
             reply_markup = InlineKeyboardMarkup(buttons)
             if query:
-                await query.edit_message_text(completion_text, reply_markup=reply_markup, parse_mode="Markdown")
+                await safe_edit_or_reply(update, completion_text, reply_markup=reply_markup, parse_mode="Markdown")
             else:
                 await send_reply(update, completion_text, reply_markup=reply_markup, parse_mode="Markdown")
 
 # ============== REPLY HELPER ==============
+
+async def safe_answer_query(query, text=None, show_alert=False):
+    """Safely answer a callback query, ignoring expired or already-answered query errors."""
+    if not query:
+        return
+    try:
+        if text is not None:
+            await query.answer(text=text, show_alert=show_alert)
+        else:
+            await query.answer()
+    except BadRequest as e:
+        logger.debug(f"Ignored callback query answer error: {e}")
+    except Exception as e:
+        logger.warning(f"Unexpected error answering callback query: {e}")
+
+async def safe_delete_message(query):
+    """Safely delete a callback query's message, ignoring already-deleted message errors."""
+    if not query or not query.message:
+        return
+    try:
+        await query.message.delete()
+    except BadRequest as e:
+        logger.debug(f"Ignored message delete error: {e}")
+    except Exception as e:
+        logger.warning(f"Unexpected error deleting message: {e}")
+
+async def safe_edit_or_reply(update: Update, text, reply_markup=None, parse_mode=None):
+    """Safely edit a text callback message, or fall back to send_reply for voice/media messages."""
+    query = update.callback_query
+    user_id = update.effective_user.id if update.effective_user else None
+    voice_enabled = bool(user_id and get_voice_responses(user_id))
+
+    if query and query.message and getattr(query.message, "text", None) and not voice_enabled:
+        try:
+            return await query.edit_message_text(
+                text,
+                reply_markup=reply_markup,
+                parse_mode=parse_mode
+            )
+        except BadRequest as e:
+            err_msg = str(e).lower()
+            if "message is not modified" in err_msg:
+                return query.message
+            logger.debug(f"Falling back to send_reply after edit_message_text error: {e}")
+        except Exception as e:
+            logger.warning(f"Falling back to send_reply after unexpected edit error: {e}")
+
+    # For voice/photo messages, Voice Mode users, or failed edits: clear old inline buttons and send a fresh reply
+    if query and query.message:
+        try:
+            await query.edit_message_reply_markup(reply_markup=None)
+        except Exception:
+            pass
+
+    return await send_reply(update, text, reply_markup=reply_markup, parse_mode=parse_mode)
 
 async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
     """Send a reply that works for both commands and callback queries, and handles accessibility voice notes if enabled."""
@@ -802,8 +874,8 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
         if len(clean_text) > 800:
             clean_text = clean_text[:800] + "..."
             
-        output_filename = f"assets/voice_reply_{user_id}.ogg"
-        success = synthesize_speech(clean_text, output_filename)
+        output_filename = f"assets/voice_reply_{user_id}_{uuid.uuid4().hex[:8]}.ogg"
+        success = await asyncio.to_thread(synthesize_speech, clean_text, output_filename)
         if success:
             try:
                 chat_msg = update.callback_query.message if update.callback_query else update.message
@@ -811,10 +883,7 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
                     with open(output_filename, "rb") as voice_file:
                         target_msg = await chat_msg.reply_voice(voice=voice_file, reply_markup=reply_markup)
                     if update.callback_query:
-                        try:
-                            await update.callback_query.answer()
-                        except Exception:
-                            pass
+                        await safe_answer_query(update.callback_query)
                     return target_msg
             except Exception as e:
                 logger.error(f"Error sending synthesized voice reply: {e}")
@@ -827,7 +896,7 @@ async def send_reply(update: Update, text, reply_markup=None, parse_mode=None):
 
     # Send text reply (when voice responses are disabled or synthesis failed)
     target_msg = None
-    if update.callback_query:
+    if update.callback_query and update.callback_query.message:
         target_msg = await update.callback_query.message.reply_text(
             text,
             reply_markup=reply_markup,
@@ -2428,7 +2497,7 @@ async def handle_graduation_and_certificate(update: Update, context: ContextType
     if email:
         try:
             from email_utils import send_certificate_email
-            email_sent = send_certificate_email(email, learner_name, certificate_file)
+            email_sent = await asyncio.to_thread(send_certificate_email, email, learner_name, certificate_file)
         except Exception as ee:
             logger.error(f"Error calling send_certificate_email: {ee}")
 
@@ -2582,7 +2651,7 @@ async def reminder_scheduler(application: Application) -> None:
                     
                     if is_due:
                         from email_utils import send_monthly_status_email
-                        success = send_monthly_status_email(admin_email)
+                        success = await asyncio.to_thread(send_monthly_status_email, admin_email)
                         
                         if success:
                             conn = get_connection()
@@ -2627,8 +2696,12 @@ async def reminder_scheduler(application: Application) -> None:
                     )
                     update_reminder_sent(user_id, reminder_type)
                     logger.info(f"Dispatched weekly pledge reminder to user {user_id} ({reminders_sent+1}/4)")
+                except Forbidden as e:
+                    logger.info(f"Skipping weekly reminder for unreachable user {user_id}: {e}")
+                    update_reminder_sent(user_id, reminder_type)
                 except Exception as e:
                     logger.error(f"Failed to send weekly reminder to {user_id}: {e}")
+                await asyncio.sleep(0.05)
 
             # 2. Inactive Learner Nudges (2 Days) (Clean, Emoji-Free)
             inactive_learners = get_inactive_learners()
@@ -2649,8 +2722,12 @@ async def reminder_scheduler(application: Application) -> None:
                     # Resets activity timestamp by updating current progress state
                     update_learner_progress(user_id, current_module, current_lesson)
                     logger.info(f"Dispatched inactive learner nudge to user {user_id}")
+                except Forbidden as e:
+                    logger.info(f"Skipping inactive nudge for unreachable user {user_id}: {e}")
+                    update_learner_progress(user_id, current_module, current_lesson)
                 except Exception as e:
                     logger.error(f"Failed to send inactive nudge to {user_id}: {e}")
+                await asyncio.sleep(0.05)
 
             # 3. Sunday Oga Checks (Clean, Emoji-Free)
             import datetime
@@ -2685,8 +2762,12 @@ async def reminder_scheduler(application: Application) -> None:
                     )
                     update_sunday_check_sent(user_id)
                     logger.info(f"Dispatched Sunday check-in to user {user_id} (active={is_active})")
+                except Forbidden as e:
+                    logger.info(f"Skipping Sunday check-in for unreachable user {user_id}: {e}")
+                    update_sunday_check_sent(user_id)
                 except Exception as e:
                     logger.error(f"Failed to send Sunday check-in to {user_id}: {e}")
+                await asyncio.sleep(0.05)
 
             # 4. Wednesday Midweek Checks (Clean, Emoji-Free)
             due_midweek_checks = get_due_midweek_checks()
@@ -2701,8 +2782,12 @@ async def reminder_scheduler(application: Application) -> None:
                     )
                     update_midweek_check_sent(user_id)
                     logger.info(f"Dispatched Wednesday midweek check-in to user {user_id}")
+                except Forbidden as e:
+                    logger.info(f"Skipping Wednesday check-in for unreachable user {user_id}: {e}")
+                    update_midweek_check_sent(user_id)
                 except Exception as e:
                     logger.error(f"Failed to send Wednesday check-in to {user_id}: {e}")
+                await asyncio.sleep(0.05)
 
         except Exception as e:
             logger.error(f"Error in background reminder worker loop: {e}")
@@ -2924,17 +3009,19 @@ async def accessibility_command(update: Update, context: ContextTypes.DEFAULT_TY
 
 async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming voice messages by transcribing them via Whisper and piping to text handler."""
+    if not update.message or not update.message.voice:
+        return
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
     
+    ogg_path = f"assets/voice_input_{user_id}_{uuid.uuid4().hex[:8]}.ogg"
     try:
         # Download user voice note (.ogg format)
         voice_file = await update.message.voice.get_file()
-        ogg_path = f"assets/voice_input_{user_id}.ogg"
         await voice_file.download_to_drive(ogg_path)
         
-        # Transcribe using Whisper with language guidance
-        transcription = transcribe_voice(ogg_path, language=lang)
+        # Transcribe using Whisper with language guidance (non-blocking)
+        transcription = await asyncio.to_thread(transcribe_voice, ogg_path, lang)
         
         # Clean up temporary audio file
         if os.path.exists(ogg_path):
@@ -2960,6 +3047,12 @@ async def handle_voice_message(update: Update, context: ContextTypes.DEFAULT_TYP
     except Exception as e:
         logger.error(f"Error handling voice message: {e}")
         await update.message.reply_text(get_text("error_generic", lang))
+    finally:
+        if os.path.exists(ogg_path):
+            try:
+                os.remove(ogg_path)
+            except Exception:
+                pass
 
 # ============== BUTTON CALLBACK HANDLERS ==============
 
@@ -2968,10 +3061,13 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     if update.effective_chat and update.effective_chat.type != "private":
         return
     query = update.callback_query
-    await query.answer()
+    if not query:
+        return
     
     user_id = query.from_user.id
-    data = query.data
+    data = query.data or ""
+    if data != "cmd_accessibility":
+        await safe_answer_query(query)
     lang = get_language_preference(user_id) or "en"
     
     # Language selection
@@ -2997,7 +3093,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                     InlineKeyboardButton(get_text("button_voice_off", lang_code), callback_data="voicepref_no")
                 ]
             ])
-            await query.edit_message_text(
+            await safe_edit_or_reply(
+                update,
                 ask_voice_text,
                 reply_markup=keyboard,
                 parse_mode="Markdown"
@@ -3005,14 +3102,15 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         else:
             # Mid-course language change
             success_msg = get_text("language_changed", lang_code)
-            await query.edit_message_text(
+            await safe_edit_or_reply(
+                update,
                 success_msg,
                 reply_markup=get_main_menu_buttons(lang_code, user_id=user_id)
             )
         return
 
     elif data in ["voicepref_yes", "voicepref_no"]:
-        await query.delete_message()
+        await safe_delete_message(query)
         enable_voice = (data == "voicepref_yes")
         set_voice_responses(user_id, enable_voice)
         
@@ -3028,7 +3126,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
         
     elif data == "consent_yes":
-        await query.delete_message()
+        await safe_delete_message(query)
         # Start profile registration onboarding: ask Full Name
         context.user_data['awaiting_full_name'] = True
         ask_name_text = get_text("ask_full_name", lang)
@@ -3036,7 +3134,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
         
     elif data == "consent_no":
-        await query.delete_message()
+        await safe_delete_message(query)
         # Halt registration
         halt_text = get_text("consent_declined", lang)
         keyboard = InlineKeyboardMarkup([
@@ -3046,14 +3144,14 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
         
     elif data == "cmd_restart_reg":
-        await query.delete_message()
+        await safe_delete_message(query)
         reset_learner_data(user_id)
         context.user_data.clear()
         await start(update, context)
         return
 
     elif data in ["pwd_yes", "pwd_no"]:
-        await query.delete_message()
+        await safe_delete_message(query)
         is_pwd_val = "Yes" if data == "pwd_yes" else "No"
         from db_manager import update_pwd_status
         update_pwd_status(user_id, is_pwd_val)
@@ -3091,7 +3189,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
     # Intercept pre-test callbacks
     if data == "pretest_start":
-        await query.delete_message()
+        await safe_delete_message(query)
         context.user_data["pretest_answers"] = {}
         context.user_data["pretest_current"] = 0
         await send_pre_test_question(update, context, 0)
@@ -3106,18 +3204,18 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             context.user_data["pretest_answers"] = {}
         context.user_data["pretest_answers"][q_idx] = selected_choice
         
-        await query.delete_message()
+        await safe_delete_message(query)
         await send_pre_test_question(update, context, q_idx + 1)
         return
 
     # Intercept post-test callbacks
     if data == "posttest_start":
         if is_user_graduated(user_id):
-            await query.delete_message()
+            await safe_delete_message(query)
             await send_graduation_dashboard(update, context, lang, user_id)
             return
             
-        await query.delete_message()
+        await safe_delete_message(query)
         context.user_data["posttest_answers"] = {}
         context.user_data["posttest_current"] = 0
         await send_post_test_question(update, context, 0)
@@ -3132,32 +3230,32 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             context.user_data["posttest_answers"] = {}
         context.user_data["posttest_answers"][q_idx] = selected_choice
         
-        await query.delete_message()
+        await safe_delete_message(query)
         await send_post_test_question(update, context, q_idx + 1)
         return
         
     elif data == "cmd_admin":
-        await query.delete_message()
+        await safe_delete_message(query)
         await admin_command(update, context)
         return
         
     elif data.startswith("admin_leaderboard"):
-        await query.delete_message()
+        await safe_delete_message(query)
         await show_admin_leaderboard(update, context)
         return
         
     elif data == "admin_analytics":
-        await query.delete_message()
+        await safe_delete_message(query)
         await show_admin_analytics(update, context)
         return
         
     elif data == "admin_export_csv":
-        await query.delete_message()
+        await safe_delete_message(query)
         await export_admin_csv(update, context)
         return
         
     elif data == "admin_send_report":
-        await query.delete_message()
+        await safe_delete_message(query)
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
         if not admin_ids or user_id not in admin_ids:
@@ -3173,8 +3271,11 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 
         try:
             from email_utils import send_monthly_status_email
-            success = send_monthly_status_email(admin_email, raise_on_error=True)
-            await load_msg.delete()
+            success = await asyncio.to_thread(send_monthly_status_email, admin_email, None, None, True)
+            try:
+                await load_msg.delete()
+            except Exception:
+                pass
             
             if success:
                 conn = get_connection()
@@ -3244,7 +3345,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             return
         
     elif data == "admin_reset_prompt":
-        await query.delete_message()
+        await safe_delete_message(query)
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
         if not admin_ids or user_id not in admin_ids:
@@ -3289,7 +3390,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
         
     elif data == "admin_wipe_prompt":
-        await query.delete_message()
+        await safe_delete_message(query)
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
         if not admin_ids or user_id not in admin_ids:
@@ -3311,7 +3412,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
 
     elif data == "admin_wipe_confirm":
-        await query.delete_message()
+        await safe_delete_message(query)
         admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
         admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
         if not admin_ids or user_id not in admin_ids:
@@ -3345,43 +3446,44 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         return
     
     if data == "cmd_next":
-        await query.delete_message()
+        await safe_delete_message(query)
         # Call next_lesson_handler via update object
         await next_lesson_handler(update, context)
         
     elif data == "cmd_prev":
-        await query.delete_message()
+        await safe_delete_message(query)
         # Call prev_lesson_handler via update object
         await prev_lesson_handler(update, context)
         
     elif data == "cmd_start":
-        await query.delete_message()
+        await safe_delete_message(query)
         await start(update, context)
     
     elif data == "cmd_quiz":
-        await query.delete_message()
+        await safe_delete_message(query)
         await quiz_command(update, context)
     
     elif data == "cmd_progress":
-        await query.delete_message()
+        await safe_delete_message(query)
         await progress_command(update, context)
     
     elif data == "cmd_menu":
-        await query.delete_message()
+        await safe_delete_message(query)
         await menu_command(update, context)
         
     elif data == "cmd_journal":
-        await query.delete_message()
+        await safe_delete_message(query)
         await journal_command(update, context)
     
     elif data == "cmd_language":
-        await query.edit_message_text(
+        await safe_edit_or_reply(
+            update,
             TRANSLATIONS["language_change"]["en"],
             reply_markup=get_language_selection_buttons()
         )
     
     elif data == "cmd_help":
-        await query.delete_message()
+        await safe_delete_message(query)
         await help_command(update, context)
         
     elif data == "cmd_accessibility":
@@ -3398,9 +3500,9 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         }
         toast_msg = status_text.get(lang, status_text["en"])
         
-        await query.answer(text=toast_msg, show_alert=True)
+        await safe_answer_query(query, text=toast_msg, show_alert=True)
         
-        message_text = query.message.text or ""
+        message_text = (query.message.text or "") if query.message else ""
         
         # Check if the user is on the welcome/pretest onboarding screen
         is_welcome_screen = False
@@ -3440,9 +3542,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
             else:
                 reply_markup = get_main_menu_buttons(lang, user_id=user_id, context=context)
             
-        await query.edit_message_reply_markup(reply_markup=reply_markup)
+        try:
+            await query.edit_message_reply_markup(reply_markup=reply_markup)
+        except BadRequest as e:
+            logger.debug(f"Ignored edit_message_reply_markup error: {e}")
         
-        if new_status:
+        if new_status and query.message:
             voice_status_full = {
                 "en": "Accessibility Voice Replies have been ENABLED. The bot will now send audio voice notes instead of text messages.",
                 "pcm": "Accessibility Voice Replies don START. Bot go now dey send voice notes instead of text.",
@@ -3451,8 +3556,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
                 "ig": "Accessibility Voice Replies abanyela MERE."
             }.get(lang, "Accessibility Voice Replies have been ENABLED.")
             
-            output_filename = f"assets/voice_reply_{user_id}.ogg"
-            success = synthesize_speech(voice_status_full, output_filename)
+            output_filename = f"assets/voice_reply_{user_id}_{uuid.uuid4().hex[:8]}.ogg"
+            success = await asyncio.to_thread(synthesize_speech, voice_status_full, output_filename)
             if success:
                 try:
                     with open(output_filename, "rb") as voice_file:
@@ -3469,7 +3574,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     elif data == "quiz_retry":
         context.user_data["quiz_question_idx"] = 0
         context.user_data["quiz_errors"] = 0
-        await query.delete_message()
+        await safe_delete_message(query)
         await quiz_command(update, context)
         
     # Quiz next question transition
@@ -3478,12 +3583,12 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         module_id = parts[1]
         next_q_idx = int(parts[2])
         context.user_data["quiz_question_idx"] = next_q_idx
-        await query.delete_message()
+        await safe_delete_message(query)
         await quiz_command(update, context)
     
     # Quiz skip/move forward
     elif data == "quiz_skip":
-        await query.delete_message()
+        await safe_delete_message(query)
         context.user_data.pop("quiz_question_idx", None)
         context.user_data.pop("quiz_errors", None)
         context.user_data.pop("quiz_module_id", None)
@@ -3528,7 +3633,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     elif data.startswith("quiz|"):
         parts = data.split("|")
         if len(parts) < 3:
-            await query.edit_message_text(get_text("error_generic", lang))
+            await safe_edit_or_reply(update, get_text("error_generic", lang))
             return
         
         module_id = parts[1]
@@ -3544,6 +3649,8 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, user_message: str = None) -> None:
     """Handle text messages and transcribed voice inputs."""
     if user_message is None:
+        if not update.message or not update.message.text:
+            return
         user_message = update.message.text
     user_id = update.effective_user.id
     lang = get_language_preference(user_id)
@@ -3798,8 +3905,12 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
                 if not isinstance(quizzes, list):
                     quizzes = [quizzes]
                 if q_idx < len(quizzes):
-                    options = quizzes[q_idx]["options"]
-                    valid_letters = [opt[0].upper() for opt in options]
+                    raw_options = quizzes[q_idx]["options"]
+                    if isinstance(raw_options, dict):
+                        options = raw_options.get(lang, raw_options.get("en", []))
+                    else:
+                        options = raw_options
+                    valid_letters = [opt[0].upper() for opt in options if opt]
                     if option_letter in valid_letters:
                         await process_quiz_answer(update, context, module_id, q_idx, option_letter)
                         return
@@ -3870,7 +3981,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
     else:
         context_for_openai = full_course_text
 
-    response = get_openai_response(user_message, context_for_openai, language=lang)
+    response = await asyncio.to_thread(get_openai_response, user_message, context_for_openai, lang)
     await send_reply(
         update,
         response,
@@ -3879,6 +3990,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE, use
 
 async def handle_video_upload(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """Handle incoming video/file from admin and reply with the file_id."""
+    if not update.message:
+        return
     user_id = update.effective_user.id
     admin_ids_str = os.getenv("ADMIN_USER_IDS", "")
     admin_ids = [int(x.strip()) for x in admin_ids_str.split(",") if x.strip()]
@@ -3931,7 +4044,10 @@ async def post_init(application: Application) -> None:
     ]
     
     # Set commands only for private 1-on-1 chats
-    await application.bot.set_my_commands(commands, scope=BotCommandScopeAllPrivateChats())
+    try:
+        await application.bot.set_my_commands(commands, scope=BotCommandScopeAllPrivateChats())
+    except Exception as e:
+        logger.error(f"Error setting private chat commands: {e}")
     
     # Delete default commands so they don't show up in group chats
     try:
@@ -3942,24 +4058,12 @@ async def post_init(application: Application) -> None:
     # Start background reminder and nudge scheduler clock
     asyncio.create_task(reminder_scheduler(application))
 
-def main() -> None:
-    """Start the bot."""
-    init_db()
+async def error_handler(update: object, context: ContextTypes.DEFAULT_TYPE) -> None:
+    """Log unhandled Telegram handler exceptions cleanly instead of failing silently."""
+    logger.error("Unhandled exception while processing update %s: %s", update, context.error, exc_info=context.error)
 
-    # Start the web analytics dashboard in a background daemon thread
-    try:
-        import threading
-        from dashboard import run_dashboard_server
-        threading.Thread(target=run_dashboard_server, daemon=True).start()
-        logger.info("Background facilitator dashboard web server started successfully!")
-    except Exception as e:
-        logger.error(f"Failed to start dashboard web server: {e}")
-
-    token = os.getenv("TELEGRAM_BOT_TOKEN")
-    if not token:
-        logger.error("TELEGRAM_BOT_TOKEN environment variable not set.")
-        return
-
+def build_application(token: str) -> Application:
+    """Build and configure the Telegram Bot Application with all handlers."""
     application = Application.builder().token(token).post_init(post_init).build()
 
     # Command handlers
@@ -3981,21 +4085,59 @@ def main() -> None:
     # Message, voice, and button handlers
     application.add_handler(MessageHandler((filters.VIDEO | filters.Document.ALL) & filters.ChatType.PRIVATE, handle_video_upload))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND & filters.ChatType.PRIVATE, handle_message))
-    application.add_handler(MessageHandler(filters.VOICE, handle_voice_message))
+    application.add_handler(MessageHandler(filters.VOICE & filters.ChatType.PRIVATE, handle_voice_message))
     application.add_handler(CallbackQueryHandler(button_handler))
 
-    # Run the bot
+    # Global error handler
+    application.add_error_handler(error_handler)
+    return application
+
+def main() -> None:
+    """Start the bot with automatic polling recovery."""
+    init_db()
+
+    # Start the web analytics dashboard in a background daemon thread
     try:
-        application.run_polling(allowed_updates=Update.ALL_TYPES)
+        import threading
+        from dashboard import run_dashboard_server
+        threading.Thread(target=run_dashboard_server, daemon=True).start()
+        logger.info("Background facilitator dashboard web server started successfully!")
     except Exception as e:
-        logger.error(f"Telegram Bot Polling Error: {e}")
-        logger.info("Keeping process alive so that the Analytics Dashboard web server remains accessible at http://localhost:8080/")
-        import time
+        logger.error(f"Failed to start dashboard web server: {e}")
+
+    token = os.getenv("TELEGRAM_BOT_TOKEN")
+    if not token:
+        logger.error("TELEGRAM_BOT_TOKEN environment variable not set.")
+        return
+
+    retry_delay = 5
+    max_retry_delay = 60
+
+    while True:
+        started_at = time.time()
         try:
-            while True:
-                time.sleep(3600)
+            application = build_application(token)
+            application.run_polling(
+                allowed_updates=Update.ALL_TYPES,
+                bootstrap_retries=5,
+            )
+            # Clean shutdown (e.g., SIGTERM / SIGINT)
+            logger.info("Telegram polling stopped cleanly.")
+            break
         except KeyboardInterrupt:
             logger.info("Shutting down...")
+            break
+        except Exception as e:
+            uptime = time.time() - started_at
+            if uptime > 60:
+                retry_delay = 5
+            logger.error(f"Telegram Bot Polling Error: {e}. Retrying in {retry_delay}s...")
+            try:
+                time.sleep(retry_delay)
+            except KeyboardInterrupt:
+                logger.info("Shutting down...")
+                break
+            retry_delay = min(retry_delay * 2, max_retry_delay)
 
 if __name__ == "__main__":
     main()

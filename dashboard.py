@@ -2,7 +2,9 @@ import os
 import logging
 import csv
 import io
-from flask import Flask, jsonify, render_template_string, request, make_response, send_from_directory
+import hmac
+import hashlib
+from flask import Flask, jsonify, render_template_string, request, make_response, send_from_directory, session
 from db_manager import get_connection
 
 # Setup logging
@@ -10,13 +12,32 @@ logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 try:
     app.json.sort_keys = False
 except AttributeError:
     pass
 
-# Authentication token configuration
-ADMIN_TOKEN = os.getenv("ADMIN_DASHBOARD_PASSWORD", "admin123").strip().replace('"', '\\"').replace('\n', '').replace('\r', '')
+# Authentication token configuration (kept strictly server-side, never embedded in HTML/JS)
+ADMIN_TOKEN = os.getenv("ADMIN_DASHBOARD_PASSWORD", "admin123").strip()
+app.secret_key = (
+    os.getenv("FLASK_SECRET_KEY")
+    or hashlib.sha256(f"tbr-dashboard-session:{ADMIN_TOKEN}".encode("utf-8")).hexdigest()
+)
+
+def is_admin_authenticated() -> bool:
+    """Verify admin access via server-side HttpOnly session or explicit API token."""
+    if session.get("dashboard_authenticated") is True:
+        return True
+    provided_token = (
+        request.headers.get("X-Admin-Token")
+        or request.args.get("token")
+        or ((request.get_json(silent=True) or {}).get("token") if request.is_json else None)
+    )
+    if isinstance(provided_token, str) and ADMIN_TOKEN:
+        return hmac.compare_digest(provided_token, ADMIN_TOKEN)
+    return False
 
 def format_lesson_id(lesson_id):
     """Helper to convert raw database lesson IDs (e.g., lesson_1_1) to pretty layout labels (e.g., Lesson 1)."""
@@ -2152,7 +2173,6 @@ DASHBOARD_HTML = """
     </div>
 
     <script>
-        const expectedToken = "ADMIN_DASHBOARD_PASSWORD_PLACEHOLDER"; // Injected by Flask
         let currentStartDate = '';
         let currentEndDate = '';
         let funnelChartInstance = null;
@@ -2172,16 +2192,17 @@ DASHBOARD_HTML = """
         const sunIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path></svg>`;
         const moonIcon = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>`;
 
-        function checkStoredAuth() {
+        async function checkStoredAuth() {
             try {
-                let token = null;
+                // Clean up any legacy token previously stored in localStorage
                 try {
-                    token = localStorage.getItem("dashboard_auth_token");
-                } catch (e) {
-                    console.error("localStorage access blocked:", e);
-                }
-                
-                if (token === expectedToken) {
+                    localStorage.removeItem("dashboard_auth_token");
+                } catch (e) {}
+
+                const res = await fetch("/api/auth/status", { credentials: "same-origin" });
+                const data = res.ok ? await res.json() : { authenticated: false };
+
+                if (data.authenticated) {
                     try { initTheme(); } catch (e) { console.error("initTheme error:", e); }
                     try { initSidebarState(); } catch (e) { console.error("initSidebarState error:", e); }
                     try { populateDateDropdowns(); } catch (e) { console.error("populateDateDropdowns error:", e); }
@@ -2203,41 +2224,50 @@ DASHBOARD_HTML = """
             }
         }
 
-        function checkAuth() {
+        async function checkAuth() {
             const val = document.getElementById("passwordInput").value;
             const loginCard = document.querySelector(".login-box");
-            
-            if (val === expectedToken) {
-                try {
-                    localStorage.setItem("dashboard_auth_token", val);
-                } catch (e) {
-                    console.error("localStorage write blocked:", e);
+            const errEl = document.getElementById("loginError");
+            if (errEl) errEl.innerText = "";
+
+            try {
+                const res = await fetch("/api/auth/login", {
+                    method: "POST",
+                    credentials: "same-origin",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ password: val })
+                });
+                const data = await res.json().catch(() => ({}));
+
+                if (res.ok && data.success) {
+                    // Success entry transitions
+                    const overlay = document.getElementById("loginOverlay");
+                    overlay.style.transition = "opacity 0.4s ease-out, transform 0.4s ease-out";
+                    overlay.style.opacity = "0";
+                    overlay.style.transform = "scale(0.95)";
+                    
+                    setTimeout(() => {
+                        overlay.style.display = "none";
+                        try { initTheme(); } catch (e) { console.error("initTheme error:", e); }
+                        try { initSidebarState(); } catch (e) { console.error("initSidebarState error:", e); }
+                        try { populateDateDropdowns(); } catch (e) { console.error("populateDateDropdowns error:", e); }
+                        try { loadDashboardData(); } catch (e) { console.error("loadDashboardData error:", e); }
+                        try { loadActivityLog(); } catch (e) { console.error("loadActivityLog error:", e); }
+                        document.getElementById("dashboardContent").style.display = "flex"; 
+                    }, 400);
+                } else {
+                    if (errEl) errEl.innerText = data.error || "Invalid credentials. Access Denied.";
+                    
+                    // Shake validation error feedback trigger
+                    if (loginCard) {
+                        loginCard.classList.remove("shake-animation");
+                        void loginCard.offsetWidth; // Trigger layout reflow to restart keyframe
+                        loginCard.classList.add("shake-animation");
+                    }
                 }
-                
-                // Success entry transitions
-                const overlay = document.getElementById("loginOverlay");
-                overlay.style.transition = "opacity 0.4s ease-out, transform 0.4s ease-out";
-                overlay.style.opacity = "0";
-                overlay.style.transform = "scale(0.95)";
-                
-                setTimeout(() => {
-                    overlay.style.display = "none";
-                    try { initTheme(); } catch (e) { console.error("initTheme error:", e); }
-                    try { initSidebarState(); } catch (e) { console.error("initSidebarState error:", e); }
-                    try { populateDateDropdowns(); } catch (e) { console.error("populateDateDropdowns error:", e); }
-                    try { loadDashboardData(); } catch (e) { console.error("loadDashboardData error:", e); }
-                    try { loadActivityLog(); } catch (e) { console.error("loadActivityLog error:", e); }
-                    document.getElementById("dashboardContent").style.display = "flex"; 
-                }, 400);
-            } else {
-                document.getElementById("loginError").innerText = "Invalid credentials. Access Denied.";
-                
-                // Shake validation error feedback trigger
-                if (loginCard) {
-                    loginCard.classList.remove("shake-animation");
-                    void loginCard.offsetWidth; // Trigger layout reflow to restart keyframe
-                    loginCard.classList.add("shake-animation");
-                }
+            } catch (err) {
+                console.error("Login request failed:", err);
+                if (errEl) errEl.innerText = "Unable to connect to authentication server.";
             }
         }
 
@@ -2257,12 +2287,17 @@ DASHBOARD_HTML = """
             }
         }
 
-        function logout() {
+        async function logout() {
             const content = document.getElementById("dashboardContent");
             content.style.transition = "opacity 0.3s ease-out, transform 0.3s ease-out";
             content.style.opacity = "0";
             content.style.transform = "scale(0.98)";
             
+            try {
+                await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" });
+            } catch (e) {
+                console.error("Logout error:", e);
+            }
             setTimeout(() => {
                 try {
                     localStorage.removeItem("dashboard_auth_token");
@@ -2423,7 +2458,7 @@ DASHBOARD_HTML = """
             tableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">Loading platform analytics...</td></tr>`;
             
             try {
-                const res = await fetch("/api/platform-analytics?token=" + expectedToken);
+                const res = await fetch("/api/platform-analytics", { credentials: "same-origin" });
                 const data = await res.json();
                 
                 if (data.success && data.analytics) {
@@ -2464,7 +2499,7 @@ DASHBOARD_HTML = """
         }
 
         function exportWaitlistCSV() {
-            window.location.href = "/api/waitlist/export?token=" + expectedToken;
+            window.location.href = "/api/waitlist/export";
         }
 
         async function clearWaitlist() {
@@ -2472,8 +2507,9 @@ DASHBOARD_HTML = """
                 return;
             }
             try {
-                const res = await fetch("/api/waitlist/clear?token=" + expectedToken, {
+                const res = await fetch("/api/waitlist/clear", {
                     method: "POST",
+                    credentials: "same-origin",
                     headers: { "Content-Type": "application/json" }
                 });
                 const data = await res.json();
@@ -2531,19 +2567,19 @@ DASHBOARD_HTML = """
             currentStartDate = startDate;
             currentEndDate = endDate;
             try {
-                let statsUrl = "/api/stats?token=" + expectedToken;
-                let reflectionsUrl = "/api/reflections?token=" + expectedToken;
+                const dateParams = new URLSearchParams();
                 if (startDate) {
-                    statsUrl += "&start_date=" + startDate;
-                    reflectionsUrl += "&start_date=" + startDate;
+                    dateParams.set("start_date", startDate);
                 }
                 if (endDate) {
-                    statsUrl += "&end_date=" + endDate;
-                    reflectionsUrl += "&end_date=" + endDate;
+                    dateParams.set("end_date", endDate);
                 }
+                const qs = dateParams.toString() ? "?" + dateParams.toString() : "";
+                let statsUrl = "/api/stats" + qs;
+                let reflectionsUrl = "/api/reflections" + qs;
 
                 // Fetch Stats
-                const statsRes = await fetch(statsUrl);
+                const statsRes = await fetch(statsUrl, { credentials: "same-origin" });
                 const stats = await statsRes.json();
                 
                 if (stats.error) {
@@ -2720,7 +2756,7 @@ DASHBOARD_HTML = """
                 renderCharts(stats);
 
                 // Fetch Reflections Feed
-                const refRes = await fetch(reflectionsUrl);
+                const refRes = await fetch(reflectionsUrl, { credentials: "same-origin" });
                 const reflections = await refRes.json();
                 
                 const feed = document.getElementById("reflectionsFeed");
@@ -2946,7 +2982,7 @@ DASHBOARD_HTML = """
                 refreshBtn.classList.add("spin-animation");
             }
             try {
-                const res = await fetch("/api/activity-log?token=" + expectedToken);
+                const res = await fetch("/api/activity-log", { credentials: "same-origin" });
                 const data = await res.json();
                 
                 const feed = document.getElementById("activityLogFeed");
@@ -2999,7 +3035,7 @@ DASHBOARD_HTML = """
         async function loadLearnersList() {
             try {
                 const offset = currentLearnersPage * learnersPerPage;
-                const res = await fetch(`/api/learners?token=${expectedToken}&search=${encodeURIComponent(currentSearchQuery)}&order_by=${currentSortQuery}&limit=${learnersPerPage}&offset=${offset}`);
+                const res = await fetch(`/api/learners?search=${encodeURIComponent(currentSearchQuery)}&order_by=${currentSortQuery}&limit=${learnersPerPage}&offset=${offset}`, { credentials: "same-origin" });
                 const data = await res.json();
                 
                 const tbody = document.getElementById("learnersTableBody");
@@ -3159,7 +3195,7 @@ DASHBOARD_HTML = """
 
         // Trigger CSV download
         function downloadLearnersCSV() {
-            const url = `/api/learners/export?token=${expectedToken}&search=${encodeURIComponent(currentSearchQuery)}&order_by=${currentSortQuery}`;
+            const url = `/api/learners/export?search=${encodeURIComponent(currentSearchQuery)}&order_by=${currentSortQuery}`;
             window.location.href = url;
         }
 
@@ -3345,8 +3381,9 @@ DASHBOARD_HTML = """
             btn.innerText = "Sending Report...";
             
             try {
-                const res = await fetch("/api/send-report?token=" + expectedToken, {
+                const res = await fetch("/api/send-report", {
                     method: "POST",
+                    credentials: "same-origin",
                     headers: {
                         "Content-Type": "application/json"
                     },
@@ -3380,7 +3417,7 @@ DASHBOARD_HTML = """
     </script>
 </body>
 </html>
-""".replace("ADMIN_DASHBOARD_PASSWORD_PLACEHOLDER", ADMIN_TOKEN)
+"""
 
 LANDING_HTML = """<!DOCTYPE html>
 <html lang="en">
@@ -5998,6 +6035,24 @@ def privacy_route():
 def index_route():
     return render_template_string(DASHBOARD_HTML)
 
+@app.route("/api/auth/status")
+def auth_status_api():
+    return jsonify({"authenticated": is_admin_authenticated()})
+
+@app.route("/api/auth/login", methods=["POST"])
+def auth_login_api():
+    data = request.get_json(silent=True) or {}
+    password = str(data.get("password", ""))
+    if ADMIN_TOKEN and hmac.compare_digest(password, ADMIN_TOKEN):
+        session["dashboard_authenticated"] = True
+        return jsonify({"success": True})
+    return jsonify({"success": False, "error": "Invalid credentials. Access Denied."}), 401
+
+@app.route("/api/auth/logout", methods=["POST"])
+def auth_logout_api():
+    session.clear()
+    return jsonify({"success": True})
+
 @app.route("/api/vote", methods=["POST"])
 @app.route("/api/track_click", methods=["POST"])
 def submit_platform_vote():
@@ -6033,9 +6088,7 @@ def submit_platform_vote():
 
 @app.route("/api/stats")
 def stats_api():
-    # Allow local API requests or authenticate with token
-    token = request.args.get("token")
-    if token != ADMIN_TOKEN and token != "admin123":
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
@@ -6043,8 +6096,7 @@ def stats_api():
 
 @app.route("/api/reflections")
 def reflections_api():
-    token = request.args.get("token")
-    if token != ADMIN_TOKEN:
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
@@ -6052,16 +6104,14 @@ def reflections_api():
 
 @app.route("/api/activity-log")
 def activity_log_api():
-    token = request.args.get("token")
-    if token != ADMIN_TOKEN:
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
     return jsonify(get_activity_log())
 
 @app.route("/api/platform-analytics")
 @app.route("/api/waitlist")
 def platform_analytics_api():
-    token = request.args.get("token")
-    if token != ADMIN_TOKEN and token != "admin123":
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
     try:
         from db_manager import get_platform_analytics
@@ -6078,8 +6128,7 @@ def platform_analytics_api():
 @app.route("/api/platform-analytics/export")
 @app.route("/api/waitlist/export")
 def export_waitlist_csv():
-    token = request.args.get("token")
-    if token != ADMIN_TOKEN and token != "admin123":
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
     
     try:
@@ -6106,11 +6155,10 @@ def export_waitlist_csv():
         logger.error(f"Error exporting platform analytics CSV: {e}")
         return jsonify({"success": False, "error": str(e)}), 500
 
-@app.route("/api/platform-analytics/clear")
+@app.route("/api/platform-analytics/clear", methods=["POST"])
 @app.route("/api/waitlist/clear", methods=["POST"])
 def clear_waitlist_api():
-    token = request.args.get("token") or (request.json.get("token") if request.is_json else None)
-    if token != ADMIN_TOKEN and token != "admin123":
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
     try:
         from db_manager import get_connection
@@ -6126,8 +6174,7 @@ def clear_waitlist_api():
 
 @app.route("/api/learners")
 def learners_api():
-    token = request.args.get("token")
-    if token != ADMIN_TOKEN:
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
     search = request.args.get("search")
     order_by = request.args.get("order_by", "active")
@@ -6137,8 +6184,7 @@ def learners_api():
 
 @app.route("/api/learners/export")
 def export_learners_csv():
-    token = request.args.get("token")
-    if token != ADMIN_TOKEN:
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
     
     search_query = request.args.get("search")
@@ -6243,8 +6289,7 @@ def export_learners_csv():
 
 @app.route("/api/send-report", methods=["POST"])
 def send_report_api():
-    token = request.args.get("token")
-    if token != ADMIN_TOKEN:
+    if not is_admin_authenticated():
         return jsonify({"error": "Unauthorized"}), 401
         
     data = request.get_json() or {}

@@ -964,17 +964,32 @@ def get_platform_analytics():
     whatsapp_count = results.get("WhatsApp", 0)
     telegram_count = results.get("Telegram", 0)
     
-    # Also add learners platform breakdown if learners table has platform data
+    # Also add learners platform breakdown if learners table has a platform column
+    conn_l = None
     try:
         conn_l = get_connection()
         cursor_l = conn_l.cursor()
-        cursor_l.execute("SELECT platform, COUNT(*) FROM learners GROUP BY platform")
-        learner_platforms = dict(cursor_l.fetchall())
-        conn_l.close()
-        whatsapp_count += learner_platforms.get("whatsapp", 0) + learner_platforms.get("WhatsApp", 0)
-        telegram_count += learner_platforms.get("telegram", 0) + learner_platforms.get("Telegram", 0)
+        if conn_l.is_sqlite:
+            cursor_l.execute("PRAGMA table_info(learners)")
+            has_platform_col = any(r[1] == "platform" for r in cursor_l.fetchall())
+        else:
+            cursor_l.execute(
+                "SELECT 1 FROM information_schema.columns WHERE table_name = 'learners' AND column_name = 'platform' LIMIT 1"
+            )
+            has_platform_col = cursor_l.fetchone() is not None
+        if has_platform_col:
+            cursor_l.execute("SELECT platform, COUNT(*) FROM learners GROUP BY platform")
+            learner_platforms = dict(cursor_l.fetchall())
+            whatsapp_count += learner_platforms.get("whatsapp", 0) + learner_platforms.get("WhatsApp", 0)
+            telegram_count += learner_platforms.get("telegram", 0) + learner_platforms.get("Telegram", 0)
     except Exception:
         pass
+    finally:
+        if conn_l:
+            try:
+                conn_l.close()
+            except Exception:
+                pass
         
     total_count = whatsapp_count + telegram_count
     wa_pct = round((whatsapp_count / total_count) * 100, 1) if total_count > 0 else 50.0
